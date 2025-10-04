@@ -1,0 +1,39 @@
+export default function Sidebar({ initialPage }) {
+  return (
+    <div className="d-flex flex-column flex-shrink-0 p-3 bg-white text-black" style={{ width: "220px", height: "100vh" }}>
+            <a href="/" className="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-black text-decoration-none">
+                <img 
+                    src="/images/arana_utn.png"
+                    alt="Logo"
+                    className="img-fluid me-2"
+                    style={{ maxWidth: "40px" }}
+                />
+                <div className="vr amarillo-principal mx-3"></div>
+                <span className="fs-4">Posgrado</span>
+            </a>
+            <hr />
+            <ul className="nav nav-pills flex-column ">
+                <li className="nav-item">
+                    <a href="/alumno" className="nav-link text-black bg-light" aria-current="page">
+                        Alumnos
+                    </a>
+                </li>
+                <li>
+                    <a href="/carrera" className="nav-link text-black">
+                        Carreras
+                    </a>
+                </li>
+                <li>
+                    <a href="/curso" className="nav-link text-black">
+                        Cursos
+                    </a>
+                </li>
+                <li>
+                    <a href="/pago" className="nav-link text-black">
+                        Pagos
+                    </a>
+                </li>
+            </ul>
+        </div>
+  );
+}
