@@ -9,13 +9,13 @@
 
         {% block javascripts %}
         {% endblock %}
+        {{ encore_entry_link_tags('app') }}
     </head>
     <body>
+        <div id="sidebar-root" data-page="{{ currentPage|default('/alumno') }}"></div>
+
         {% block body %}{% endblock %}
 
-        <div id="sidebar-root" data-page="{{ currentPage|default('home') }}"></div>
-
-        {{ encore_entry_link_tags('app') }}
         {{ encore_entry_script_tags('app') }}
     </body>
 </html>
