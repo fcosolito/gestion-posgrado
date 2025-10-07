@@ -92,3 +92,9 @@ composer require symfony/twig-bundle
 ```
 npm install bootstrap
 ```
+
+## Instalar forms y validaciones de symfony
+(contenedor)
+```
+composer require symfony/form symfony/validator
+```
