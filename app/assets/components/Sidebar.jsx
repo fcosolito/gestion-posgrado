@@ -38,7 +38,7 @@ export default function Sidebar({ initialPage }) {
 
                             <a 
                                 href={item.path} 
-                                className={"nav-link text-black "}
+                                className={"nav-link text-black " + (initialPage === item.path ? "bg-grey" : "")}
                             >
                                 {item.name}
                             </a>

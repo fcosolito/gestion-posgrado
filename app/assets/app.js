@@ -9,16 +9,13 @@
 import './styles/app.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import React from "react";
 import { createRoot } from "react-dom/client";
-import Sidebar from "./components/Sidebar";
+import Sidebar from "./components/Sidebar.jsx";
 
-// En este archivo pueden ir los componentes que se asocien a la template base,
-// los que esten en todas las vistas.
 document.addEventListener("DOMContentLoaded", () => {
   const el = document.getElementById("sidebar-root");
   if (el) {
-    const initialPage = el.dataset.page || "home"; // Symfony puede inyectar datos acá
+    const initialPage = el.dataset.page || "/alumno"; // Symfony puede inyectar datos acá
     const root = createRoot(el);
     root.render(<Sidebar initialPage={initialPage} />);
   }
