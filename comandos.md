@@ -98,3 +98,16 @@ npm install bootstrap
 ```
 composer require symfony/form symfony/validator
 ```
+
+## Instalar maker bundle
+(contenedor)
+```
+composer require symfony/maker-bundle
+```
+
+## Instalar Doctrine y dependencias relacionadas
+(contenedor)
+```
+composer require symfony/orm-pack
+```
+
