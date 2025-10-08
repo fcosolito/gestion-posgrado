@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+{{ encore_entry_link_tags('ejemplo') }}
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2>Ejemplo de dictados por curso en un form</h2>
+    {{ form_start(form) }}
+
+    {{ form_row(form.curso) }}
+
+    {# este div será reemplazado por React #}
+    <div id="curso-select-root"
+         data-api="{{ path('api_dictados_por_curso', {'id': 0})|replace({'0': ''}) }}">
+    </div>
+    {# form_widget renderiza solo el <input> #}
+    {{ form_widget(form.dictado) }}
+
+    {{ form_row(form.inscribir) }}
+    {#<button class="btn btn-primary mt-3">Guardar</button>#}
+    {{ form_end(form) }}
+</div>
+
+{{ encore_entry_script_tags('ejemplo') }}
+
+{% endblock %}
