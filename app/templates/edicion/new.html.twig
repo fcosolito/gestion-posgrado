@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Edicion{% endblock %}
+
+{% block body %}
+    <h1>Create new Edicion</h1>
+
+    {{ include('edicion/_form.html.twig') }}
+
+    <a href="{{ path('app_edicion_index') }}">back to list</a>
+{% endblock %}

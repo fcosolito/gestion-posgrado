@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Cuota{% endblock %}
+
+{% block body %}
+    <h1>Cuota</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ cuotum.id }}</td>
+            </tr>
+            <tr>
+                <th>NumeroCuota</th>
+                <td>{{ cuotum.numeroCuota }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_cuota_index') }}">back to list</a>
+
+    <a href="{{ path('app_cuota_edit', {'id': cuotum.id}) }}">edit</a>
+
+    {{ include('cuota/_delete_form.html.twig') }}
+{% endblock %}
