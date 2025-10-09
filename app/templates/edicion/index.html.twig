@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edicion index{% endblock %}
+
+{% block body %}
+    <h1>Edicion index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Precio</th>
+                <th>FechaInicio</th>
+                <th>FechaFin</th>
+                <th>Nombre</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for edicion in edicions %}
+            <tr>
+                <td>{{ edicion.id }}</td>
+                <td>{{ edicion.precio }}</td>
+                <td>{{ edicion.fechaInicio ? edicion.fechaInicio|date('Y-m-d') : '' }}</td>
+                <td>{{ edicion.fechaFin ? edicion.fechaFin|date('Y-m-d') : '' }}</td>
+                <td>{{ edicion.nombre }}</td>
+                <td>
+                    <a href="{{ path('app_edicion_show', {'id': edicion.id}) }}">show</a>
+                    <a href="{{ path('app_edicion_edit', {'id': edicion.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_edicion_new') }}">Create new</a>
+{% endblock %}
