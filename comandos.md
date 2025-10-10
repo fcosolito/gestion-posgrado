@@ -9,10 +9,7 @@ del proyecto.
 
 ### IMPORTANTE
 Voy a poner "(contenedor)" de ahora en adelante para indicar que
-el comando se tiene que ejecutar dentro de este. Ademas, casi
-todos los comandos, por ejemplo composer, symfony, npm, tienen que
-ejecutarse en /app/app dentro del contenedor, es decir, la 
-carpeta del proyecto symfony.
+el comando se tiene que ejecutar dentro de este. 
 
 ### Entrar por primera vez al contenedor
 ```

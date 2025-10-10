@@ -10,3 +10,4 @@ app/vendor/
 ###< symfony/framework-bundle ###
 home/
 app/node_modules/
+.env

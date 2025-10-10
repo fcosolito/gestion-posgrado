@@ -43,4 +43,4 @@ EXPOSE 8000
 
 # Comando por defecto
 # --dir= tiene que indicar la carpeta del proyecto symfony
-CMD ["symfony", "serve", "--no-tls", "--allow-http", "--port=8000", "--allow-all-ip", "--dir=app"]
+CMD ["symfony", "serve", "--no-tls", "--allow-http", "--port=8000", "--allow-all-ip"]
