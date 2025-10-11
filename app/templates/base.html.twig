@@ -9,7 +9,6 @@
 
         {% block javascripts %}
         {% endblock %}
-        {{ encore_entry_link_tags('app') }}
     </head>
     <body>
         <div class="container-fluid">
@@ -18,12 +17,20 @@
                     <div id="sidebar-root" data-page="{{ currentPage|default('/alumno') }}"></div>
                 </div>
                 <div class="col p-4" id="main-content">
-                    {% block body %}{% endblock %}
+                    <div class="d-flex flex-column gap-2">
+                        <div class="p-2 rounded color-titulo">
+                            <h1>
+                            {{ block("title") }}
+                            </h1>
+                        </div>
+                        {% block body %}{% endblock %}
+                    </div>
                 </div>
             </div>
         </div>
 
 
         {{ encore_entry_script_tags('app') }}
+        {{ encore_entry_link_tags('app') }}
     </body>
 </html>

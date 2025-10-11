@@ -1,4 +1,42 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
-{{ form_end(form) }}
+<div class="container col-3 m-0 rounded bg-white">
+
+    {{ form_start(form) }}
+    <div class="row mb-2 mt-2">
+        <div class="col-5">
+        {{ form_label(form.nombre) }}
+        </div>
+        <div class="col">
+        {{ form_widget(form.nombre) }}
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-5">
+        {{ form_label(form.horas) }}
+        </div>
+        <div class="col">
+        {{ form_widget(form.horas) }}
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-5">
+        {{ form_label(form.nroOrdenanza) }}
+        </div>
+        <div class="col">
+        {{ form_widget(form.nroOrdenanza) }}
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-5">
+        {{ form_label(form.nroImplementacion) }}
+        </div>
+        <div class="col">
+        {{ form_widget(form.nroImplementacion) }}
+        </div>
+    </div>
+    <div class="row mb-2">
+        <div class="col-2 offset-8">
+            <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
+        </div>
+    </div>
+    {{ form_end(form) }}
+</div>

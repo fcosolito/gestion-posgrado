@@ -1,41 +1,80 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Curso index{% endblock %}
+{% block title %}Cursos{% endblock %}
 
 {% block body %}
-    <h1>Curso index</h1>
-
+    <div class="p-3 rounded bg-white">
+        <div class="row align-items-center">
+            <div class="col text-start">
+                <h2>Buscar</h2>
+            </div>
+            <div class="col text-end">
+                <a href="{{ path('app_curso_new') }}" class="btn btn-secondary">Nuevo</a>
+            </div>
+        </div>
+        <div class="container ms-0">
+        {{ form_start(form) }}
+        <div class="row g-2">
+            <div class="col">
+                {{ form_label(form.nombre) }}
+                {{ form_widget(form.nombre) }}
+            </div>
+            <div class="col">
+                {{ form_label(form.horas) }}
+                {{ form_widget(form.horas) }}
+            </div>
+            <div class="col">
+                {{ form_label(form.ordenanza) }}
+                {{ form_widget(form.ordenanza) }}
+            </div>
+            <div class="col">
+                {{ form_label(form.implementacion) }}
+                {{ form_widget(form.implementacion) }}
+            </div>
+            <div class="col align-items-end d-flex">
+                {{ form_widget(form.buscar, {'attr': {'class': "btn btn-primary"}}) }}
+            </div>
+        </div>
+        {{ form_end(form) }}
+        </div>
+    </div>
+    <div class="p-3 rounded bg-white">
+    <h2>Cursos</h2>
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
                 <th>Nombre</th>
                 <th>Horas</th>
-                <th>NroOrdenanza</th>
-                <th>NroImplementacion</th>
-                <th>actions</th>
+                <th>Ordenanza</th>
+                <th>Implementacion</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
         {% for curso in cursos %}
             <tr>
-                <td>{{ curso.id }}</td>
                 <td>{{ curso.nombre }}</td>
                 <td>{{ curso.horas }}</td>
                 <td>{{ curso.nroOrdenanza }}</td>
                 <td>{{ curso.nroImplementacion }}</td>
                 <td>
-                    <a href="{{ path('app_curso_show', {'id': curso.id}) }}">show</a>
-                    <a href="{{ path('app_curso_edit', {'id': curso.id}) }}">edit</a>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Acciones
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ path('app_curso_show', {'id': curso.id}) }}">Ver</a></li>
+                            <li><a class="dropdown-item" href="{{ path('app_curso_edit', {'id': curso.id}) }}">Editar</a></li>
+                        </ul>
+                    </div>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="6">no records found</td>
+                <td colspan="6">No se registraron cursos.</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ path('app_curso_new') }}">Create new</a>
+    </div>
 {% endblock %}
