@@ -1,14 +1,29 @@
-version: "3.9"
 services:
   php:
     build: .
     container_name: desarrollo-gestion-posgrado
     user: "${UID}:${GID}"
     volumes:
-      - .:/app
+      - ./app:/app
     ports:
       - "8000:8000"
     environment:
       APP_ENV: dev
       HOME: /app/home
     tty: true
+
+  db:
+    image: mariadb:11
+    container_name: mariadb-local
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword        
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-mi_base}     
+      MYSQL_USER: ${MYSQL_USER:-mi_usuario}         
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mi_contraseña}
+    ports:
+      - "3306:3306"   
+    volumes:
+      - mysql_data:/var/lib/mysql  
+
+volumes:
+  mysql_data:

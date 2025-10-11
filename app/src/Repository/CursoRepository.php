@@ -16,6 +16,30 @@ class CursoRepository extends ServiceEntityRepository
         parent::__construct($registry, Curso::class);
     }
 
+    public function search($criteria): array
+    {
+        $qb = $this->createQueryBuilder('a');
+
+        if (!empty($criteria['nombre'])) {
+            $qb->andWhere('a.nombre LIKE :nom')
+                ->setParameter('nom', "%".$criteria['nombre']."%");
+        }
+        if (!empty($criteria['horas'])) {
+            $qb->andWhere('a.horas = :horas')
+                ->setParameter('horas', $criteria['horas']);
+        }
+        if (!empty($criteria['implementacion'])) {
+            $qb->andWhere('a.nroImplementacion = :implementacion')
+                ->setParameter('implementacion', $criteria['implementacion']);
+        }
+        if (!empty($criteria['ordenanza'])) {
+            $qb->andWhere('a.nroOrdenanza = :ordenanza')
+                ->setParameter('ordenanza', $criteria['ordenanza']);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
     //    /**
     //     * @return Curso[] Returns an array of Curso objects
     //     */

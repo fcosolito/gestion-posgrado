@@ -3,36 +3,49 @@
 {% block title %}Curso{% endblock %}
 
 {% block body %}
-    <h1>Curso</h1>
+    <div class="container-fluid p-3 rounded bg-white">
+        <div class="row align-items-center">
+            <div class="col text-start">
+                <h2>{{ curso.nombre }}</h2>
+            </div>
+            <div class="col text-end">
+                <a href="{{ path('app_curso_edit', { 'id': curso.id }) }}" class="btn btn-secondary">Editar</a>
+            </div>
+            <div class="col text-end">
+                {{ include('curso/_delete_form.html.twig') }}
+            </div>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Horas</th>
+                    <th>NroOrdenanza</th>
+                    <th>NroImplementacion</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ curso.nombre }}</td>
+                    <td>{{ curso.horas }}</td>
+                    <td>{{ curso.nroOrdenanza }}</td>
+                    <td>{{ curso.nroImplementacion }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="container-fluid p-3 rounded bg-white">
+        <div class="row g-1 p-0 m-0">
+            <div class="col-3 p-3 rounded bg-light">
+                <h1>Edicion</h1>
+                <h3>Docentes</h3>
+                <button>Nueva</button>
+            </div>
+            <div class="col-9 p-3 rounded bg-light">
+                <h1>Alumnos</h1>
+                <button>Inscribir</button>
+            </div>
+        </div>
+    </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ curso.id }}</td>
-            </tr>
-            <tr>
-                <th>Nombre</th>
-                <td>{{ curso.nombre }}</td>
-            </tr>
-            <tr>
-                <th>Horas</th>
-                <td>{{ curso.horas }}</td>
-            </tr>
-            <tr>
-                <th>NroOrdenanza</th>
-                <td>{{ curso.nroOrdenanza }}</td>
-            </tr>
-            <tr>
-                <th>NroImplementacion</th>
-                <td>{{ curso.nroImplementacion }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_curso_index') }}">back to list</a>
-
-    <a href="{{ path('app_curso_edit', {'id': curso.id}) }}">edit</a>
-
-    {{ include('curso/_delete_form.html.twig') }}
 {% endblock %}

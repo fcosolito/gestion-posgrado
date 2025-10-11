@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Curso;
+use App\Form\CursoSearchType;
 use App\Form\CursoType;
 use App\Repository\CursoRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,11 +15,35 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/curso')]
 final class CursoController extends AbstractController
 {
-    #[Route(name: 'app_curso_index', methods: ['GET'])]
-    public function index(CursoRepository $cursoRepository): Response
+    #[Route(name: 'app_curso_index', methods: ['GET', 'POST'])]
+    public function index(Request $request, CursoRepository $cursoRepository): Response
     {
+        $form = $this->createForm(CursoSearchType::class);
+        $form->handleRequest($request);
+
+        $criteria = [];
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            if (!empty($data['nombre'])) {
+                $criteria['nombre'] = $data['nombre'];
+            }
+            if (!empty($data['horas'])) {
+                $criteria['horas'] = $data['horas'];
+            }
+            if (!empty($data['ordenanza'])) {
+                $criteria['ordenanza'] = $data['ordenanza'];
+            }
+            if (!empty($data['implementacion'])) {
+                $criteria['implementacion'] = $data['implementacion'];
+            }
+        }
+
+        $cursos = $cursoRepository->search($criteria);
+
         return $this->render('curso/index.html.twig', [
-            'cursos' => $cursoRepository->findAll(),
+            'cursos' => $cursos,
+            'form' => $form
         ]);
     }
 
