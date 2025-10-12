@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Curso;
 use App\Entity\Edicion;
 use App\Form\EdicionType;
 use App\Repository\EdicionRepository;
@@ -23,7 +24,7 @@ final class EdicionController extends AbstractController
     }
 
     #[Route('/new', name: 'app_edicion_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, Curso $curso): Response
     {
         $edicion = new Edicion();
         $form = $this->createForm(EdicionType::class, $edicion);

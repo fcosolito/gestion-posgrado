@@ -14,6 +14,7 @@
             <div class="col text-end">
                 {{ include('curso/_delete_form.html.twig') }}
             </div>
+                
         </div>
         <table class="table">
             <thead>
@@ -37,9 +38,37 @@
     <div class="container-fluid p-3 rounded bg-white">
         <div class="row g-1 p-0 m-0">
             <div class="col-3 p-3 rounded bg-light">
-                <h1>Edicion</h1>
-                <h3>Docentes</h3>
-                <button>Nueva</button>
+                <div class="row">
+                    <div class="col"><h1>Edicion</h1></div>
+                    <div class="col">
+                        {{ form_start(form) }}
+                            {{ form_widget(form.edicion) }}
+                        {{ form_end(form) }}
+                        <a href="{{ path('app_edicion_new', {"id": curso.id })}}" class="btn btn-primary">Nueva</a>
+                    </div>
+                </div>
+                {% if edicion %}
+                <table class="table">
+                    <tbody>
+                        <tr><th>Nombre</th><td>{{ edicion.nombre}}</td></tr>
+                        <tr><th>Precio</th><td>{{ edicion.precio}}</td></tr>
+                    </tbody>
+                </table>
+                    <h3>Docentes</h3>
+                    <ul>
+                    {% for docente in docentes %}
+                        <li>
+                        {{ docente.nombre }}
+                        {{ docente.apellido }}
+                        {% if docente.esFirmante %}
+                            Firmante: Si
+                        {% else %}
+                            Firmante: No
+                        {% endif %}
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
             </div>
             <div class="col-9 p-3 rounded bg-light">
                 <h1>Alumnos</h1>

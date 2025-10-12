@@ -3,11 +3,18 @@
 namespace App\Controller;
 
 use App\Entity\Curso;
+use App\Entity\Docente;
+use App\Entity\Edicion;
 use App\Form\CursoSearchType;
 use App\Form\CursoType;
 use App\Repository\CursoRepository;
+use App\Repository\DictaRepository;
+use App\Repository\DocenteRepository;
+use App\Repository\EdicionRepository;
+use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -67,11 +74,53 @@ final class CursoController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_curso_show', methods: ['GET'])]
-    public function show(Curso $curso): Response
+    #[Route('/{id}', name: 'app_curso_show', methods: ['GET', 'POST'])]
+    public function show(Request $request, EdicionRepository $edicionRepository, DictaRepository $dictaRepository, Curso $curso): Response
     {
+        $ediciones = $edicionRepository->findBy(["curso" => $curso], ["fechaInicio" => "ASC"]);
+        $edicion = !empty($ediciones) ? $ediciones[0] : null;
+
+        $form = $this->createFormBuilder()
+            ->setMethod("GET")
+            ->add('edicion', ChoiceType::class, [
+                'choices' => $ediciones,
+                'choice_value' => "id",
+                'choice_label' => function(?Edicion $edicion): string {
+                    return $edicion ? $edicion->getNombre() : "";
+                },
+                'placeholder' => "Seleccionar una edicion",
+                'attr' => [
+                    'onchange' => "this.form.submit();",
+                    'class' => "dropdown-toggle btn btn-secondary"
+                ],
+                'choice_attr' => [
+                    'class' => "dropdown-item",
+                ]
+            ])->getForm();
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $edicion = $form->getData()["edicion"];
+        }
+
+        $dicta_docentes = $edicion ? $dictaRepository->findBy(["edicion" => $edicion]) : [];
+        $docentes = [];
+
+        foreach ($dicta_docentes as $dicta) {
+            $docente = $dicta->getDocente();
+            $docentes[] = [
+                "nombre" => $docente->getNombre(),
+                "apellido" => $docente->getApellido(),
+                "esFirmante" => $dicta->getEsFirmante(),
+            ];
+        }
+
         return $this->render('curso/show.html.twig', [
             'curso' => $curso,
+            'ediciones' => $ediciones,
+            'edicion' => $edicion,
+            'docentes' => $docentes,
+            'form' => $form,
         ]);
     }
 
