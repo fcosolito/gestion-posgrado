@@ -18,10 +18,6 @@ class EdicionType extends AbstractType
             ->add('fechaInicio')
             ->add('fechaFin')
             ->add('nombre')
-            ->add('curso', EntityType::class, [
-                'class' => Curso::class,
-                'choice_label' => 'id',
-            ])
         ;
     }
 

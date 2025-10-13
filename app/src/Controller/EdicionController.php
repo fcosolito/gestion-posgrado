@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/edicion')]
+#[Route('/curso/{cursoId}/edicion')]
 final class EdicionController extends AbstractController
 {
     #[Route(name: 'app_edicion_index', methods: ['GET'])]
@@ -24,17 +24,22 @@ final class EdicionController extends AbstractController
     }
 
     #[Route('/new', name: 'app_edicion_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, Curso $curso): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, Curso $cursoId): Response
     {
+        //$cursoId = $request->query->getInt('curso');
+        //$curso = $entityManager->getRepository(Curso::class)->find($cursoId);
         $edicion = new Edicion();
         $form = $this->createForm(EdicionType::class, $edicion);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        // cursoId en este punto es la entidad, debe tener ese nombre para
+        // que symfony asocie el argumento del metodo al parametro de la ruta
+        if ($form->isSubmitted() && $form->isValid() && $cursoId) {
+            $edicion->setCurso($cursoId);
             $entityManager->persist($edicion);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_edicion_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_curso_show', ["edicion" => $edicion], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('edicion/new.html.twig', [
@@ -60,7 +65,7 @@ final class EdicionController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_edicion_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_curso_show', ["edicion" => $edicion], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('edicion/edit.html.twig', [

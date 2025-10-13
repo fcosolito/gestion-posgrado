@@ -44,13 +44,13 @@
                         {{ form_start(form) }}
                             {{ form_widget(form.edicion) }}
                         {{ form_end(form) }}
-                        <a href="{{ path('app_edicion_new', {"id": curso.id })}}" class="btn btn-primary">Nueva</a>
+                        <a href="{{ path('app_edicion_new', {"cursoId": curso.id })}}" class="btn btn-primary">Nueva</a>
                     </div>
                 </div>
                 {% if edicion %}
                 <table class="table">
                     <tbody>
-                        <tr><th>Nombre</th><td>{{ edicion.nombre}}</td></tr>
+                        <tr><th>Nombre</th><td>{{ edicion.nombre}}</td><td><a href="{{ path('app_edicion_edit', {"cursoId": curso.id, "id": edicion.id })}}" class="btn btn-primary">Editar</a></td></tr>
                         <tr><th>Precio</th><td>{{ edicion.precio}}</td></tr>
                     </tbody>
                 </table>
