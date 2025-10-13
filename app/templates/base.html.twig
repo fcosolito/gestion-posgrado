@@ -17,7 +17,7 @@
                     <div id="sidebar-root" data-page="{{ currentPage|default('/alumno') }}"></div>
                 </div>
                 <div class="col p-4" id="main-content">
-                    <div class="d-flex flex-column gap-2">
+                    <div class="main-content d-flex flex-column gap-2">
                         <div class="p-2 rounded color-titulo">
                             <h1>
                             {{ block("title") }}
@@ -28,7 +28,6 @@
                 </div>
             </div>
         </div>
-
 
         {{ encore_entry_script_tags('app') }}
         {{ encore_entry_link_tags('app') }}

@@ -1,7 +1,7 @@
 @import "~bootstrap/scss/bootstrap";
 
 body {
-    background-color: lightgray;
+  background-color: lightgray;
 }
 
 .amarillo-principal {
@@ -16,4 +16,9 @@ body {
 .color-titulo {
   background-color: rgb(52, 52, 236);
   color: white;
+}
+
+.main-content{
+  background-color: #efefef;
+  border-radius: 8px;
 }
