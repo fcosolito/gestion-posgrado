@@ -33,3 +33,12 @@
 .table-carreras thead{
     background-color: #efefef;
 }
+.table-carreras th{
+    padding: 8px 25px;
+    font-weight: normal;
+    font-style: normal;
+    text-transform: none;
+}
+.table-carreras td{
+    padding: 8px 25px;
+}
