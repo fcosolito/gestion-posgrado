@@ -1,0 +1,16 @@
+.agregar-curso{
+    width:90%;
+    margin:0 auto;
+    padding: 8px 30px;
+    border: none;
+    background-color: #efefef;
+    border-radius: 8px;
+    display: flex;
+}
+.agregar-curso div{
+    width:50%;
+}
+
+.lista-cursos-restantes ul{
+    list-style:none;
+}

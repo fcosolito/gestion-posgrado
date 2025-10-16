@@ -29,7 +29,7 @@
                         <td>{{ carrera.nombre }}</td>
                         <td>{{ carrera.nroOrdenanza }}</td>
                         <td>{{ carrera.nroImplementacion }}</td>
-                        <td>{{ carrera.cantidadCuotas }}</td>
+                        <td>{{ inscriptosPorCarrera[carrera.id] }}</td>
                         <td>
                             <a href="{{ path('app_carrera_show', {'id': carrera.id}) }}">show</a>
                             <a href="{{ path('app_carrera_edit', {'id': carrera.id}) }}">edit</a>

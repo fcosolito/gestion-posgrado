@@ -15,6 +15,14 @@ class InscripcionCarreraRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, InscripcionCarrera::class);
     }
+    public function findByCarrera(int $carreraId): array
+    {
+        return $this->createQueryBuilder('ic')
+            ->andWhere('ic.carrera = :carreraId')
+            ->setParameter('carreraId', $carreraId)
+            ->getQuery()
+            ->getResult();
+    }
 
     //    /**
     //     * @return InscripcionCarrera[] Returns an array of InscripcionCarrera objects
