@@ -1,0 +1,96 @@
+.edit-alumno{
+    display: flex;
+    width:100%;
+    height: 85vh;
+}
+.info-alumno-carreras-cursos{
+    width: 75%;
+    
+}
+.info-alumno-cuotas{
+    width: 25%;
+}
+
+.info-alumno,
+.lista-carreras,
+.lista-cursos,
+.info-alumno-cuotas{
+    margin:1rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+}
+
+.info-alumno,
+.info-alumno-cuotas{
+    padding:1rem;
+}
+
+.info-alumno{
+    display: flex;
+}
+.buttons-info-alumno{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-left: 5vw;
+}
+
+.carreras-cursos{
+    display: flex;
+    width: 100%;
+}
+.lista-carreras,
+.lista-cursos{
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+
+table{
+    width: 100%;
+    font-weight: normal;
+}
+table thead{
+    background-color: #efefef;
+}
+table th{
+    padding: 8px 25px;
+    font-weight: normal;
+    font-style: normal;
+    text-transform: none;
+}
+table td{
+    padding: 8px 25px;
+}
+
+.lista-carreras h2, .lista-cursos h2{
+    padding: 1rem 0 0 1rem;
+}
+
+.button-inscribir{
+    color:white;
+    background-color: #f5ba04;
+    border:transparent;
+    border-radius: 8px;
+    padding: 0.5rem;
+    align-self: flex-end; 
+    margin: 0 1rem 1rem 0;
+    transition: background-color ease 0.3s;
+}
+
+.button-inscribir:hover{
+    background-color: #d39e01;
+}
+
+.lista-cuotas{
+    background-color: #efefef;
+    border-radius: 8px;
+}
+.cuotas-no-pagas,
+.cuotas-pagas{
+    margin:1rem;
+    height:10vh;
+}
+.cuotas-no-pagas{
+    border-bottom: solid 1px #d9d9d9;
+}

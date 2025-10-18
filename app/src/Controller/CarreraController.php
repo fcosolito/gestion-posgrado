@@ -3,7 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\Carrera;
+use App\Entity\Curso;
+use App\Entity\PerteneceA;
 use App\Form\CarreraType;
+use App\Form\CarreraSearchType;
 use App\Repository\CarreraRepository;
 use App\Repository\InscripcionCarreraRepository;
 use App\Repository\CursoRepository;
@@ -18,9 +21,30 @@ use Symfony\Component\Routing\Attribute\Route;
 final class CarreraController extends AbstractController
 {
     #[Route(name: 'app_carrera_index', methods: ['GET'])]
-    public function index(CarreraRepository $carreraRepository, InscripcionCarreraRepository $inscripcionCarreraRepository): Response
+    public function index(Request $request,CarreraRepository $carreraRepository, InscripcionCarreraRepository $inscripcionCarreraRepository): Response
     {
-        $carreras = $carreraRepository->findAll();
+        // Creamos formulario para buscar carrera por nombre, nroImpl y/o nroOrd.
+        $searchForm = $this->createForm(CarreraSearchType::class);
+        $searchForm->handleRequest($request);
+        
+        $criteria = [];
+
+        if($searchForm->isSubmitted() && $searchForm->isValid()){
+            $data = $searchForm->getData(); // Esto devuelve un objeto Carrera
+            
+            // Acceder a las propiedades del objeto Carrera
+            if(!empty($data->getNombre())){
+                $criteria['nombre'] = $data->getNombre();
+            }
+            if(!empty($data->getNroImplementacion())){
+                $criteria['nroImplementacion'] = $data->getNroImplementacion();
+            }
+            if(!empty($data->getNroOrdenanza())){
+                $criteria['nroOrdenanza'] = $data->getNroOrdenanza();
+            }
+        }
+        
+        $carreras = $carreraRepository->search($criteria);
         $inscriptosPorCarrera = [];
         foreach($carreras as $carrera){
             $inscriptos = $inscripcionCarreraRepository->findByCarrera($carrera->getId());
@@ -30,6 +54,7 @@ final class CarreraController extends AbstractController
         return $this->render('carrera/index.html.twig', [
             'carreras' => $carreras,
             'inscriptosPorCarrera'=>$inscriptosPorCarrera,
+            'searchForm' => $searchForm,
         ]);
     }
 
@@ -100,6 +125,7 @@ final class CarreraController extends AbstractController
         $cursosTotales = $cursoRepository->findAll();
         $cursosRestantes = array_filter($cursosTotales, fn($r)=> !in_array($r,$cursosAsignados));
 
+
         return $this->render('carrera/edit.html.twig', [
             'carrera' => $carrera,
             'form' => $form,
@@ -107,6 +133,69 @@ final class CarreraController extends AbstractController
             'cursosElectivos' => $electivos,
             'cursosRestantes' => $cursosRestantes,
         ]);
+    }
+
+    // Método para asignar cursos ya existentes a una carrera
+    #[Route('/{id}/asignar-curso', name: 'app_carrera_asignar_curso', methods: ['POST'])]
+    public function asignarCurso(
+            Request $request, 
+            Carrera $carrera, 
+            EntityManagerInterface $entityManager
+        ) : Response
+
+    {
+        $cursoId = $request->request->get('curso_id');
+        $tipo = $request->request->get('tipo_asignacion');
+
+        //Recuperamos el curso de la db
+        $curso = $entityManager->getRepository(Curso::class)->find($cursoId);
+
+        // Creamos la relación en la db
+        $pertenece = new PerteneceA();
+        $pertenece->setCarrera($carrera);
+        $pertenece->setCurso($curso);
+        $pertenece->setEsElectivo($tipo === 'electivo');
+
+        $entityManager->persist($pertenece);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_carrera_edit', ['id' => $carrera->getId()]);
+    }
+
+    // Método para asignar un curso creado nuevo a una carrera
+    #[Route('/{id}/crear-asignar-curso', name: 'app_carrera_crear_asignar_curso', methods: ['POST'])]
+    public function crearAsignarCurso(
+            Request $request, 
+            Carrera $carrera, 
+            EntityManagerInterface $entityManager
+        ) : Response
+    {
+        // Datos del formulario
+        $nombre = $request->request->get('nombre');
+        $nroOrdenanza = $request->request->get('nroOrdenanza');
+        $nroImplementacion = $request->request->get('nroImplementacion');
+        $cantidadHoras = $request->request->get('cantidadHoras');
+        $tipo = $request->request->get('tipo_asignacion'); // 'obligatorio' o 'electivo'
+
+        // Creamos el curso nuevo
+        $curso = new Curso();
+        $curso->setNombre($nombre);
+        $curso->setNroOrdenanza($nroOrdenanza);
+        $curso->setNroImplementacion($nroImplementacion);
+        $curso->setHoras($cantidadHoras);
+
+        $entityManager->persist($curso);
+
+        // Creamos la relación entre el curso nuevo y la carrera
+        $pertenece = new PerteneceA();
+        $pertenece->setCarrera($carrera);
+        $pertenece->setCurso($curso);
+        $pertenece->setEsElectivo($tipo === 'electivo');
+
+        $entityManager->persist($pertenece);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('app_carrera_edit', ['id' => $carrera->getId()]);        
     }
 
     #[Route('/{id}', name: 'app_carrera_delete', methods: ['POST'])]

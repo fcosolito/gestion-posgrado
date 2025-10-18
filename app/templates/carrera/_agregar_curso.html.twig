@@ -3,15 +3,36 @@
 {% endblock %}
 
 <div class="agregar-curso">
-    <div class="lista-cursos-restantes">
-        <h3>Cursos restantes</h3>
-            <ul>
-                {% for curso in cursosRestantes %}
-                    <li>{{ curso.nombre }}</li>
-                                {% endfor %}
-            </ul>
-        </div>
-    <div>
-        <h3>Cargar Curso</h3>
+    <div class="cursos-restantes">
+        <h4>Cursos disponibles para asignar</h4>
+        {% if cursosRestantes|length>0 %}
+        <ul class="lista-cursos-restantes">
+            {% for curso in cursosRestantes %}
+                <div class="lista-item">
+                    <li class="curso-nombre">{{ curso.nombre }}</li>
+                    <form action="{{ path('app_carrera_asignar_curso', {'id': carrera.id}) }}" method="POST" class="form-asignar">
+                        <input type="hidden" name="carrera_id" value="{{ carrera.id }}">
+                        <input type="hidden" name="curso_id" value="{{ curso.id }}">
+                        <input type="hidden" name="tipo_asignacion" value="{{ tipoAsignacion }}">
+                        <button type="submit" class="button-asignar-curso">Asignar</button>
+                    </form>
+                </div>
+            {% endfor %}
+        </ul>
+        {% else %}
+            <p>No hay cursos disponibles para asignar.</p>
+        {% endif %}
+    </div>
+    <div class="formulario-agregar">
+        <h4>Agregar Curso a la Carrera</h4>
+        <form action="{{ path('app_carrera_crear_asignar_curso', {'id': carrera.id}) }}" method="POST" class="form-crear-curso">
+            <input type="hidden" name="carrera_id" value="{{ carrera.id }}">
+            <input type="hidden" name="tipo_asignacion" value="{{ tipoAsignacion }}">
+            <input type="text" name="nombre" placeholder="Nombre" required>
+            <input type="text" name="nroOrdenanza" placeholder="Nro. Ordenanza" required>
+            <input type="text" name="nroImplementacion" placeholder="Nro. Implementación" required>
+            <input type="number" name="cantidadHoras" placeholder="Cantidad de horas" required>
+            <button type="submit">Crear y asignar</button>
+        </form>
     </div>
 </div>

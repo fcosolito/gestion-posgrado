@@ -1,13 +1,93 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Alumno{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/alumno/edit.css') }}"
+{% endblock %}
+
+{% block title %}Editar Alumno{% endblock %}
 
 {% block body %}
-    <h1>Edit Alumno</h1>
+    <div class="edit-alumno">
+        <div class="info-alumno-carreras-cursos">
+            <div class="info-alumno"> 
+                <div>
+                    {{ include('alumno/_form.html.twig', {'button_label': 'Guardar'}) }}
+                </div>
+                <div class="buttons-info-alumno">
+                    {{ include('alumno/_delete_form.html.twig') }}           
+                    <a href="{{ path('app_alumno_index') }}">Cancelar</a>   
+                </div>
+            </div>
+            <div class="carreras-cursos">
+                <div class="lista-carreras">
+                    <h2>Carreras</h2>
+                    <table>
+                        <thead>
+                            <tr> 
+                                <th>Nombre</th>
+                                <th>Nro. Ordenanza</th>
+                                <th>Nro. Implementación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for carrera in carreras %}
+                            <tr>
+                                <td>{{ carrera.nombre }}</td>
+                                <td>{{ carrera.nro_ordenanza }}</td>
+                                <td>{{ carrera.nro_implementacion }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3">El alumno no está inscripto a ninguna materia.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button class="button-inscribir">Inscribir</button> 
+                </div>
+                <div class="lista-cursos">
+                    <h2>Cursos</h2>
+                    <table>
+                        <thead>
+                            <tr> 
+                                <th>Nombre</th>
+                                <th>Nro. Ordenanza</th>
+                                <th>Nro. Implementación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for curso in cursos %}
+                            <tr>
+                                <td>{{ curso.nombre }}</td>
+                                <td>{{ curso.nro_ordenanza }}</td>
+                                <td>{{ curso.nro_implementacion }}</td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3">El alumno no está inscripto a ningun curso.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    <button class="button-inscribir">Inscribir</button> 
+                </div>
+            </div>
+        </div>
+        <div class="info-alumno-cuotas">
+            <h2>Cuotas</h2>
+            <div class="lista-cuotas">
+                <div class="cuotas-no-pagas">
+                    {% for cuota in cuotasNoPagas %}
+                        <p>Cuota</p>
+                        <p>No paga</p>
+                    {% endfor %}
+                </div>
+                <div class="cuotas-pagas">
+                    {% for cuota in cuotasPagas %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
 
-    {{ include('alumno/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('app_alumno_index') }}">back to list</a>
-
-    {{ include('alumno/_delete_form.html.twig') }}
 {% endblock %}

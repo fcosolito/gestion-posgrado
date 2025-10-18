@@ -56,6 +56,11 @@ final class AlumnoController extends AbstractController
         $form = $this->createForm(AlumnoType::class, $alumno);
         $form->handleRequest($request);
 
+        $carreras = []; // esto debería rellenarlo
+        $cursos = []; // esto debería rellenarlo
+        $cuotasNoPagas = []; // esto debería rellenarlo
+        $cuotasPagas = []; // esto debería rellenarlo
+
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
@@ -65,6 +70,10 @@ final class AlumnoController extends AbstractController
         return $this->render('alumno/edit.html.twig', [
             'alumno' => $alumno,
             'form' => $form,
+            'carreras' => $carreras,
+            'cursos' => $cursos,
+            'cuotasNoPagas' => $cuotasNoPagas,
+            'cuotasPagas' => $cuotasPagas,
         ]);
     }
 

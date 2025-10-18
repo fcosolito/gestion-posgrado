@@ -1,7 +1,10 @@
-.main-content-carreras{
+.buscador-carreras,.main-content-carreras{
     margin: 1rem;
     border-radius:8px;
     background-color: #ffffff;
+}
+.buscador-carreras{
+    padding:1rem;
 }
 .main-content-carreras-header{
     display: flex;
@@ -9,10 +12,9 @@
     padding: 1rem;
 }
 
-/* Botón para ir a la página de crear una carrera */
 .main-content-carreras-header a{
     text-decoration: none;
-    color:black;
+    color:white;
     background-color: #f5ba04;
     display: flex;
     border-radius: 8px;
@@ -23,7 +25,7 @@
 }
 
 .main-content-carreras-header a:hover{
-    background-color: #dba504;
+    background-color: #d39e01;
 }
 
 .table-carreras{

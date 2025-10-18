@@ -15,28 +15,44 @@
                     <button class="agregar-button" id="agregar-button-obligatorios">+ Agregar</button>
                 </div>
                 <div class="body-cursos-obligatorios">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Nro. Ordenanza</th>
-                                <th>Nro. Implementación</th>
-                                <th>Acción</th> 
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for cursoObligatorio in cursosObligatorios %}
-                            <tr>        
-                                <td>{{ cursoObligatorio.nombre }}</td>
-                                <td>{{ cursoObligatorio.nroOrdenanza }}</td>
-                                <td>{{ cursoObligatorio.nroImplementacion }}</td>
-                                <td>...</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    <div class="tabla-cursos">
+                        <table class="tabla-cursos">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Nro. Ordenanza</th>
+                                    <th>Nro. Implementación</th>
+                                    <th>Acción</th> 
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cursoObligatorio in cursosObligatorios %}
+                                <tr>        
+                                    <td>{{ cursoObligatorio.nombre }}</td>
+                                    <td>{{ cursoObligatorio.nroOrdenanza }}</td>
+                                    <td>{{ cursoObligatorio.nroImplementacion }}</td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Acciones
+                                            </button>
+                                                <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="{{ path('app_curso_show', {'id': cursoObligatorio.id}) }}">Ver</a></li>
+                                                <li><a class="dropdown-item" href="{{ path('app_curso_show', {'id': cursoObligatorio.id}) }}">Quitar</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>                    
+                    </div>
                     <div class="agregar-cursos" id="agregar-curso-obligatorios">
-                        {{ include('carrera/_agregar_curso.html.twig', { 'cursosRestantes': cursosRestantes }) }}
+                        {{ include('carrera/_agregar_curso.html.twig', { 
+                                'cursosRestantes': cursosRestantes,
+                                'tipoAsignacion': 'obligatorio',
+                            }) 
+                        }}
                     </div>
                 </div>
             </div>
@@ -46,28 +62,44 @@
                     <button class="agregar-button" id="agregar-button-electivos">+ Agregar</button>
                 </div>
                 <div class="body-cursos-electivos">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>Nro. Ordenanza</th>
-                                <th>Nro. Implementación</th>
-                                <th>Acción</th> 
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for cursoElectivo in cursosElectivos %}
-                            <tr>        
-                                <td>{{ cursoElectivo.nombre }}</td>
-                                <td>{{ cursoElectivo.nroOrdenanza }}</td>
-                                <td>{{ cursoElectivo.nroImplementacion }}</td>
-                                <td>...</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                    <div class="tabla-cursos">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Nro. Ordenanza</th>
+                                    <th>Nro. Implementación</th>
+                                    <th>Acción</th> 
+                                </tr>
+                            </thead>
+                                <tbody>
+                                    {% for cursoElectivo in cursosElectivos %}
+                                    <tr>        
+                                        <td>{{ cursoElectivo.nombre }}</td>
+                                        <td>{{ cursoElectivo.nroOrdenanza }}</td>
+                                        <td>{{ cursoElectivo.nroImplementacion }}</td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    Acciones
+                                                </button>
+                                                <ul class="dropdown-menu">
+                                                    <li><a class="dropdown-item" href="{{ path('app_curso_show', {'id': cursoElectivo.id}) }}">Ver</a></li>
+                                                    <li><a class="dropdown-item" href="{{ path('app_curso_show', {'id': cursoElectivo.id}) }}">Quitar</a></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                        </table>        
+                    </div>            
                     <div class="agregar-cursos" id="agregar-curso-electivos">
-                        {{ include('carrera/_agregar_curso.html.twig', { 'cursosRestantes': cursosRestantes }) }}
+                        {{ include('carrera/_agregar_curso.html.twig', { 
+                                'cursosRestantes': cursosRestantes,
+                                'tipoAsignacion': 'electivo',
+                            })
+                        }}
                     </div>
                 </div>
             </div>
