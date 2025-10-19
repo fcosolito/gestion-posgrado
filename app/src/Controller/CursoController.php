@@ -7,14 +7,17 @@ use App\Entity\Docente;
 use App\Entity\Edicion;
 use App\Form\CursoSearchType;
 use App\Form\CursoType;
+use App\Repository\CarreraRepository;
 use App\Repository\CursoRepository;
 use App\Repository\DictaRepository;
 use App\Repository\DocenteRepository;
 use App\Repository\EdicionRepository;
+use App\Repository\PerteneceARepository;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -75,52 +78,43 @@ final class CursoController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_curso_show', methods: ['GET', 'POST'])]
-    public function show(Request $request, EdicionRepository $edicionRepository, DictaRepository $dictaRepository, Curso $curso): Response
+    public function show(EdicionRepository $edicionRepository, PerteneceARepository $perteneceARepository, Curso $curso): Response
     {
-        $ediciones = $edicionRepository->findBy(["curso" => $curso], ["fechaInicio" => "ASC"]);
-        $edicion = !empty($ediciones) ? $ediciones[0] : null;
-
-        $form = $this->createFormBuilder()
-            ->setMethod("GET")
-            ->add('edicion', ChoiceType::class, [
-                'choices' => $ediciones,
-                'choice_value' => "id",
-                'choice_label' => function(?Edicion $edicion): string {
-                    return $edicion ? $edicion->getNombre() : "";
-                },
-                'placeholder' => "Seleccionar una edicion",
-                'attr' => [
-                    'onchange' => "this.form.submit();",
-                    'class' => "dropdown-toggle btn btn-secondary"
-                ],
-                'choice_attr' => [
-                    'class' => "dropdown-item",
-                ]
-            ])->getForm();
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $edicion = $form->getData()["edicion"];
-        }
-
-        $dicta_docentes = $edicion ? $dictaRepository->findBy(["edicion" => $edicion]) : [];
-        $docentes = [];
-
-        foreach ($dicta_docentes as $dicta) {
-            $docente = $dicta->getDocente();
-            $docentes[] = [
-                "nombre" => $docente->getNombre(),
-                "apellido" => $docente->getApellido(),
-                "esFirmante" => $dicta->getEsFirmante(),
-            ];
-        }
+        $ediciones_ser = array_map(
+            function ($e) {
+                return [
+                    "id" => $e->getId(),
+                    "nombre" => $e->getNombre(),
+                    "fechaInicio" => $e->getFechaInicio()->format("d-m-Y"),
+                    "fechaFin" => $e->getFechaFin() ? $e->getFechaFin()->format("d-m-Y") : "",
+                    "precio" => $e->getPrecio(),
+                ];
+            },
+            $edicionRepository->findBy(["curso" => $curso], ["fechaInicio" => "ASC"])
+        );
+        $carreras_ser = array_map(
+            function ($p) {
+                $carrera = $p->getCarrera();
+                return [
+                    "id" => $carrera->getId(),
+                    "carrera" => $carrera->getNombre(),
+                    "electivo" => $p->getEsElectivo(),
+                ];
+            },
+            $perteneceARepository->findBy(["curso" => $curso])
+        );
+        $curso_ser = [
+            "id" => $curso->getId(),
+            "nombre" => $curso->getNombre(),
+            "nroOrdenanza" => $curso->getNroOrdenanza(),
+            "nroImplementacion" => $curso->getNroImplementacion(),
+            "horas" => $curso->getHoras(),
+        ];
 
         return $this->render('curso/show.html.twig', [
-            'curso' => $curso,
-            'ediciones' => $ediciones,
-            'edicion' => $edicion,
-            'docentes' => $docentes,
-            'form' => $form,
+            'curso' => $curso_ser,
+            'ediciones' => $ediciones_ser,
+            'carreras' => $carreras_ser,
         ]);
     }
 
@@ -141,6 +135,35 @@ final class CursoController extends AbstractController
             'form' => $form,
         ]);
     }
+
+    #[Route('/{id}', name: 'api_curso_update', methods: ['PUT', 'PATCH'])]
+    public function update(Curso $curso, Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if ($data === null) {
+            return $this->json(['error' => 'JSON inválido'], 400);
+        }
+
+        if (isset($data['nombre'])) $curso->setNombre($data['nombre']);
+        if (isset($data['nroOrdenanza'])) $curso->setNroOrdenanza($data['nroOrdenanza']);
+        if (isset($data['nroImplementacion']))   $curso->setNroImplementacion($data['nroImplementacion']);
+        if (isset($data['horas']))   $curso->setHoras($data['horas']);
+
+        $em->flush();
+
+        return $this->json([
+            'success' => true,
+            'curso' => [
+                'id' => $curso->getId(),
+                'nombre' => $curso->getNombre(),
+                'nroOrdenanza' => $curso->getNroOrdenanza(),
+                'nroImplementacion' => $curso->getNroImplementacion(),
+                'horas' => $curso->getHoras(),
+            ]
+        ]);
+    }
+    
 
     #[Route('/{id}', name: 'app_curso_delete', methods: ['POST'])]
     public function delete(Request $request, Curso $curso, EntityManagerInterface $entityManager): Response

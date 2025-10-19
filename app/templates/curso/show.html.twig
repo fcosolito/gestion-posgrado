@@ -3,78 +3,98 @@
 {% block title %}Curso{% endblock %}
 
 {% block body %}
-    <div class="container-fluid p-3 rounded bg-white">
-        <div class="row align-items-center">
-            <div class="col text-start">
-                <h2>{{ curso.nombre }}</h2>
-            </div>
-            <div class="col text-end">
-                <a href="{{ path('app_curso_edit', { 'id': curso.id }) }}" class="btn btn-secondary">Editar</a>
-            </div>
-            <div class="col text-end">
-                {{ include('curso/_delete_form.html.twig') }}
-            </div>
-                
-        </div>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Horas</th>
-                    <th>NroOrdenanza</th>
-                    <th>NroImplementacion</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ curso.nombre }}</td>
-                    <td>{{ curso.horas }}</td>
-                    <td>{{ curso.nroOrdenanza }}</td>
-                    <td>{{ curso.nroImplementacion }}</td>
-                </tr>
-            </tbody>
-        </table>
+
+    <div id="curso"
+        data-curso="{{ curso|json_encode }}"
+        data-delete-form="{{ include('curso/_delete_form.html.twig')|e('html_attr') }}"
+    >
     </div>
-    <div class="container-fluid p-3 rounded bg-white">
-        <div class="row g-1 p-0 m-0">
-            <div class="col-3 p-3 rounded bg-light">
-                <div class="row">
-                    <div class="col"><h1>Edicion</h1></div>
-                    <div class="col">
-                        {{ form_start(form) }}
-                            {{ form_widget(form.edicion) }}
-                        {{ form_end(form) }}
-                        <a href="{{ path('app_edicion_new', {"cursoId": curso.id })}}" class="btn btn-primary">Nueva</a>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-7 p-2 rounded bg-light">
+                <div class="row m-1">
+                    <div class="col-4">
+                        <h3>Ediciones</h3>
+                    </div>
+                    <div class="col-1 ms-auto m-1">
+                        <a class="btn btn-primary" href="{{ path('app_edicion_new', {'cursoId': curso.id }) }}">
+                            Nueva
+                        </a>
                     </div>
                 </div>
-                {% if edicion %}
-                <table class="table">
-                    <tbody>
-                        <tr><th>Nombre</th><td>{{ edicion.nombre}}</td><td><a href="{{ path('app_edicion_edit', {"cursoId": curso.id, "id": edicion.id })}}" class="btn btn-primary">Editar</a></td></tr>
-                        <tr><th>Precio</th><td>{{ edicion.precio}}</td></tr>
-                    </tbody>
-                </table>
-                    <h3>Docentes</h3>
-                    <ul>
-                    {% for docente in docentes %}
-                        <li>
-                        {{ docente.nombre }}
-                        {{ docente.apellido }}
-                        {% if docente.esFirmante %}
-                            Firmante: Si
-                        {% else %}
-                            Firmante: No
-                        {% endif %}
-                        </li>
-                    {% endfor %}
-                    </ul>
-                {% endif %}
+                <div class="row m-1">
+                    <div class="col bg-grey fw-bold">Nombre</div>
+                    <div class="col bg-grey fw-bold">Inicio</div>
+                    <div class="col bg-grey fw-bold">Fin</div>
+                    <div class="col bg-grey fw-bold">Precio</div>
+                    <div class="col bg-grey fw-bold">Acciones</div>
+                </div>
+                {% for edicion in ediciones %}
+                <div class="row m-1">
+                    <div class="col">{{ edicion.nombre }}</div>
+                    <div class="col">{{ edicion.fechaInicio }}</div>
+                    <div class="col">{{ edicion.fechaFin }}</div>
+                    <div class="col">{{ edicion.precio }}</div>
+                    <div class="col">
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Acciones
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a 
+                                        class="dropdown-item btn btn-secondary" 
+                                        href="{{ path('app_edicion_show', {'id': edicion.id }) }}"
+                                    >
+                                        Ver
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <p class="m-1">No hay ediciones registradas</p>
+                {% endfor %}
+
             </div>
-            <div class="col-9 p-3 rounded bg-light">
-                <h1>Alumnos</h1>
-                <button>Inscribir</button>
+            <div class="col-4 ms-auto p-2 rounded bg-light">
+                <h3 class="m-1">Carreras</h3>
+                <div class="row m-1">
+                    <div class="col bg-grey fw-bold">Nombre</div>
+                    <div class="col bg-grey fw-bold">Relacion</div>
+                    <div class="col bg-grey fw-bold">Acciones</div>
+                </div>
+                {% for carrera in carreras %}
+                <div class="row m-1">
+                    <div class="col">{{ carrera.nombre }}</div>
+                    <div class="col">
+                    {% if carrera.electivo %}
+                        Electivo
+                    {% else %}
+                        Obligatorio
+                    {% endif %}
+                    </div>
+                    <div class="col">
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Acciones
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>Ver</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <p class="m-1">No hay carreras asociadas</p>
+                {% endfor %}
+
+
             </div>
         </div>
     </div>
 
+    {{ encore_entry_script_tags('curso_show') }}
+    {{ encore_entry_link_tags('curso_show') }}
 {% endblock %}

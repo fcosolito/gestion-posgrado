@@ -4,30 +4,27 @@ namespace App\Controller;
 
 use App\Entity\Curso;
 use App\Entity\Edicion;
+use App\Entity\InscripcionEdicion;
 use App\Form\EdicionType;
+use App\Repository\DictaRepository;
+use App\Repository\DocenteRepository;
 use App\Repository\EdicionRepository;
+use App\Repository\InscripcionEdicionRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Validator\Constraints\Date;
 
-#[Route('/curso/{cursoId}/edicion')]
+#[Route('/edicion')]
 final class EdicionController extends AbstractController
 {
-    #[Route(name: 'app_edicion_index', methods: ['GET'])]
-    public function index(EdicionRepository $edicionRepository): Response
-    {
-        return $this->render('edicion/index.html.twig', [
-            'edicions' => $edicionRepository->findAll(),
-        ]);
-    }
-
-    #[Route('/new', name: 'app_edicion_new', methods: ['GET', 'POST'])]
+    #[Route('/{cursoId}/new', name: 'app_edicion_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, Curso $cursoId): Response
     {
-        //$cursoId = $request->query->getInt('curso');
-        //$curso = $entityManager->getRepository(Curso::class)->find($cursoId);
         $edicion = new Edicion();
         $form = $this->createForm(EdicionType::class, $edicion);
         $form->handleRequest($request);
@@ -39,7 +36,7 @@ final class EdicionController extends AbstractController
             $entityManager->persist($edicion);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_curso_show', ["edicion" => $edicion], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_edicion_show', ["edicion" => $edicion], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('edicion/new.html.twig', [
@@ -49,28 +46,78 @@ final class EdicionController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_edicion_show', methods: ['GET'])]
-    public function show(Edicion $edicion): Response
+    public function show(Edicion $edicion, DictaRepository $dictaRepository, InscripcionEdicionRepository $inscripcionRepository): Response
     {
+        $docentes_ser = array_map(
+            function ($dicta) {
+                $docente = $dicta->getDocente();
+
+                return [
+                    "id" => $docente->getId(),
+                    "nombre" => $docente->getNombre(),
+                    "apellido" => $docente->getApellido(),
+                    "esFirmante" => $dicta->getEsFirmante(),
+                ];
+            },
+            $dictaRepository->findBy(["edicion" => $edicion])
+        );
+
+        // Agregar una query en InscripcionEdicionRepository que haga Join con Nota
+        $alumnos_ser = array_map(
+            function ($i) {
+                $alumno = $i->getAlumno();
+
+                return [
+                    "id" => $alumno->getId(),
+                    "nombre" => $alumno->getNombre(),
+                    "apellido" => $alumno->getApellido(),
+                    "descuento" => $i->getDescuento(),
+                ];
+            },
+            $inscripcionRepository->findBy(["edicion" => $edicion])
+        );
+
+        $edicion_ser = [
+            "id" => $edicion->getId(),
+            "nombre" => $edicion->getNombre(),
+            "fechaInicio" => $edicion->getFechaInicio()->format("Y-m-d"),
+            "fechaFin" => $edicion->getFechaFin()->format("Y-m-d"),
+            "precio" => $edicion->getPrecio(),
+        ];
+
         return $this->render('edicion/show.html.twig', [
-            'edicion' => $edicion,
+            'edicion' => $edicion_ser,
+            'curso' => $edicion->getCurso(),
+            'docentes' => $docentes_ser,
+            'alumnos' => $alumnos_ser,
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_edicion_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Edicion $edicion, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}', name: 'api_edicion_update', methods: ['PUT'])]
+    public function update(Request $request, Edicion $edicion, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(EdicionType::class, $edicion);
-        $form->handleRequest($request);
+        $data = json_decode($request->getContent(), true);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_curso_show', ["edicion" => $edicion], Response::HTTP_SEE_OTHER);
+        if ($data === null) {
+            return $this->json(['error' => 'JSON inválido'], 400);
         }
 
-        return $this->render('edicion/edit.html.twig', [
-            'edicion' => $edicion,
-            'form' => $form,
+        if (isset($data['nombre'])) $edicion->setNombre($data['nombre']);
+        if (isset($data['fechaInicio'])) $edicion->setFechaInicio(new DateTime($data['fechaInicio']));
+        if (isset($data['fechaFin']))   $edicion->setFechaFin(new DateTime($data['fechaFin']));
+        if (isset($data['precio']))   $edicion->setPrecio($data['precio']);
+
+        $entityManager->flush();
+
+        return $this->json([
+            'success' => true,
+            'edicion' => [
+                'id' => $edicion->getId(),
+                'nombre' => $edicion->getNombre(),
+                'fechaInicio' => $edicion->getFechaInicio(),
+                'fechaFin' => $edicion->getFechaFin(),
+                'precio' => $edicion->getPrecio(),
+            ]
         ]);
     }
 

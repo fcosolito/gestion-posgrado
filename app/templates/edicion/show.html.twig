@@ -3,36 +3,86 @@
 {% block title %}Edicion{% endblock %}
 
 {% block body %}
-    <h1>Edicion</h1>
+    <div class="container-fluid p-2 rounded bg-white">
+        <div class="row">
+            <div class="col-4">
+                <h2 class="m-1">{{ curso.nombre }}</h2>
+            </div>
+        </div>
+        <div class="row m-1">
+            <div class="col-2 fw-bold">Ordenanza</div>
+            <div class="col-2 fw-bold">Implementacion</div>
+            <div class="col-2 fw-bold">Horas</div>
+        </div>
+        <div class="row m-1">
+            <div class="col-2">{{ curso.nroOrdenanza }}</div>
+            <div class="col-2">{{ curso.nroImplementacion }}</div>
+            <div class="col-2">{{ curso.horas }}</div>
+        </div>
+    </div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-5 rounded bg-white">
+                <div id="edicion"
+                    data-edicion="{{ edicion|json_encode }}"
+                    data-delete-form="{{ include('edicion/_delete_form.html.twig')|e('html_attr') }}"
+                >
+                </div>
+            </div>
+            <div class="col-6 ms-auto rounded bg-white">
+                <div class="row m-1">
+                    <div class="col-2">
+                        <h3 class="m-1">Docentes</h3>
+                    </div>
+                    <div class="col-2 ms-auto">
+                        <button
+                            class="btn btn-primary"
+                            onclick="alert('agregar docente');"
+                        >
+                            Agregar
+                        </button>
+                    </div>
+                </div>
+                <div class="row m-1">
+                    <div class="col bg-grey fw-bold">Nombre</div>
+                    <div class="col bg-grey fw-bold">Apellido</div>
+                    <div class="col bg-grey fw-bold">Firmante</div>
+                    <div class="col bg-grey fw-bold">Acciones</div>
+                </div>
+                {% for docente in docentes %}
+                <div class="row m-1">
+                    <div class="col">{{ docente.nombre }}</div>
+                    <div class="col">{{ docente.apellido }}</div>
+                    <div class="col">
+                    {% if docente.esFirmante %}
+                        Si
+                    {% else %}
+                        No
+                    {% endif %}
+                    </div>
+                    <div class="col">
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Acciones
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item btn btn-secondary" href="{{ path('app_docente_show', {'id': docente.id }) }}">
+                                        Ver
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <p class="m-1">No hay docentes asociados</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ edicion.id }}</td>
-            </tr>
-            <tr>
-                <th>Precio</th>
-                <td>{{ edicion.precio }}</td>
-            </tr>
-            <tr>
-                <th>FechaInicio</th>
-                <td>{{ edicion.fechaInicio ? edicion.fechaInicio|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>FechaFin</th>
-                <td>{{ edicion.fechaFin ? edicion.fechaFin|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Nombre</th>
-                <td>{{ edicion.nombre }}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_edicion_index') }}">back to list</a>
-
-    <a href="{{ path('app_edicion_edit', {'id': edicion.id}) }}">edit</a>
-
-    {{ include('edicion/_delete_form.html.twig') }}
+    {{ encore_entry_script_tags('edicion_show') }}
+    {{ encore_entry_link_tags('edicion_show') }}
 {% endblock %}
