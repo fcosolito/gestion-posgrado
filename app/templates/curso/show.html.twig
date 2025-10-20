@@ -11,12 +11,12 @@
     </div>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-7 p-2 rounded bg-light">
+            <div class="col-5 p-2 rounded bg-light">
                 <div class="row m-1">
                     <div class="col-4">
                         <h3>Ediciones</h3>
                     </div>
-                    <div class="col-1 ms-auto m-1">
+                    <div class="col-2 ms-auto m-1">
                         <a class="btn btn-primary" href="{{ path('app_edicion_new', {'cursoId': curso.id }) }}">
                             Nueva
                         </a>
@@ -24,16 +24,12 @@
                 </div>
                 <div class="row m-1">
                     <div class="col bg-grey fw-bold">Nombre</div>
-                    <div class="col bg-grey fw-bold">Inicio</div>
-                    <div class="col bg-grey fw-bold">Fin</div>
                     <div class="col bg-grey fw-bold">Precio</div>
                     <div class="col bg-grey fw-bold">Acciones</div>
                 </div>
                 {% for edicion in ediciones %}
                 <div class="row m-1">
                     <div class="col">{{ edicion.nombre }}</div>
-                    <div class="col">{{ edicion.fechaInicio }}</div>
-                    <div class="col">{{ edicion.fechaFin }}</div>
                     <div class="col">{{ edicion.precio }}</div>
                     <div class="col">
                         <div class="dropdown">
@@ -58,7 +54,12 @@
                 {% endfor %}
 
             </div>
-            <div class="col-4 ms-auto p-2 rounded bg-light">
+            <div class="col-6 ms-auto p-2 rounded bg-light">
+                <div id="carreras"
+                    data-carreras="{{ carreras|json_encode }}"
+                >
+                </div>
+                {#
                 <h3 class="m-1">Carreras</h3>
                 <div class="row m-1">
                     <div class="col bg-grey fw-bold">Nombre</div>
@@ -89,6 +90,7 @@
                 {% else %}
                 <p class="m-1">No hay carreras asociadas</p>
                 {% endfor %}
+                #}
 
 
             </div>

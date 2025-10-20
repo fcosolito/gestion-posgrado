@@ -19,7 +19,6 @@ export default function Curso({curso, deleteFormHtml}) {
     };
 
     const handleSave = async () => {
-        // guardar los cambios haciendo fetch a /curso/{id}/update
         try {
             const res = await fetch(`/curso/${curso.id}`, {
             method: "PUT",
@@ -51,7 +50,7 @@ export default function Curso({curso, deleteFormHtml}) {
                         <h2 className="m-1">{curso.nombre}</h2>
                     )}
                 </div>
-                <div className="col-2 ms-auto">
+                <div className="col-3 ms-auto">
                     {isEditing ? (
                     <div className="row">
                         <div className="col">

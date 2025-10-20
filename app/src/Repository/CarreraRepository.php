@@ -16,6 +16,19 @@ class CarreraRepository extends ServiceEntityRepository
         parent::__construct($registry, Carrera::class);
     }
 
+    public function search(string $query): array {
+        $qb =  $this->createQueryBuilder('c')
+            ->where('c.nombre LIKE :nombre')
+            ->setParameter('nombre', "%".$query."%");
+        if (ctype_digit($query)){
+            $qb->orWhere('c.nroOrdenanza = :ord')
+                ->setParameter('ord', (int) $query)
+                ->orWhere('c.nroImplementacion = :imp')
+                ->setParameter('imp', (int) $query);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
     //    /**
     //     * @return Carrera[] Returns an array of Carrera objects
     //     */

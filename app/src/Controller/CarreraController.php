@@ -42,6 +42,28 @@ final class CarreraController extends AbstractController
         ]);
     }
 
+    #[Route('/search', name: 'app_carrera_search', methods: ['GET'])]
+    public function search(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $query =  $request->query->get("query", "");
+        $carreras = $entityManager->getRepository(Carrera::class)->search($query);
+        $carreras_ser = array_map(
+            function ($c) {
+                return (
+                    [
+                        "id" => $c->getId(),
+                        "nombre" => $c->getNombre(),
+                        "nroOrdenanza" => $c->getNroOrdenanza(),
+                        "nroImplementacion" => $c->getNroImplementacion(),
+                    ]
+                    );
+            },
+            $carreras
+        );
+
+        return $this->json($carreras_ser);
+    }
+
     #[Route('/{id}', name: 'app_carrera_show', methods: ['GET'])]
     public function show(Carrera $carrera): Response
     {
@@ -78,4 +100,6 @@ final class CarreraController extends AbstractController
 
         return $this->redirectToRoute('app_carrera_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    
 }

@@ -1,4 +1,45 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
-{{ form_end(form) }}
+<div class="container">
+    <div class="row">
+        <div class="col-6 m-0 rounded bg-white">
+            {{ form_start(form) }}
+            <div class="row mb-2 mt-2">
+                <div class="col-5">
+                    Nombre
+                </div>
+                <div class="col">
+                    {{ form_widget(form.nombre) }}
+                </div>
+            </div>
+            <div class="row mb-2 mt-2">
+                <div class="col-5">
+                    Fecha de inicio
+                </div>
+                <div class="col">
+                    {{ form_widget(form.fechaInicio) }}
+                </div>
+            </div>
+            <div class="row mb-2 mt-2">
+                <div class="col-5">
+                    Fecha de fin
+                </div>
+                <div class="col">
+                    {{ form_widget(form.fechaFin) }}
+                </div>
+            </div>
+            <div class="row mb-2 mt-2">
+                <div class="col-5">
+                    Precio
+                </div>
+                <div class="col">
+                    {{ form_widget(form.precio) }}
+                </div>
+            </div>
+            <div class="row mb-2 mt-2">
+                <div class="col-3 offset-7">
+                    <button class="btn btn-primary">{{ button_label|default('Registrar') }}</button>
+                </div>
+            </div>
+        {{ form_end(form) }}
+        </div>
+    </div>
+

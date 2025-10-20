@@ -36,7 +36,7 @@ final class EdicionController extends AbstractController
             $entityManager->persist($edicion);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_edicion_show', ["edicion" => $edicion], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_curso_show', ["id" => $cursoId->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('edicion/new.html.twig', [
@@ -129,6 +129,6 @@ final class EdicionController extends AbstractController
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_edicion_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_curso_show', ["id" => $edicion->getCurso()->getId()], Response::HTTP_SEE_OTHER);
     }
 }
