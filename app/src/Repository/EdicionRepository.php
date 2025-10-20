@@ -15,6 +15,16 @@ class EdicionRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Edicion::class);
     }
+    public function findUltimaEdicionByCursoId(int $cursoId): ?Edicion
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.curso = :cursoId')
+            ->setParameter('cursoId', $cursoId)
+            ->orderBy('e.fechaInicio', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 
     //    /**
     //     * @return Edicion[] Returns an array of Edicion objects

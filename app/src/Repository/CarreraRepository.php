@@ -37,6 +37,18 @@ class CarreraRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+    public function findNotInIds(array $ids): array
+    {
+        $qb = $this->createQueryBuilder('c');
+        if (empty($ids)) {
+            return $qb->getQuery()->getResult();
+        }
+        return $qb
+            ->andWhere('c.id NOT IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult();
+    }
 
     //    /**
     //     * @return Carrera[] Returns an array of Carrera objects

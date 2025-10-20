@@ -1,12 +1,34 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('/styles/alumno/edit.css') }}"
+    <link rel="stylesheet" href="{{ asset('/styles/alumno/edit.css') }}">
 {% endblock %}
 
 {% block title %}Editar Alumno{% endblock %}
 
 {% block body %}
+    {# Mensajes flash al principio #}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message|raw }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('warning') %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message|raw }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message|raw }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+
     <div class="edit-alumno">
         <div class="info-alumno-carreras-cursos">
             <div class="info-alumno"> 
@@ -20,56 +42,95 @@
             </div>
             <div class="carreras-cursos">
                 <div class="lista-carreras">
-                    <h2>Carreras</h2>
-                    <table>
-                        <thead>
-                            <tr> 
-                                <th>Nombre</th>
-                                <th>Nro. Ordenanza</th>
-                                <th>Nro. Implementación</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for carrera in carreras %}
-                            <tr>
-                                <td>{{ carrera.nombre }}</td>
-                                <td>{{ carrera.nro_ordenanza }}</td>
-                                <td>{{ carrera.nro_implementacion }}</td>
-                            </tr>
+                    <div class="header-listas">
+                        <h2>Carreras</h2>
+                        <button class="button-inscribir-toggle" id="button-inscribir-carreras">Inscribir</button>                         
+                    </div>
+                    <div class="tabla">
+                        <table>
+                            <thead>
+                                <tr> 
+                                    <th>Nombre</th>
+                                    <th>Nro. Ordenanza</th>
+                                    <th>Nro. Implementación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for carrera in carreras %}
+                                <tr>
+                                    <td>{{ carrera.nombre }}</td>
+                                    <td>{{ carrera.nroOrdenanza }}</td>
+                                    <td>{{ carrera.nroImplementacion }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3">El alumno no está inscripto a ninguna materia.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>                  
+                    </div>
+
+                    <div class="inscribir-carreras">
+                        <h3>Inscribir alumno a carrera</h3>
+                        <ul>
+                            {% for carreraNoInscripto in carrerasNoInscripto %}
+                            <div class="lista-item">
+                                <li>{{ carreraNoInscripto.nombre }}</li>
+                                <button class="button-inscribir">Inscribir</button>
+                            </div>
                             {% else %}
-                            <tr>
-                                <td colspan="3">El alumno no está inscripto a ninguna materia.</td>
-                            </tr>
+                                <p> No hay carreras para inscribir </p>
                             {% endfor %}
-                        </tbody>
-                    </table>
-                    <button class="button-inscribir">Inscribir</button> 
+                        </ul>
+                    </div>                    
                 </div>
                 <div class="lista-cursos">
-                    <h2>Cursos</h2>
-                    <table>
-                        <thead>
-                            <tr> 
-                                <th>Nombre</th>
-                                <th>Nro. Ordenanza</th>
-                                <th>Nro. Implementación</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for curso in cursos %}
-                            <tr>
-                                <td>{{ curso.nombre }}</td>
-                                <td>{{ curso.nro_ordenanza }}</td>
-                                <td>{{ curso.nro_implementacion }}</td>
-                            </tr>
+                    <div class="header-listas">
+                        <h2>Cursos</h2>
+                        <button class="button-inscribir-toggle" id="button-inscribir-cursos">Inscribir</button>                         
+                    </div>
+                    <div class="tabla">
+                        <table>
+                            <thead>
+                                <tr> 
+                                    <th>Nombre</th>
+                                    <th>Nro. Ordenanza</th>
+                                    <th>Nro. Implementación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for curso in cursos %}
+                                <tr>
+                                    <td>{{ curso.nombre }}</td>
+                                    <td>{{ curso.nroOrdenanza }}</td>
+                                    <td>{{ curso.nroImplementacion }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3">El alumno no está inscripto a ningun curso.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>                   
+                    </div>
+
+                    <div class="inscribir-cursos">
+                        <h3>Inscribir alumno a curso</h3>
+                        <ul>
+                            {% for cursoNoInscripto in cursosNoInscripto %}
+                            <div class="lista-item">
+                                <li>{{ cursoNoInscripto.nombre }}</li>
+                                <form action="{{ path('app_alumno_inscribir_curso', {'id': alumno.id}) }}" method ="POST">
+                                    <input type="hidden" name="curso_id" value="{{ cursoNoInscripto.id }}"/> 
+                                    <button class="button-inscribir">Inscribir</button>
+                                </form>
+                            </div>
                             {% else %}
-                            <tr>
-                                <td colspan="3">El alumno no está inscripto a ningun curso.</td>
-                            </tr>
+                                <p>No hay cursos para inscribir</p>
                             {% endfor %}
-                        </tbody>
-                    </table>
-                    <button class="button-inscribir">Inscribir</button> 
+                        </ul>
+                    </div> 
                 </div>
             </div>
         </div>
@@ -90,4 +151,26 @@
         </div>
     </div>
 
+    <script>
+        document.querySelector('.lista-carreras .button-inscribir-toggle').addEventListener('click', function(){
+            let button = document.getElementById('button-inscribir-carreras');
+            let carreras = document.querySelector('.inscribir-carreras');
+            carreras.classList.toggle('visible');
+            if(carreras.classList.contains('visible')){
+                button.textContent = "Cancelar";
+            }else{
+                button.textContent = "Inscribir";
+            }            
+        });
+        document.querySelector('.lista-cursos .button-inscribir-toggle').addEventListener('click', function(){
+            let button = document.getElementById('button-inscribir-cursos');
+            let carreras = document.querySelector('.inscribir-cursos');
+            carreras.classList.toggle('visible');
+            if(carreras.classList.contains('visible')){
+                button.textContent = "Cancelar";
+            }else{
+                button.textContent = "Inscribir";
+            }            
+        });
+    </script> 
 {% endblock %}
