@@ -1,8 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
-
 body {
     background-color: lightgray;
-    font-family: 'Open Sans', Arial, sans-serif;
 }
 
 .amarillo-principal {
@@ -11,7 +8,18 @@ body {
 }
 
 .bg-grey {
+  background-color: rgb(241, 241, 241);
+}
+
+.color-titulo {
+  /*background-color: rgb(52, 52, 236);*/
+  background-color: #276da6;
+  color: white;
+}
+
+.main-content{
   background-color: #efefef;
+  border-radius: 8px;
 }
 
 /*-------------CSS VALE-------------*/

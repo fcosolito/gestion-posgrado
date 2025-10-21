@@ -14,10 +14,6 @@
         </div>
     {% endfor %}
 
-	<div class="cabecera-azul">
-		<h1 class="titulo-principal">Alumnos</h1>
-	</div>
-
     <div class="contenedor-blanco">
         <div class="cuadrado-reutilizable auto-height">
             {# Header con título y botones #}
@@ -146,5 +142,8 @@
             });
         });
     </script>
+    {{ encore_entry_script_tags('alumno') }}
+    {{ encore_entry_link_tags('alumno') }}
+
 {% endblock %}
 
