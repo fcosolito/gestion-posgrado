@@ -21,7 +21,7 @@ services:
       MYSQL_USER: ${MYSQL_USER:-mi_usuario}         
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-mi_contraseña}
     ports:
-      - "3306:3306"   
+      - "3307:3306"   
     volumes:
       - mysql_data:/var/lib/mysql  
 

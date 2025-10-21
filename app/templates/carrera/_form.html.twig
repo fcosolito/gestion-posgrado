@@ -1,4 +1,36 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/carrera/form.css') }}">
+{% endblock %}
+
+{{ form_start(form, {'attr': {'class': 'carrera-form'} }) }}
+
+    <div class="form-group">
+        {{ form_label(form.nombre, 'Nombre de la Carrera') }}
+        {{ form_widget(form.nombre, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.nroOrdenanza, 'Número de Ordenanza') }}
+        {{ form_widget(form.nroOrdenanza, {'attr': {'class': 'form-control'}}) }}
+    </div>
+
+    <div class="form-group">
+        {{ form_label(form.nroImplementacion, 'Número de Implementación') }}
+        {{ form_widget(form.nroImplementacion, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.cantidadCuotas, 'Cantidad de Cuotas') }}
+        {{ form_widget(form.cantidadCuotas, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    <div class="form-group">
+        {{ form_label(form.precioInscripcion, 'Precio de Inscripción') }}
+        {{ form_widget(form.precioInscripcion, {'attr': {'class': 'form-control'}}) }}
+    </div>
+    <div class="form-buttons"> 
+        <a href="{{ path('app_carrera_index') }}">Volver</a>
+        <button class="btn btn-primary">{{ button_label|default('Guardar') }}</button>
+    </div>
+
+
 {{ form_end(form) }}

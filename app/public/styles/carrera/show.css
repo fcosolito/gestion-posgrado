@@ -1,0 +1,14 @@
+.main-content-show-carrera{
+    background-color: #ffffff;
+    margin: 1rem;
+    border-radius:8px;
+}
+.show-carrera-buttons{
+    display:flex;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+}
+
+.main-content-show-carrera-title{
+    padding: 1rem;
+}

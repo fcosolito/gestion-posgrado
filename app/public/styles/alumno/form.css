@@ -1,0 +1,11 @@
+.nombre-apellido{
+    display:flex;
+}
+.resto-campos{
+    display: flex;
+    margin-top:1rem;
+    align-items:end;
+}
+.resto-campos div{
+    margin-right: 1rem;
+}

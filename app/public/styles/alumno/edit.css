@@ -1,0 +1,182 @@
+.edit-alumno{
+    display: flex;
+    width:100%;
+    height: 85vh;
+}
+.info-alumno-carreras-cursos{
+    width: 75%;
+}
+.info-alumno-cuotas{
+    width: 25%;
+}
+
+.info-alumno,
+.lista-carreras,
+.lista-cursos,
+.info-alumno-cuotas{
+    margin:1rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+}
+.info-alumno,
+.info-alumno-cuotas{
+    padding:1rem;
+}
+
+.info-alumno{
+    display: flex;
+}
+.buttons-info-alumno{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-left: 5vw;
+}
+.carreras-cursos{
+    display: flex;
+    width: 100%;
+}
+.lista-carreras,
+.lista-cursos{
+    display: flex;
+    flex-direction: column;
+    height: 60vh;
+    width: 50%;
+}
+.header-listas{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0 0 1rem;
+}
+
+/* .tabla es el div que uso para poder limitar el tamaño de la table y para hacerlo scrolleable */
+.tabla{
+    max-height:30vh;
+    overflow-y: scroll;
+}
+table{
+    width: 100%;
+    font-weight: normal;
+}
+table thead{
+    background-color: #efefef;
+}
+table th{
+    padding: 8px 25px;
+    font-weight: normal;
+    font-style: normal;
+    text-transform: none;
+}
+table td{
+    padding: 8px 25px;
+}
+.button-inscribir-toggle{
+    color:white;
+    background-color: #f5ba04;
+    border:transparent;
+    border-radius: 8px;
+    padding: 0.5rem;
+    align-self: flex-end; 
+    margin: 0 1rem 1rem 0;
+    transition: background-color ease 0.3s;
+}
+.button-inscribir-toggle:hover{
+    background-color: #d39e01;
+}
+
+.lista-cuotas{
+    background-color: #efefef;
+    border-radius: 8px;
+}
+.cuotas-no-pagas,
+.cuotas-pagas{
+    margin:1rem;
+    height:10vh;
+}
+.cuotas-no-pagas{
+    border-bottom: solid 1px #d9d9d9;
+}
+
+ul{
+    list-style: none;
+}
+.lista-item{
+    display: flex;
+    margin-right: 3vw;
+    justify-content: space-between;
+}
+
+/* Estilos boton para inscribir tanto a carreras como a cursos */
+.button-inscribir{
+    background-color: transparent;
+    color: #adadad;
+    margin-right: 20px;
+    border: none;
+    transition: color 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.button-inscribir:hover{
+    color: #000000;
+}
+
+/* Subrayado del botón */
+.button-inscribir::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 1px;
+    width: 0;
+    background: #000;
+    transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.button-inscribir:hover::after {
+    width: 100%;
+}
+
+
+/* Estilos transiciones para inscribir a carreras y cursos */
+.inscribir-carreras, .inscribir-cursos{
+    opacity: 0;
+    max-height: 0;
+    transition: max-height ease 0.3s;
+    overflow-y: auto;
+}
+.visible{
+    opacity: 1;
+    max-height: 300px;
+}
+.inscribir-carreras, .inscribir-cursos{
+    width:90%;
+    margin:0 auto 1rem;
+    padding: 8px 30px;
+    border: none;
+    background-color: #efefef;
+    border-radius: 8px;
+    height: 20vh;
+}
+
+/* Mensaje de inscripción exitosa */
+.alert {
+    margin: 20px;
+    border-radius: 8px;
+    border-left: 5px solid;
+}
+
+.alert-success {
+    border-left-color: #28a745;
+    background-color: #f8fff9;
+}
+
+.alert-warning {
+    border-left-color: #ffc107;
+    background-color: #fffef0;
+}
+
+.alert-danger {
+    border-left-color: #dc3545;
+    background-color: #fff5f5;
+} 

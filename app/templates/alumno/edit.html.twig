@@ -1,13 +1,176 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Alumno{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/alumno/edit.css') }}">
+{% endblock %}
+
+{% block title %}Editar Alumno{% endblock %}
 
 {% block body %}
-    <h1>Edit Alumno</h1>
+    {# Mensajes flash al principio #}
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message|raw }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
 
-    {{ include('alumno/_form.html.twig', {'button_label': 'Update'}) }}
+    {% for message in app.flashes('warning') %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message|raw }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
 
-    <a href="{{ path('app_alumno_index') }}">back to list</a>
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message|raw }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
 
-    {{ include('alumno/_delete_form.html.twig') }}
+    <div class="edit-alumno">
+        <div class="info-alumno-carreras-cursos">
+            <div class="info-alumno"> 
+                <div>
+                    {{ include('alumno/_form.html.twig', {'button_label': 'Guardar'}) }}
+                </div>
+                <div class="buttons-info-alumno">
+                    {{ include('alumno/_delete_form.html.twig') }}           
+                    <a href="{{ path('app_alumno_index') }}">Cancelar</a>   
+                </div>
+            </div>
+            <div class="carreras-cursos">
+                <div class="lista-carreras">
+                    <div class="header-listas">
+                        <h2>Carreras</h2>
+                        <button class="button-inscribir-toggle" id="button-inscribir-carreras">Inscribir</button>                         
+                    </div>
+                    <div class="tabla">
+                        <table>
+                            <thead>
+                                <tr> 
+                                    <th>Nombre</th>
+                                    <th>Nro. Ordenanza</th>
+                                    <th>Nro. Implementación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for carrera in carreras %}
+                                <tr>
+                                    <td>{{ carrera.nombre }}</td>
+                                    <td>{{ carrera.nroOrdenanza }}</td>
+                                    <td>{{ carrera.nroImplementacion }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3">El alumno no está inscripto a ninguna materia.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>                  
+                    </div>
+
+                    <div class="inscribir-carreras">
+                        <h3>Inscribir alumno a carrera</h3>
+                        <ul>
+                            {% for carreraNoInscripto in carrerasNoInscripto %}
+                            <div class="lista-item">
+                                <li>{{ carreraNoInscripto.nombre }}</li>
+                                <button class="button-inscribir">Inscribir</button>
+                            </div>
+                            {% else %}
+                                <p> No hay carreras para inscribir </p>
+                            {% endfor %}
+                        </ul>
+                    </div>                    
+                </div>
+                <div class="lista-cursos">
+                    <div class="header-listas">
+                        <h2>Cursos</h2>
+                        <button class="button-inscribir-toggle" id="button-inscribir-cursos">Inscribir</button>                         
+                    </div>
+                    <div class="tabla">
+                        <table>
+                            <thead>
+                                <tr> 
+                                    <th>Nombre</th>
+                                    <th>Nro. Ordenanza</th>
+                                    <th>Nro. Implementación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for curso in cursos %}
+                                <tr>
+                                    <td>{{ curso.nombre }}</td>
+                                    <td>{{ curso.nroOrdenanza }}</td>
+                                    <td>{{ curso.nroImplementacion }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="3">El alumno no está inscripto a ningun curso.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>                   
+                    </div>
+
+                    <div class="inscribir-cursos">
+                        <h3>Inscribir alumno a curso</h3>
+                        <ul>
+                            {% for cursoNoInscripto in cursosNoInscripto %}
+                            <div class="lista-item">
+                                <li>{{ cursoNoInscripto.nombre }}</li>
+                                <form action="{{ path('app_alumno_inscribir_curso', {'id': alumno.id}) }}" method ="POST">
+                                    <input type="hidden" name="curso_id" value="{{ cursoNoInscripto.id }}"/> 
+                                    <button class="button-inscribir">Inscribir</button>
+                                </form>
+                            </div>
+                            {% else %}
+                                <p>No hay cursos para inscribir</p>
+                            {% endfor %}
+                        </ul>
+                    </div> 
+                </div>
+            </div>
+        </div>
+        <div class="info-alumno-cuotas">
+            <h2>Cuotas</h2>
+            <div class="lista-cuotas">
+                <div class="cuotas-no-pagas">
+                    {% for cuota in cuotasNoPagas %}
+                        <p>Cuota</p>
+                        <p>No paga</p>
+                    {% endfor %}
+                </div>
+                <div class="cuotas-pagas">
+                    {% for cuota in cuotasPagas %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('.lista-carreras .button-inscribir-toggle').addEventListener('click', function(){
+            let button = document.getElementById('button-inscribir-carreras');
+            let carreras = document.querySelector('.inscribir-carreras');
+            carreras.classList.toggle('visible');
+            if(carreras.classList.contains('visible')){
+                button.textContent = "Cancelar";
+            }else{
+                button.textContent = "Inscribir";
+            }            
+        });
+        document.querySelector('.lista-cursos .button-inscribir-toggle').addEventListener('click', function(){
+            let button = document.getElementById('button-inscribir-cursos');
+            let carreras = document.querySelector('.inscribir-cursos');
+            carreras.classList.toggle('visible');
+            if(carreras.classList.contains('visible')){
+                button.textContent = "Cancelar";
+            }else{
+                button.textContent = "Inscribir";
+            }            
+        });
+    </script> 
 {% endblock %}

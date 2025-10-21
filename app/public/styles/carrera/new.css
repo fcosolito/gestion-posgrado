@@ -1,0 +1,11 @@
+.main-content-new-carrera{
+    background-color: #ffffff;
+    margin: 1rem;
+    border-radius:8px;
+}
+
+.form-buttons{
+    display: flex;
+    justify-content: space-between;
+    padding:0px 25px;
+}

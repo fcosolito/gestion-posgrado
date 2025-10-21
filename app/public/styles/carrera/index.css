@@ -1,0 +1,46 @@
+.buscador-carreras,.main-content-carreras{
+    margin: 1rem;
+    border-radius:8px;
+    background-color: #ffffff;
+}
+.buscador-carreras{
+    padding:1rem;
+}
+.main-content-carreras-header{
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+.main-content-carreras-header a{
+    text-decoration: none;
+    color:white;
+    background-color: #f5ba04;
+    display: flex;
+    border-radius: 8px;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 5px;
+    transition:background-color ease 0.3s;
+}
+
+.main-content-carreras-header a:hover{
+    background-color: #d39e01;
+}
+
+.table-carreras{
+    width: 100%;
+    font-weight: normal;
+}
+.table-carreras thead{
+    background-color: #efefef;
+}
+.table-carreras th{
+    padding: 8px 25px;
+    font-weight: normal;
+    font-style: normal;
+    text-transform: none;
+}
+.table-carreras td{
+    padding: 8px 25px;
+}

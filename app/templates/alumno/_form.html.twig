@@ -1,4 +1,27 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/alumno/form.css') }}">
+{% endblock %}
+
+
+{{ form_start(form, {'attr': {'class': 'form-alumno'}}) }}
+    <div>
+        {{ form_label(form.nombre, "Nombre") }}
+        <div class="nombre-apellido">
+            {{ form_widget(form.nombre, {'attr':{'class': 'form-control' }}) }}
+            {{ form_widget(form.apellido, {'attr':{'class': 'form-control' }}) }}
+        </div>
+    </div>
+    <div class="resto-campos">
+        <div>
+            {{ form_label(form.dni, "DNI") }}
+            {{ form_widget(form.dni, {'attr': { 'class':'form-control' } })}}
+        </div>
+        <div>
+            {{ form_label(form.email, "Correo electrónico")}}
+            {{ form_widget(form.email,{ 'attr':{ 'class':'form-control' } })}}
+        </div>
+        <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
+    </div>
+
+    
 {{ form_end(form) }}

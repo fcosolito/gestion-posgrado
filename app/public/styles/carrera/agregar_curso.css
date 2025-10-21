@@ -1,0 +1,66 @@
+.agregar-curso{
+    width:90%;
+    margin:0 auto;
+    padding: 8px 30px;
+    border: none;
+    background-color: #efefef;
+    border-radius: 8px;
+    display: flex;
+}
+
+.cursos-restantes,
+.formulario-agregar{
+    width: 50%;
+}
+
+.lista-cursos-restantes{
+    list-style:none;
+    width: 100%;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+h4{
+    display: flex;
+    justify-content: center;
+}
+
+.cursos-restantes{
+    border-right: white solid 1px;
+}
+
+.lista-item{
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 1vh;
+}
+
+.button-asignar-curso{
+    background-color: transparent;
+    color: #adadad;
+    margin-right: 20px;
+    border: none;
+    transition: color 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.button-asignar-curso:hover{
+    color: #000000;
+}
+
+/* Subrayado del botón */
+.button-asignar-curso::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 1px;
+    width: 0;
+    background: #000;
+    transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.button-asignar-curso:hover::after {
+    width: 100%;
+}

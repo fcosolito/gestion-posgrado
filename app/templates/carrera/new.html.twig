@@ -1,11 +1,15 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Carrera{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/carrera/new.css') }}">
+{% endblock %}
+
+{% block title %}Carreras{% endblock %}
 
 {% block body %}
-    <h1>Create new Carrera</h1>
+    <div class="main-content-new-carrera"> 
+        <h1>Crear nueva carrera</h1>
+        {{ include('carrera/_form.html.twig') }}
+    </div>
 
-    {{ include('carrera/_form.html.twig') }}
-
-    <a href="{{ path('app_carrera_index') }}">back to list</a>
 {% endblock %}

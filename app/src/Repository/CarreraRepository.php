@@ -16,7 +16,7 @@ class CarreraRepository extends ServiceEntityRepository
         parent::__construct($registry, Carrera::class);
     }
 
-    public function search(string $query): array {
+    public function searchXor(string $query): array {
         $qb =  $this->createQueryBuilder('c')
             ->where('c.nombre LIKE :nombre')
             ->setParameter('nombre', "%".$query."%");
@@ -29,6 +29,42 @@ class CarreraRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    public function search(array $criteria): array
+    {
+        $qb = $this->createQueryBuilder('c');
+
+        if (!empty($criteria['nombre'])) {
+            $qb->andWhere('c.nombre LIKE :nombre')
+                ->setParameter('nombre', '%' . $criteria['nombre'] . '%');
+        }
+        
+        if (!empty($criteria['nroImplementacion'])) {
+            $qb->andWhere('c.nroImplementacion = :nroImplementacion')
+                ->setParameter('nroImplementacion', $criteria['nroImplementacion']);
+        }
+        
+        if (!empty($criteria['nroOrdenanza'])) {
+            $qb->andWhere('c.nroOrdenanza = :nroOrdenanza')
+                ->setParameter('nroOrdenanza', $criteria['nroOrdenanza']);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findNotInIds(array $ids): array
+    {
+        $qb = $this->createQueryBuilder('c');
+        if (empty($ids)) {
+            return $qb->getQuery()->getResult();
+        }
+        return $qb
+            ->andWhere('c.id NOT IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Carrera[] Returns an array of Carrera objects
     //     */

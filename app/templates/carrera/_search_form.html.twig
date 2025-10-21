@@ -1,0 +1,28 @@
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{asset('/styles/carrera/search_form.css')}}">
+{% endblock %}
+
+
+{{ form_start(searchForm, {'attr': {'class': 'search-form'}}) }}
+    <div class="search-form-inputs">
+        <div>
+            {{ form_label(searchForm.nombre) }}
+            {{ form_widget(searchForm.nombre, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        
+        <div>
+            {{ form_label(searchForm.nroImplementacion) }}
+            {{ form_widget(searchForm.nroImplementacion, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        
+        <div>
+            {{ form_label(searchForm.nroOrdenanza) }}
+            {{ form_widget(searchForm.nroOrdenanza, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="btn-group w-100 search-form-buttons" role="group">
+        {{ form_widget(searchForm.buscar, {'attr': {'class': 'btn btn-primary'}}) }}
+        <a href="{{ path('app_carrera_index') }}" class="btn btn-outline-secondary">Limpiar</a>
+    </div>
+{{ form_end(searchForm) }}
