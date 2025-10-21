@@ -12,12 +12,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const curso = JSON.parse(curso_el.dataset.curso);
     const deleteForm = curso_el.dataset.deleteForm;
     curso_root.render(<Curso curso={curso} deleteFormHtml={deleteForm} />);
+
+    const carreras_el = document.getElementById("carreras");
+    if (carreras_el) {
+      const carreras_root = createRoot(carreras_el);
+      const carreras = JSON.parse(carreras_el.dataset.carreras);
+      carreras_root.render(<Carreras asociadas={carreras} curso={curso} />);
+    }
   }
 
-  const carreras_el = document.getElementById("carreras");
-  if (carreras_el) {
-    const carreras_root = createRoot(carreras_el);
-    const carreras = JSON.parse(carreras_el.dataset.carreras);
-    carreras_root.render(<Carreras asociadas={carreras} />);
-  }
-});
+  });

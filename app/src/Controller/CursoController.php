@@ -97,8 +97,10 @@ final class CursoController extends AbstractController
                 $carrera = $p->getCarrera();
                 return [
                     "id" => $carrera->getId(),
-                    "carrera" => $carrera->getNombre(),
-                    "electivo" => $p->getEsElectivo(),
+                    "nombre" => $carrera->getNombre(),
+                    "nroOrdenanza" => $carrera->getNroOrdenanza(),
+                    "nroImplementacion" => $carrera->getNroImplementacion(),
+                    "esElectivo" => $p->isEsElectivo(),
                 ];
             },
             $perteneceARepository->findBy(["curso" => $curso])

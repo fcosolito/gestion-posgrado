@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Carrera;
+use App\Entity\Curso;
+use App\Entity\PerteneceA;
 use App\Form\CarreraType;
 use App\Repository\CarreraRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -102,4 +104,41 @@ final class CarreraController extends AbstractController
     }
 
     
+    #[Route('/{id}/asociar-curso/{cursoId}', name: 'app_carrera_asociar_curso', methods: ['PUT'])]
+    public function asociarCurso(Request $request, Carrera $carrera, Curso $cursoId, EntityManagerInterface $entityManager): Response
+    {
+        $perteneceA = new PerteneceA();
+
+        $perteneceA->setCarrera($carrera);
+        $perteneceA->setCurso($cursoId);
+        $perteneceA->setEsElectivo(false);
+
+        if ($request->query->has("electivo")) {
+            $perteneceA->setEsElectivo(true);
+        }
+
+        $entityManager->persist($perteneceA);
+        $entityManager->flush();
+
+        return $this->json([
+            "carrera" => $carrera->getId(),
+            "curso" => $cursoId->getId(),
+            "esElectivo" => $perteneceA->isEsElectivo(),
+        ]);
+    }
+
+    #[Route('/{id}/asociar-curso/{cursoId}', name: 'app_carrera_desasociar_curso', methods: ['POST'])]
+    public function desasociarCurso(Carrera $carrera, Curso $cursoId, EntityManagerInterface $entityManager): Response
+    {
+        $asociaciones = $entityManager->getRepository(PerteneceA::class)->findBy(["carrera" => $carrera, "curso" => $cursoId]);
+
+        foreach ($asociaciones as $as) {
+            $entityManager->remove($as);
+        }
+        $entityManager->flush();
+
+        return $this->json([
+
+        ]);
+    }
 }
