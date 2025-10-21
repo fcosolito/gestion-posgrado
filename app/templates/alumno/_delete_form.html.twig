@@ -1,4 +1,12 @@
-<form method="post" action="{{ path('app_alumno_delete', {'id': alumno.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
+<button class="btn-peligro" 
+        type="button" 
+        data-bs-toggle="modal" 
+        data-bs-target="#deleteModal"
+        data-alumno-id="{{ alumno.id }}"
+        data-alumno-nombre="{{ alumno.nombre }} {{ alumno.apellido }}">
+    Eliminar
+</button>
+
+<form method="post" action="{{ path('app_alumno_delete', {'id': alumno.id}) }}" id="form-eliminar-alumno-{{ alumno.id }}" style="display: none;">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ alumno.id) }}">
-    <button class="btn">Delete</button>
 </form>

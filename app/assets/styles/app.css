@@ -1,5 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+
 body {
     background-color: lightgray;
+    font-family: 'Open Sans', Arial, sans-serif;
 }
 
 .amarillo-principal {
@@ -8,5 +11,349 @@ body {
 }
 
 .bg-grey {
-  background-color: grey;
+  background-color: #efefef;
 }
+
+/*-------------CSS VALE-------------*/
+
+.boton-base {
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  min-width: 120px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 10px;
+  border: none;
+  font-weight: 500;
+  transition: all 0.2s;
+  box-shadow: 0 4px 4px rgba(0,0,0,0.18);
+}
+
+button.btn-principal {
+  background: #f5ba04 !important;
+  border: 0 !important;
+  color: #fff !important;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-width: 90px;
+  min-height: 40px;
+  padding: 0.5rem 1.5rem;
+}
+button.btn-principal:hover {
+  background: #f1cc5c !important;
+  color: #fff !important;
+}
+
+button.btn-secundario {
+  background: #67db98 !important;
+  border: 0 !important;
+  color: #fff !important;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-width: 90px;
+  min-height: 40px;
+  padding: 0.5rem 1.5rem;
+}
+button.btn-secundario:hover {
+  background: #a6e6c1 !important;
+  color: #fff !important;
+}
+
+button.btn-alternativo {
+  background: #c6c5c5 !important;
+  border: 0 !important;
+  color: #fff !important;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-width: 90px;
+  min-height: 40px;
+  padding: 0.5rem 1.5rem;
+}
+button.btn-alternativo:hover {
+  background: #dad9d9 !important;
+  color: #fff !important;
+}
+
+button.btn-peligro {
+  background: #f15d65 !important;
+  border: 0 !important;
+  color: #fff !important;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-width: 90px;
+  min-height: 40px;
+  padding: 0.5rem 1.5rem;
+}
+button.btn-peligro:hover {
+  background: #f1a6aa !important;
+  color: #fff !important;
+}
+
+.cabecera-azul {
+    background-color: #276da6;
+    padding: 1.5rem;
+    border-radius: 10px 10px 0 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    min-height: 35px;
+}
+
+.contenedor-blanco {
+    background-color: #efefef;
+    padding: 1.5rem;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    height: calc(100vh - 8.5rem);
+
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    overflow: hidden;
+}
+
+.cuadrado-reutilizable {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 1rem;
+    width: 100%;  
+}
+
+
+.cuadrado-reutilizable.auto-height {
+    flex: 0 0 auto;
+    min-height: auto;
+}
+
+.cuadrado-reutilizable.fill-remaining {
+    flex: 1 1 0; 
+    min-height: 0; 
+    overflow: hidden; 
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.cuadrado-reutilizable.fill-remaining > div {
+    flex: 1;
+    min-height: 0;
+}
+
+.cuadrado-reutilizable.fill-remaining > h4 {
+    flex: 0 0 auto;
+}
+
+.titulo-principal {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+}
+
+.lista-generica {
+  height: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+
+.lista-header {
+  display: flex;
+  flex-direction: row;
+  background: #efefef;
+  font-weight: bold;
+  margin-top: 1.5rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 2px solid #ccc;
+  flex-shrink: 0;
+}
+
+.lista-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding-left: 1rem;
+}
+
+.lista-label, .lista-cell {
+  flex: 1;
+}
+
+.lista-row {
+  display: flex;
+  padding: 0.5rem;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+}
+
+/* Estilos para mensajes flash */
+.flash-notice {
+  background-color: #67db98;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.flash-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.flash-close{
+  background-color: #8fecb6;
+  color: white;
+  border-radius: 10px;
+  border: none;
+  padding: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Estilos para dropdown de acciones */
+.dropdown-acciones {
+  position: relative;
+  display: inline-block;
+}
+
+.btn-acciones {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  transition: background 0.2s;
+}
+
+.btn-acciones:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.btn-acciones .dot {
+  width: 5px;
+  height: 5px;
+  background-color: #000;
+  border-radius: 50%;
+  display: block;
+}
+
+.dropdown-menu-acciones {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 0.25rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 150px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.dropdown-item-acciones {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: white;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.2s;
+  color: #333;
+}
+
+.dropdown-item-acciones:hover {
+  background: #f5f5f5;
+}
+
+.dropdown-item-acciones:first-child {
+  border-radius: 10px 10px 0 0;
+}
+
+.dropdown-item-acciones:last-child {
+  border-radius: 0 0 10px 10px;
+}
+
+/* Estilos para ListaCuotas */
+.lista-cuotas {
+  height: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.lista-cuotas-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.cuota-row {
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.2s;
+}
+
+.cuota-row:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.cuota-nombre {
+  flex: 1;
+  font-weight: 500;
+  color: #333;
+}
+
+.cuota-divider {
+  width: 1px;
+  height: 30px;
+  background-color: #ccc;
+  margin: 0 1rem;
+}
+
+.cuota-estado {
+  font-weight: 600;
+  min-width: 90px;
+  text-align: right;
+}
+
+.cuota-row-empty {
+  text-align: center;
+  color: #999;
+  padding: 2rem;
+  font-style: italic;
+}
+
+/*-------------FIN CSS VALE-------------*/
