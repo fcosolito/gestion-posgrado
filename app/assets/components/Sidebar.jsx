@@ -20,7 +20,7 @@ export default function Sidebar({ initialPage }) {
     ];
 
     return (
-        <div className="d-flex flex-column flex-shrink-0 p-3 bg-white text-black" style={{ width: "220px", height: "100vh" }}>
+        <div className="d-flex flex-column flex-shrink-0 p-3 bg-white text-black" style={{ width: "220px", minHeight: "100vh" }}>
                 <a href="/" className="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-black text-decoration-none">
                     <img 
                         src="/images/arana_utn.png"
