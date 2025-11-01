@@ -1,5 +1,3 @@
-import '../styles/app.css';
-
 import { createRoot } from "react-dom/client";
 import Curso from './Curso';
 import Carreras from './Carreras';
