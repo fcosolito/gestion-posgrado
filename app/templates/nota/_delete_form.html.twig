@@ -1,4 +1,13 @@
 <form method="post" action="{{ path('app_nota_delete', {'id': notum.id}) }}" onsubmit="return confirm('Are you sure you want to delete this item?');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ notum.id) }}">
+    {% if redirect_to is defined %}
+        <input type="hidden" name="redirect_to" value="{{ redirect_to }}">
+    {% endif %}
+    {% if alumno_id is defined %}
+        <input type="hidden" name="alumno_id" value="{{ alumno_id }}">
+    {% endif %}
+    {% if edicion_id is defined %}
+        <input type="hidden" name="edicion_id" value="{{ edicion_id }}">
+    {% endif %}
     <button class="btn">Delete</button>
 </form>

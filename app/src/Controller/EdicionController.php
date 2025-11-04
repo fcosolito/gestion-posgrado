@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Curso;
 use App\Entity\Edicion;
+use App\Entity\Nota;
+use App\Form\NotaType;
 use App\Entity\InscripcionEdicion;
 use App\Form\EdicionType;
 use App\Repository\DictaRepository;
@@ -130,5 +132,66 @@ final class EdicionController extends AbstractController
         }
 
         return $this->redirectToRoute('app_curso_show', ["id" => $edicion->getCurso()->getId()], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/notas', name: 'app_edicion_notas', methods: ['GET', 'POST'])]
+    public function notas(Request $request, Edicion $edicion, EntityManagerInterface $entityManager): Response
+    {
+
+        $notum = new Nota();
+        $form = $this->createForm(NotaType::class, $notum);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($notum);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_edicion_notas', ['id' => $edicion->getId()], Response::HTTP_SEE_OTHER);
+        }
+
+        // Obtener inscripciones y notas en una sola consulta optimizada
+        $inscripciones = $entityManager->getRepository(\App\Entity\InscripcionEdicion::class)
+            ->createQueryBuilder('ie')
+            ->select('ie', 'a')
+            ->innerJoin('ie.alumno', 'a')
+            ->where('ie.edicion = :edicion')
+            ->setParameter('edicion', $edicion)
+            ->getQuery()
+            ->getResult();
+
+        // Obtener las notas de esta edición
+        $notas = $entityManager->createQueryBuilder()
+            ->select('n', 'ie', 'a')
+            ->from(\App\Entity\Nota::class, 'n')
+            ->innerJoin('n.inscripcionEdicion', 'ie')
+            ->innerJoin('ie.alumno', 'a')
+            ->where('ie.edicion = :edicion')
+            ->setParameter('edicion', $edicion)
+            ->getQuery()
+            ->getResult();
+
+        // Preparar datos para el template de notas
+        $notasData = [];
+        
+        foreach ($notas as $nota) {
+            $inscripcion = $nota->getInscripcionEdicion();
+            $alumno = $inscripcion->getAlumno();
+            
+            $notasData[] = [
+                'id' => $nota->getId(),
+                'alumno' => $alumno->getNombre() . ' ' . $alumno->getApellido(),
+                'nota' => $nota->getValor(),
+                'descripcion' => $nota->getDescripcion(),
+                'fecha_carga' => $nota->getFechaCarga() ? $nota->getFechaCarga()->format('d/m/Y') : 'N/A',
+            ];
+        }
+
+        return $this->render('edicion/notas_edicion.html.twig', [
+            'edicion' => $edicion,
+            'curso' => $edicion->getCurso(),
+            'notas' => $notasData,
+            'inscripciones' => $inscripciones,
+            'form' => $form,
+        ]);
     }
 }

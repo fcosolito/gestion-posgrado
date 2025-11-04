@@ -1,0 +1,24 @@
+{{ form_start(form, {'attr': {'id': form_id|default('nota-form')}}) }}                        
+    <div class="row g-3">
+        <div class="col-md-3">
+            <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Nota</div>
+            {{ form_widget(form.valor, {'attr': {'class': 'form-control', 'placeholder': '10', 'maxlength': '2'}}) }}
+        </div>
+        <div class="col-md-3">
+            <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Descripcion</div>
+            {{ form_widget(form.descripcion, {'attr': {'class': 'form-control', 'placeholder': 'Descripcion', 'maxlength': '255'}}) }}
+        </div>
+        <div class="col-md-3">
+            <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Fecha de carga</div>
+            {{ form_widget(form.fechaCarga) }}
+        </div>
+        <div class="col-md-3">
+            <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Documentacion asociada</div>
+            {{ form_widget(form.documentacionNota) }}
+        </div>
+        <div class="col-md-3" style="display: none;">
+            <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Ocultar</div>
+            {{ form_widget(form.inscripcionEdicion, {'attr': {'id': 'nota_inscripcionEdicion'}, 'value': inscripcionEdicionId|default('')}) }}
+        </div>
+    </div>
+{{ form_end(form) }}

@@ -1,0 +1,6 @@
+<form method="post" action="{{ path('app_nota_delete', {'id': notum.id}) }}" id="form-eliminar-nota-{{ notum.id }}" style="display: none;">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ notum.id) }}">
+    <input type="hidden" name="redirect_to" value="alumno">
+    <input type="hidden" name="alumno_id" value="{{ alumno.id }}">
+    <button class="btn btn-danger">Delete</button>
+</form>
