@@ -39,6 +39,23 @@ class CursoRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    public function searchXor(string $query): array {
+        $qb =  $this->createQueryBuilder('c')
+            ->where('c.nombre LIKE :nombre')
+            ->setParameter('nombre', "%".$query."%");
+        if (ctype_digit($query)){
+            $qb->orWhere('c.nroOrdenanza = :ord')
+                ->setParameter('ord', (int) $query)
+                ->orWhere('c.nroImplementacion = :imp')
+                ->setParameter('imp', (int) $query)
+                ->orWhere('c.horas = :horas')
+                ->setParameter('horas', (int) $query);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function findNotInIds(array $ids): array
     {
         $qb = $this->createQueryBuilder('c');

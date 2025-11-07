@@ -13,8 +13,9 @@ class InscripcionEdicion
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?float $descuento = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Descuento $descuento = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -32,12 +33,12 @@ class InscripcionEdicion
         return $this->id;
     }
 
-    public function getDescuento(): ?float
+    public function getDescuento(): ?Descuento
     {
         return $this->descuento;
     }
 
-    public function setDescuento(float $descuento): static
+    public function setDescuento(?Descuento $descuento): static
     {
         $this->descuento = $descuento;
 

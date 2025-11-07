@@ -21,6 +21,9 @@ class PagoCuota
     #[ORM\JoinColumn(nullable: false)]
     private ?Pago $pago = null;
 
+    #[ORM\Column]
+    private ?float $montoCuota = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -46,6 +49,18 @@ class PagoCuota
     public function setPago(?Pago $pago): static
     {
         $this->pago = $pago;
+
+        return $this;
+    }
+
+    public function getMontoCuota(): ?float
+    {
+        return $this->montoCuota;
+    }
+
+    public function setMontoCuota(float $montoCuota): static
+    {
+        $this->montoCuota = $montoCuota;
 
         return $this;
     }

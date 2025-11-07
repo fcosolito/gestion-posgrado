@@ -77,6 +77,29 @@ final class CursoController extends AbstractController
         ]);
     }
 
+    #[Route('/search', name: 'app_curso_search', methods: ['GET'])]
+    public function search(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $query =  $request->query->get("query", "");
+        $cursos = $entityManager->getRepository(Curso::class)->searchXor($query);
+        $cursos_ser = array_map(
+            function ($c) {
+                return (
+                    [
+                        "id" => $c->getId(),
+                        "nombre" => $c->getNombre(),
+                        "nroOrdenanza" => $c->getNroOrdenanza(),
+                        "nroImplementacion" => $c->getNroImplementacion(),
+                        "horas" => $c->getHoras(),
+                    ]
+                    );
+            },
+            $cursos
+        );
+
+        return $this->json($cursos_ser);
+    }
+
     #[Route('/{id}', name: 'app_curso_show', methods: ['GET', 'POST'])]
     public function show(EdicionRepository $edicionRepository, PerteneceARepository $perteneceARepository, Curso $curso): Response
     {

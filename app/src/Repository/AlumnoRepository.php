@@ -16,6 +16,21 @@ class AlumnoRepository extends ServiceEntityRepository
         parent::__construct($registry, Alumno::class);
     }
 
+    public function searchXor(string $query): array {
+        $qb =  $this->createQueryBuilder('a')
+            ->where('a.nombre LIKE :nombre')
+            ->setParameter('nombre', "%".$query."%")
+            ->orWhere('a.apellido = :apellido')
+            ->setParameter('apellido', "%".$query."%")
+            ->orWhere('a.email = :email')
+            ->setParameter('email', "%".$query."%");
+        if (ctype_digit($query)){
+            $qb->orWhere('a.dni = :dni')
+                ->setParameter('dni', (int) $query);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
     //    /**
     //     * @return Alumno[] Returns an array of Alumno objects
     //     */
