@@ -4,11 +4,13 @@ namespace App\DataFixtures;
 
 use App\Entity\Alumno;
 use App\Entity\Carrera;
+use App\Entity\Cuota;
 use App\Entity\Curso;
 use App\Entity\Descuento;
 use App\Entity\Edicion;
 use App\Entity\InscripcionEdicion;
 use App\Entity\Nota;
+use App\Entity\Pago;
 use App\Entity\PerteneceA;
 use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -98,6 +100,20 @@ class AppFixtures extends Fixture
         $insc1->setNota($nota1);
 
         $manager->persist($nota1);
+
+        // Cuotas
+        $cuota1 = new Cuota();
+        $cuota1->setInscripcionEdicion($insc1);
+        $cuota1->setNumeroCuota(1);
+
+        $manager->persist($cuota1);
+
+        // Pagos
+        $pago1 = new Pago();
+        $pago1->setMonto(15000);
+        $pago1->setFechaPago(new DateTime());
+
+        $manager->persist($pago1);
 
         // Persistir cambios
         $manager->flush();
