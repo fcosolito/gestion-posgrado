@@ -3,39 +3,47 @@
 {% block title %}Edicion{% endblock %}
 
 {% block body %}
-    <div class="container-fluid p-2 rounded bg-white">
-        <div class="row">
-            <div class="col-4">
-                <h2 class="m-1">{{ curso.nombre }}</h2>
+    <div class="container-fluid pb-1">
+
+        {# Curso show #}
+        <div class="row m-2">
+            <div class="col rounded bg-white p-2">
+                <div class="row">
+                    <div class="col-4">
+                        <span class="m-1 fs-5 fw-bold">{{ curso.nombre }}</span>
+                    </div>
+                </div>
+                <div class="row m-1">
+                    <div class="col-2 fw-bold">Ordenanza</div>
+                    <div class="col-2 fw-bold">Implementacion</div>
+                    <div class="col-2 fw-bold">Horas</div>
+                </div>
+                <div class="row m-1">
+                    <div class="col-2">{{ curso.nroOrdenanza }}</div>
+                    <div class="col-2">{{ curso.nroImplementacion }}</div>
+                    <div class="col-2">{{ curso.horas }}</div>
+                </div>
             </div>
         </div>
-        <div class="row m-1">
-            <div class="col-2 fw-bold">Ordenanza</div>
-            <div class="col-2 fw-bold">Implementacion</div>
-            <div class="col-2 fw-bold">Horas</div>
-        </div>
-        <div class="row m-1">
-            <div class="col-2">{{ curso.nroOrdenanza }}</div>
-            <div class="col-2">{{ curso.nroImplementacion }}</div>
-            <div class="col-2">{{ curso.horas }}</div>
-        </div>
-    </div>
     
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-5 rounded bg-white">
+        <div class="row m-2">
+
+            {# Edicion show #}
+            <div class="col-5 rounded bg-white p-2">
                 <div id="edicion"
                     data-edicion="{{ edicion|json_encode }}"
                     data-delete-form="{{ include('edicion/_delete_form.html.twig')|e('html_attr') }}"
                 >
                 </div>
             </div>
-            <div class="col-6 ms-auto rounded bg-white">
-                <div class="row m-1">
-                    <div class="col-2">
-                        <h3 class="m-1">Docentes</h3>
+
+            {# Listado de docentes #}
+            <div class="col-6 ms-auto rounded bg-white p-0 ">
+                <div class="row d-flex p-2 justify-content-between align-items-center">
+                    <div class="col-2 d-flex align-items-end ">
+                        <span class="m-1 fs-5 fw-bold">Docentes</span>
                     </div>
-                    <div class="col-2 ms-auto">
+                    <div class="col-2 d-flex justify-content-end align-items-end">
                         <button
                             class="btn btn-primary"
                             onclick="alert('agregar docente');"
@@ -44,7 +52,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="row m-1">
+                <div class="row p-2">
                     <div class="col bg-grey fw-bold">Nombre</div>
                     <div class="col bg-grey fw-bold">Apellido</div>
                     <div class="col bg-grey fw-bold">Firmante</div>
@@ -77,7 +85,56 @@
                     </div>
                 </div>
                 {% else %}
-                <p class="m-1">No hay docentes asociados</p>
+                <div class="d-flex justify-content-center">
+                    <p class="m-1"><i>No hay docentes asociados</i></p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# Listado de alumnos #}
+        <div  class="row m-2">
+            <div class="col rounded bg-white p-0">
+                <div class="row p-2 d-flex justify-content-between">
+                    <div class="col d-flex align-items-center justify-content-start">
+                        <span class="m-1 fs-5 fw-bold">Alumnos</span>
+                    </div>
+                    <div class="col d-flex align-items-center justify-content-end">
+                        <button class="btn btn-primary">Inscribir</button>
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <div class="col bg-grey fw-bold">Nombre</div>
+                    <div class="col bg-grey fw-bold">Apellido</div>
+                    <div class="col bg-grey fw-bold">DNI</div>
+                    <div class="col bg-grey fw-bold">Nota</div>
+                    <div class="col bg-grey fw-bold">Acciones</div>
+                </div>
+                {% for alumno in alumnos %}
+                <div class="row m-1">
+                    <div class="col">{{ alumno.nombre }}</div>
+                    <div class="col">{{ alumno.apellido }}</div>
+                    <div class="col">{{ alumno.dni}}</div>
+                    <div class="col">{{ alumno.nota}}</div>
+                    <div class="col">
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Acciones
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item btn btn-secondary" href="{{ path('app_alumno_show', {'id': alumno.id }) }}">
+                                        Ver
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="d-flex justify-content-center">
+                    <p class="m-1"><i>No hay alumnos inscriptos</i></p>
+                </div>
                 {% endfor %}
             </div>
         </div>

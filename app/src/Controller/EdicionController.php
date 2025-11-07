@@ -64,7 +64,6 @@ final class EdicionController extends AbstractController
             $dictaRepository->findBy(["edicion" => $edicion])
         );
 
-        // Agregar una query en InscripcionEdicionRepository que haga Join con Nota
         $alumnos_ser = array_map(
             function ($i) {
                 $alumno = $i->getAlumno();
@@ -73,10 +72,12 @@ final class EdicionController extends AbstractController
                     "id" => $alumno->getId(),
                     "nombre" => $alumno->getNombre(),
                     "apellido" => $alumno->getApellido(),
+                    "dni" => $alumno->getDni(),
                     "descuento" => $i->getDescuento(),
+                    "nota" => $i->getNota() ? $i->getNota()->getValor() : "",
                 ];
             },
-            $inscripcionRepository->findBy(["edicion" => $edicion])
+            $inscripcionRepository->findByEdicionConNota($edicion)
         );
 
         $edicion_ser = [

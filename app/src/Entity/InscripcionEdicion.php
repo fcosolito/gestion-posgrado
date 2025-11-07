@@ -24,6 +24,9 @@ class InscripcionEdicion
     #[ORM\JoinColumn(nullable: false)]
     private ?Edicion $edicion = null;
 
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Nota $nota = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -61,6 +64,18 @@ class InscripcionEdicion
     public function setEdicion(?Edicion $edicion): static
     {
         $this->edicion = $edicion;
+
+        return $this;
+    }
+
+    public function getNota(): ?Nota
+    {
+        return $this->nota;
+    }
+
+    public function setNota(?Nota $nota): static
+    {
+        $this->nota = $nota;
 
         return $this;
     }
