@@ -15,10 +15,7 @@ class Pago
     private ?int $id = null;
 
     #[ORM\Column]
-    private ?float $montoPagado = null;
-
-    #[ORM\Column]
-    private ?float $montoCuota = null;
+    private ?float $monto= null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $fechaPago = null;
@@ -31,26 +28,14 @@ class Pago
         return $this->id;
     }
 
-    public function getMontoPagado(): ?float
+    public function getMonto(): ?float
     {
-        return $this->montoPagado;
+        return $this->monto;
     }
 
-    public function setMontoPagado(float $montoPagado): static
+    public function setMonto(float $monto): static
     {
-        $this->montoPagado = $montoPagado;
-
-        return $this;
-    }
-
-    public function getMontoCuota(): ?float
-    {
-        return $this->montoCuota;
-    }
-
-    public function setMontoCuota(float $montoCuota): static
-    {
-        $this->montoCuota = $montoCuota;
+        $this->monto = $monto;
 
         return $this;
     }

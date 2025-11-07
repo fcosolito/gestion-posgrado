@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\Alumno;
 use App\Entity\Carrera;
 use App\Entity\Curso;
+use App\Entity\Descuento;
 use App\Entity\Edicion;
 use App\Entity\InscripcionEdicion;
 use App\Entity\Nota;
@@ -68,16 +69,23 @@ class AppFixtures extends Fixture
 
         $manager->persist($edicion1);
 
+        // Descuentos
+        $descuento1 = new Descuento();
+        $descuento1->setDescripcion("Descuento 1");
+        $descuento1->setValor(0.5);
+
+        $manager->persist($descuento1);
+
         // Inscripciones a Ediciones
         $insc1 = new InscripcionEdicion();
         $insc1->setAlumno($alumno1);
         $insc1->setEdicion($edicion1);
-        $insc1->setDescuento(0.5);
+        $insc1->setDescuento($descuento1);
 
         $insc2 = new InscripcionEdicion();
         $insc2->setAlumno($alumno2);
         $insc2->setEdicion($edicion1);
-        $insc2->setDescuento(0.4);
+        $insc2->setDescuento($descuento1);
 
         $manager->persist($insc1);
         $manager->persist($insc2);

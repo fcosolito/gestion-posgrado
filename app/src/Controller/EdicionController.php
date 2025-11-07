@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Curso;
+use App\Entity\Descuento;
 use App\Entity\Edicion;
 use App\Entity\InscripcionEdicion;
 use App\Form\EdicionType;
+use App\Repository\DescuentoRepository;
 use App\Repository\DictaRepository;
 use App\Repository\DocenteRepository;
 use App\Repository\EdicionRepository;
@@ -45,8 +47,28 @@ final class EdicionController extends AbstractController
         ]);
     }
 
+    #[Route('/{cursoId}/find-by-curso', name: 'api_edicion_by_curso', methods: ['GET'])]
+    public function findByCurso(Curso $cursoId, EdicionRepository $edicionRepository): Response
+    {
+        $ediciones = $edicionRepository->findBy(["curso" => $cursoId]);
+
+        $ediciones_ser = array_map(
+            function (Edicion $ed) {
+                return [
+                    "id" => $ed->getId(),
+                    "nombre" => $ed->getNombre(),
+                    "fechaInicio" => $ed->getFechaInicio()->format("Y-m-d"),
+                    "fechaFin" => $ed->getFechaFin()->format("Y-m-d"),
+                    "precio" => $ed->getPrecio(),
+                ];
+            }, $ediciones
+        );
+
+        return $this->json($ediciones_ser);
+    }
+
     #[Route('/{id}', name: 'app_edicion_show', methods: ['GET'])]
-    public function show(Edicion $edicion, DictaRepository $dictaRepository, InscripcionEdicionRepository $inscripcionRepository): Response
+    public function show(Edicion $edicion, DictaRepository $dictaRepository, InscripcionEdicionRepository $inscripcionRepository, DescuentoRepository $descuentoRepository): Response
     {
         $docentes_ser = array_map(
             function ($dicta) {
@@ -71,8 +93,9 @@ final class EdicionController extends AbstractController
                     "nombre" => $alumno->getNombre(),
                     "apellido" => $alumno->getApellido(),
                     "dni" => $alumno->getDni(),
-                    "descuento" => $i->getDescuento(),
+                    "descuento" => $i->getDescuento()->getValor(),
                     "nota" => $i->getNota() ? $i->getNota()->getValor() : "",
+                    "inscripcion" => $i->getId(),
                 ];
             },
             $inscripcionRepository->findByEdicionConNota($edicion)
@@ -86,13 +109,26 @@ final class EdicionController extends AbstractController
             "precio" => $edicion->getPrecio(),
         ];
 
+        $descuentos_ser = array_map(
+            function (Descuento $d) {
+                return [
+                    "id" => $d->getId(),
+                    "descripcion" => $d->getDescripcion(),
+                    "valor" => $d->getValor(),
+                ];
+            },
+            $descuentoRepository->findAll()
+        );
+
         return $this->render('edicion/show.html.twig', [
             'edicion' => $edicion_ser,
             'curso' => $edicion->getCurso(),
             'docentes' => $docentes_ser,
             'alumnos' => $alumnos_ser,
+            'descuentos' => $descuentos_ser,
         ]);
     }
+
 
     #[Route('/{id}', name: 'api_edicion_update', methods: ['PUT'])]
     public function update(Request $request, Edicion $edicion, EntityManagerInterface $entityManager): Response

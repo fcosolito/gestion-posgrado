@@ -93,50 +93,10 @@
         </div>
 
         {# Listado de alumnos #}
-        <div  class="row m-2">
-            <div class="col rounded bg-white p-0">
-                <div class="row p-2 d-flex justify-content-between">
-                    <div class="col d-flex align-items-center justify-content-start">
-                        <span class="m-1 fs-5 fw-bold">Alumnos</span>
-                    </div>
-                    <div class="col d-flex align-items-center justify-content-end">
-                        <button class="btn btn-primary">Inscribir</button>
-                    </div>
-                </div>
-                <div class="row p-2">
-                    <div class="col bg-grey fw-bold">Nombre</div>
-                    <div class="col bg-grey fw-bold">Apellido</div>
-                    <div class="col bg-grey fw-bold">DNI</div>
-                    <div class="col bg-grey fw-bold">Nota</div>
-                    <div class="col bg-grey fw-bold">Acciones</div>
-                </div>
-                {% for alumno in alumnos %}
-                <div class="row m-1">
-                    <div class="col">{{ alumno.nombre }}</div>
-                    <div class="col">{{ alumno.apellido }}</div>
-                    <div class="col">{{ alumno.dni}}</div>
-                    <div class="col">{{ alumno.nota}}</div>
-                    <div class="col">
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Acciones
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a class="dropdown-item btn btn-secondary" href="{{ path('app_alumno_show', {'id': alumno.id }) }}">
-                                        Ver
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                {% else %}
-                <div class="d-flex justify-content-center">
-                    <p class="m-1"><i>No hay alumnos inscriptos</i></p>
-                </div>
-                {% endfor %}
-            </div>
+        <div id="listado-alumnos"
+            data-alumnos="{{ alumnos|json_encode }}"
+            data-descuentos="{{ descuentos|json_encode }}"
+        >
         </div>
     </div>
 

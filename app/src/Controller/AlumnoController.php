@@ -190,6 +190,29 @@ final class AlumnoController extends AbstractController
         ]);
     }
 
+    #[Route('/search', name: 'app_alumno_search', methods: ['GET'])]
+    public function search(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $query =  $request->query->get("query", "");
+        $alumnos = $entityManager->getRepository(Alumno::class)->searchXor($query);
+        $alumnos_ser = array_map(
+            function (Alumno $a) {
+                return (
+                    [
+                        "id" => $a->getId(),
+                        "nombre" => $a->getNombre(),
+                        "apellido" => $a->getApellido(),
+                        "dni" => $a->getDni(),
+                        "email" => $a->getEmail(),
+                    ]
+                    );
+            },
+            $alumnos
+        );
+
+        return $this->json($alumnos_ser);
+    }
+
     #[Route('/{id}', name: 'app_alumno_show', methods: ['GET'])]
     public function show(Alumno $alumno): Response
     {
@@ -198,6 +221,7 @@ final class AlumnoController extends AbstractController
         ]);
     }
 
+    
     #[Route('/{id}/edit', name: 'app_alumno_edit', methods: ['GET', 'POST'])]
     public function edit(
             Request $request,

@@ -2,9 +2,14 @@
 
 namespace App\Controller;
 
+use App\Entity\Carrera;
 use App\Entity\Cuota;
 use App\Form\CuotaType;
+use App\Repository\AlumnoRepository;
+use App\Repository\CarreraRepository;
 use App\Repository\CuotaRepository;
+use App\Repository\CursoRepository;
+use App\Repository\EdicionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,10 +20,66 @@ use Symfony\Component\Routing\Attribute\Route;
 final class CuotaController extends AbstractController
 {
     #[Route(name: 'app_cuota_index', methods: ['GET'])]
-    public function index(CuotaRepository $cuotaRepository): Response
+    public function index(Request $request, CuotaRepository $cuotaR, 
+        CarreraRepository $carreraR, CursoRepository $cursoR,
+        EdicionRepository $edicionR, AlumnoRepository $alumnoR
+        ): Response
     {
+
+        if ($request->query->has("carrera")) {
+            $carrera = $carreraR->find($request->query->get("carrera"));
+            if ($carrera) {
+                $carrera_ser = [
+                    "id" => $carrera->getId(),
+                    "nombre" => $carrera->getNombre(),
+                    "nroOrdenanza" => $carrera->getNroOrdenanza(),
+                    "nroImplementacion" => $carrera->getNroImplementacion(),
+                ];
+            }
+        }
+        if ($request->query->has("curso")) {
+            $curso = $cursoR->find($request->query->get("curso"));
+            if ($curso) {
+                $curso_ser = [
+                    "id" => $curso->getId(),
+                    "nombre" => $curso->getNombre(),
+                    "nroOrdenanza" => $curso->getNroOrdenanza(),
+                    "nroImplementacion" => $curso->getNroImplementacion(),
+                    "horas" => $curso->getHoras(),
+                ];
+            }
+        }
+        if ($request->query->has("edicion")) {
+            $edicion = $edicionR->find($request->query->get("edicion"));
+            if ($edicion) {
+                $edicion_ser = [
+                    "id" => $edicion->getId(),
+                    "nombre" => $edicion->getNombre(),
+                    "fechaInicio" => $edicion->getFechaInicio()->format("Y-m-d"),
+                    "fechaFin" => $edicion->getFechaFin()->format("Y-m-d"),
+                    "precio" => $edicion->getPrecio(),
+                ];
+            }
+        }
+        if ($request->query->has("alumno")) {
+            $alumno = $alumnoR->find($request->query->get("alumno"));
+            if ($alumno) {
+                $alumno_ser = [
+                    "id" => $alumno->getId(),
+                    "nombre" => $alumno->getNombre(),
+                    "apellido" => $alumno->getApellido(),
+                    "email" => $alumno->getEmail(),
+                    "dni" => $alumno->getDni(),
+                ];
+            }
+        }
+
         return $this->render('cuota/index.html.twig', [
-            'cuotas' => $cuotaRepository->findAll(),
+            'cuotas' => $cuotaR->findAll(),
+            'carrera' => $carrera_ser ?? null,
+            'curso' => $curso_ser ?? null,
+            'edicion' => $edicion_ser ?? null,
+            'alumno' => $alumno_ser ?? null,
         ]);
     }
 

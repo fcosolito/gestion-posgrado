@@ -1,39 +1,60 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Pago index{% endblock %}
+{% block title %}Pagos{% endblock %}
 
 {% block body %}
-    <h1>Pago index</h1>
+<div class="p-3">
+<div class="rounded bg-white vh-100 p-0">
+    <div class="row p-3">
+        <div class="col">
+            <h3>Pagos</h3>
+        </div>
+        <div class="col text-end">
+            <a class="btn btn-primary" href="{{ path('app_pago_new') }}">Nuevo</a>
+        </div>
+    </div>
+    <div class="h-100 overflow-scroll p-0">
+        <table class="table table-striped table-bordered table-hover">
+            <thead class="sticky-top table-secondary">
+                <tr>
+                    <th>ID</th>
+                    <th>Monto</th>
+                    <th>Fecha</th>
+                    <th>Comprobante</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pago in pagos %}
+                    <tr>
+                        <td>{{ pago.id }}</td>
+                        <td>{{ pago.monto}}</td>
+                        <td>{{ pago.fechaPago ? pago.fechaPago|date('Y-m-d') : '' }}</td>
+                        <td>{{ pago.comprobante ? pago.comprobante : "<i>Adjuntar</i>" }}</td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Acciones
+                                </button>
+                                <ul class="dropdown-menu" >
+                                    <li><a class="dropdown-item" href="{{ path('app_pago_show', {'id': pago.id}) }}">Ver</a></li>
+                                    <li><a class="dropdown-item" href="{{ path('app_pago_edit', {'id': pago.id}) }}">Editar</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </div>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5"><i>No se registraron pagos</i></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+    
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>MontoPagado</th>
-                <th>MontoCuota</th>
-                <th>FechaPago</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for pago in pagos %}
-            <tr>
-                <td>{{ pago.id }}</td>
-                <td>{{ pago.montoPagado }}</td>
-                <td>{{ pago.montoCuota }}</td>
-                <td>{{ pago.fechaPago ? pago.fechaPago|date('Y-m-d') : '' }}</td>
-                <td>
-                    <a href="{{ path('app_pago_show', {'id': pago.id}) }}">show</a>
-                    <a href="{{ path('app_pago_edit', {'id': pago.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_pago_new') }}">Create new</a>
+    
 {% endblock %}
