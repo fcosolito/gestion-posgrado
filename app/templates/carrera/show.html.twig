@@ -4,51 +4,209 @@
     <link rel="stylesheet" href="{{ asset('/styles/carrera/show.css') }}">
 {% endblock %}
 
-{% block title %}Carrera{% endblock %}
+{% block title %}{{ carrera.nombre }}{% endblock %}
 
 {% block body %}
     <div class="main-content-show-carrera">
-        <h2 class="main-content-show-carrera-title">Ver Carrera</h2>
-        <div> <div>
-        <table class="table">
-            <tbody>
-                <tr>
-                    <th>Id</th>
-                    <td>{{ carrera.id }}</td>
-                </tr>
-                <tr>
-                    <th>Nombre</th>
-                    <td>{{ carrera.nombre }}</td>
-                </tr>
-                <tr>
-                    <th>Número de Ordenanza</th>
-                    <td>{{ carrera.nroOrdenanza }}</td>
-                </tr>
-                <tr>
-                    <th>Número de Implementación</th>
-                    <td>{{ carrera.nroImplementacion }}</td>
-                </tr>
-                <tr>
-                    <th>Cantidad de Cuotas</th>
-                    <td>{{ carrera.cantidadCuotas }}</td>
-                </tr>
-                <tr>
-                    <th>Precio de Inscripción</th>
-                    <td>{{ carrera.precioInscripcion }}</td>
-                </tr>
-                <tr>
-                    <th>Alumnos Inscriptos</th>
-                    <td>{{ inscriptosCarrera }}</td>
-                </tr>
-            </tbody>
-        </table>
-        <div class="show-carrera-buttons">
-            <a href="{{ path('app_carrera_index') }}">Volver</a>
-            <div style="display:flex;">
-                <a href="{{ path('app_carrera_edit', {'id': carrera.id}) }}">Editar</a>
-                {{ include('carrera/_delete_form.html.twig') }}
+        <div class="info-carrera">
+            <div class="header-info-carrera">
+                <h2 class="nombre-carrera">{{ carrera.nombre }}</h2>
+                <div class="header-show-carrera-buttons">
+                    <button class="btn-alternativo" id="btn-editar" type="button">Editar</button>
+                    {{ include('carrera/_delete_form.html.twig') }}
+                    <button class="btn-principal" id="btn-volver" type="button">Volver</button>
+                </div>
+            </div>
+            <dl class="data-info-carrera">
+                <div class="info-item"> 
+                    <dt>Nro. Ordenanza</dt>
+                    <dd>{{ carrera.nroOrdenanza }}</dd>
+                </div> 
+                <div class="info-item"> 
+                    <dt>Nro. Implementación</dt>
+                    <dd>{{ carrera.nroImplementacion }}</dd>
+                </div> 
+                <div class="info-item"> 
+                    <dt>Cantidad de Cuotas</dt>
+                    <dd>{{ carrera.cantidadCuotas ?? 'No definido' }}</dd>
+                </div> 
+                <div class="info-item"> 
+                    <dt>Precio de Inscripción</dt>
+                    <dd>
+                        {% if carrera.precioInscripcion %}
+                            ${{ carrera.precioInscripcion|number_format(2, ',', '.') }}
+                        {% else %}
+                            No definido
+                        {% endif %}
+                    </dd>
+                </div>
+                <div class="info-item"> 
+                    <dt>Alumnos Inscriptos</dt>
+                    <dd>{{ inscriptosCarrera }}</dd>
+                </div> 
+            </dl>
+        </div>
+        <div class="cursos-alumnos">
+            <div class="cursos">
+                <div class="cursos-obligatorios">
+                    <div class="header">
+                        <h2>Cursos Obligatorios ({{ cursosObligatorios|length }})</h2>
+                    </div>
+                    <div class="body-cursos-obligatorios">
+                        <div class="tabla-cursos">
+                            <table class="tabla-cursos">
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Nro. Ordenanza</th>
+                                        <th>Nro. Implementación</th>
+                                        <th>Horas</th>
+                                        <th>Acción</th> 
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if cursosObligatorios|length > 0 %}
+                                        {% for cursoObligatorio in cursosObligatorios %}
+                                        <tr>        
+                                            <td>{{ cursoObligatorio.nombre }}</td>
+                                            <td>{{ cursoObligatorio.nroOrdenanza }}</td>
+                                            <td>{{ cursoObligatorio.nroImplementacion }}</td>
+                                            <td>{{ cursoObligatorio.horas }}</td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        Acciones
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="{{ path('app_curso_show', {'id': cursoObligatorio.id}) }}">Ver</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">No hay cursos obligatorios asignados</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>                    
+                        </div>
+                    </div>
+                </div>
+                <div class="cursos-electivos">
+                    <div class="header">
+                        <h2>Cursos Electivos ({{ cursosElectivos|length }})</h2>
+                    </div>
+                    <div class="body-cursos-electivos">
+                        <div class="tabla-cursos">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Nombre</th>
+                                        <th>Nro. Ordenanza</th>
+                                        <th>Nro. Implementación</th>
+                                        <th>Horas</th>
+                                        <th>Acción</th> 
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if cursosElectivos|length > 0 %}
+                                        {% for cursoElectivo in cursosElectivos %}
+                                        <tr>        
+                                            <td>{{ cursoElectivo.nombre }}</td>
+                                            <td>{{ cursoElectivo.nroOrdenanza }}</td>
+                                            <td>{{ cursoElectivo.nroImplementacion }}</td>
+                                            <td>{{ cursoElectivo.horas }}</td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        Acciones
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="{{ path('app_curso_show', {'id': cursoElectivo.id}) }}">Ver</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">No hay cursos electivos asignados</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>        
+                        </div>            
+                    </div>
+                </div>
+            </div>
+            <div class="alumnos">
+                <div class="alumnos-inscriptos">
+                    <div class="header">
+                        <h2>Alumnos Inscriptos ({{ alumnos|length }})</h2>
+                    </div>
+                    <div class="body-alumnos">
+                        <div class="tabla-alumnos">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Apellido y Nombre</th>
+                                        <th>DNI</th>
+                                        <th>Email</th>
+                                        <th>Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% if alumnos|length > 0 %}
+                                        {% for alumno in alumnos %}
+                                        <tr>
+                                            <td>{{ alumno.apellido }}, {{ alumno.nombre }}</td>
+                                            <td>{{ alumno.dni }}</td>
+                                            <td>{{ alumno.email ?? 'No especificado' }}</td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        Acciones
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="{{ path('app_alumno_visualizar', {'id': alumno.id}) }}">Ver</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="4" class="text-center text-muted">No hay alumnos inscriptos en esta carrera</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+{% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnEditar = document.getElementById('btn-editar');
+            const btnVolver = document.getElementById('btn-volver');
+
+            // Botón volver - redirigir a lista de carreras
+            btnVolver.addEventListener('click', () => {
+                window.location.href = '{{ path('app_carrera_index') }}';
+            });
+
+            // Cambiar a modo editar
+            btnEditar.addEventListener('click', () => {
+                window.location.href = '{{ path('app_carrera_edit', {'id':carrera.id}) }}';
+            });
+        });
+    </script>
 {% endblock %}

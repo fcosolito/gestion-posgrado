@@ -4,6 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Alumno;
 use App\Entity\InscripcionEdicion;
+use App\Entity\InscripcionCarrera;
+use App\Entity\Carrera;
+use App\Entity\Cuota;
 use App\Form\AlumnoType;
 use App\Repository\AlumnoRepository;
 use App\Repository\CarreraRepository;
@@ -535,17 +538,21 @@ final class AlumnoController extends AbstractController
     }
 
     #[Route('/{id}/inscribir-carrera/{carrera}', name: 'app_alumno_inscribir_carrera', methods: ['POST'])]
-    public function inscribirCarrera(Alumno $alumno, \App\Entity\Carrera $carrera, EntityManagerInterface $entityManager): Response
+    public function inscribirCarrera(
+            Alumno $alumno,
+            Carrera $carrera,
+            EntityManagerInterface $entityManager
+        ): Response
     {
         // Verificar si ya existe la inscripción
-        $inscripcionExistente = $entityManager->getRepository(\App\Entity\InscripcionCarrera::class)
+        $inscripcionExistente = $entityManager->getRepository(InscripcionCarrera::class)
             ->findOneBy(['alumno' => $alumno, 'carrera' => $carrera]);
 
         if ($inscripcionExistente) {
             $this->addFlash('warning', 'El alumno ya está inscripto en esta carrera');
         } else {
             // Crear la nueva inscripción
-            $inscripcion = new \App\Entity\InscripcionCarrera();
+            $inscripcion = new InscripcionCarrera();
             $inscripcion->setAlumno($alumno);
             $inscripcion->setCarrera($carrera);
             $inscripcion->setDescuento(0); // Descuento por defecto 0
@@ -553,10 +560,37 @@ final class AlumnoController extends AbstractController
             $entityManager->persist($inscripcion);
             $entityManager->flush();
 
+            // Creamos las cuotas correspodientes a la carrera
+            $this->crearCuotasParaCarrera($inscripcion, $entityManager);
+
             $this->addFlash('notice', 'Alumno inscripto exitosamente en ' . $carrera->getNombre());
         }
 
         return $this->redirectToRoute('app_alumno_inscribir', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
+    }
+
+    private function crearCuotasParaCarrera(
+        InscripcionCarrera $inscripcion, 
+        EntityManagerInterface $entityManager
+    ): void
+    {
+        $carrera = $inscripcion->getCarrera();
+        $cantidadCuotas = $carrera->getCantidadCuotas();
+
+        // Si la carrera no tiene cantidad de cuotas definida, no crear cuotas
+        if (!$cantidadCuotas || $cantidadCuotas <= 0) {
+            return;
+        }
+
+        // Crear cada cuota
+        for ($i = 1; $i <= $cantidadCuotas; $i++) {
+            $cuota = new Cuota();
+            $cuota->setInscripcionCarrera($inscripcion);
+            $cuota->setNumeroCuota($i);
+            $entityManager->persist($cuota);
+        }
+
+        $entityManager->flush();
     }
 
     #[Route('/{id}/desinscribir-carrera/{carrera}', name: 'app_alumno_desinscribir_carrera', methods: ['POST'])]
@@ -569,6 +603,9 @@ final class AlumnoController extends AbstractController
         if (!$inscripcion) {
             $this->addFlash('warning', 'El alumno no está inscripto en esta carrera');
         } else {
+            // Eliminamos las cuotas asociadas a la inscripción 
+            $this->eliminarCuotasDeInscripcion($inscripcion, $entityManager);
+
             // Eliminar la inscripción
             $entityManager->remove($inscripcion);
             $entityManager->flush();
@@ -577,6 +614,23 @@ final class AlumnoController extends AbstractController
         }
 
         return $this->redirectToRoute('app_alumno_inscribir', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
+    }
+
+    private function eliminarCuotasDeInscripcion(
+            InscripcionCarrera $inscripcion, 
+            EntityManagerInterface $entityManager
+        ): void
+    {
+        // Se buscan todas las cuotas asociadas a esta inscripción
+        $cuotas = $entityManager->getRepository(Cuota::class)
+            ->findBy(['inscripcionCarrera' => $inscripcion]);
+
+        // Eliminar cada cuota
+        foreach ($cuotas as $cuota) {
+            $entityManager->remove($cuota);
+        }
+        
+        // No hacemos flush aquí, se hará junto con la eliminación de la inscripción
     }
 
 }

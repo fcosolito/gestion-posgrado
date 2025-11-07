@@ -101,14 +101,40 @@ final class CarreraController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_carrera_show', methods: ['GET'])]
-    public function show(Carrera $carrera, InscripcionCarreraRepository $inscripcionCarreraRepository): Response
+    public function show(
+        Carrera $carrera, 
+        InscripcionCarreraRepository $inscripcionCarreraRepository,
+        PerteneceARepository $perteneceARepository,
+        EntityManagerInterface $entityManager
+    ): Response
     {   
-        
-        return $this->render('carrera/show.html.twig', [
-            'carrera' => $carrera,
-            'inscriptosCarrera'=> count($inscripcionCarreraRepository->findByCarrera($carrera->getId())),
-        ]);
+    // Obtenemos todos los cursos de la carrera
+    $cursosRelacionados = $perteneceARepository->findBy(['carrera' => $carrera]);
+    $cursosObligatorios = [];
+    $cursosElectivos = [];
+    
+    foreach ($cursosRelacionados as $relacion) {
+        if ($relacion->isEsElectivo()) {
+            $cursosElectivos[] = $relacion->getCurso();
+        } else {
+            $cursosObligatorios[] = $relacion->getCurso();
+        }
     }
+    
+    // Obtenemos los alumnos inscriptos a la carrera
+    $inscripciones = $inscripcionCarreraRepository->findByCarrera($carrera->getId());
+    $alumnos = array_map(function($inscripcion) {
+        return $inscripcion->getAlumno();
+    }, $inscripciones);
+    
+    return $this->render('carrera/show.html.twig', [
+        'carrera' => $carrera,
+        'inscriptosCarrera' => count($inscripciones),
+        'cursosObligatorios' => $cursosObligatorios,
+        'cursosElectivos' => $cursosElectivos,
+        'alumnos' => $alumnos,
+    ]);
+}
 
     #[Route('/{id}/edit', name: 'app_carrera_edit', methods: ['GET', 'POST'])]
     public function edit(
