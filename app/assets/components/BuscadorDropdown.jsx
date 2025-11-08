@@ -72,7 +72,7 @@ export default function BuscadorDropdown({ fetchItems, placeholder, item, setIte
     <div className="position-relative" >
       <input
         type="text"
-        className={`form-control ${isSelected ? "bg-success" : ""}`}
+        className={`form-control ${isSelected ? "seleccion-buscador" : ""}`}
         placeholder={placeholder}
         value={query}
         onChange={handleChange}
