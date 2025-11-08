@@ -27,6 +27,12 @@ body {
   border-color: #2feb7d;
 }
 
+.bg-secundario {
+  background-color: #77a4c9;
+}
+.bg-secundario:hover {
+  background-color: #54738d;
+}
 /*-------------CSS VALE-------------*/
 
 .boton-base {

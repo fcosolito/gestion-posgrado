@@ -103,10 +103,12 @@
                     </div>
                 </div>
             </div>
-            <div class="cuadrado-reutilizable fill-remaining" style="padding: 0;">
-                <h4 class="mb-0" style="padding: 1.5rem 1.5rem 0 1rem;">Cuotas</h4>
-                <div id="lista-cuotas"
-                    data-cuotas='{{ cuotas|json_encode|raw }}'>
+            <div style="display: flex; flex-direction: column; gap: 1.5rem; height: 100%;">
+                <div class="cuadrado-reutilizable fill-remaining" style="padding: 0; width: 100%">
+                    <h4 class="mb-0" style="padding: 1.5rem 1.5rem 0 1rem;">Cuotas</h4>
+                    <div id="lista-cuotas"
+                        data-cuotas='{{ cuotas|json_encode|raw }}'>
+                    </div>
                 </div>
             </div>
         </div>
