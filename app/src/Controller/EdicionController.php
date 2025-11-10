@@ -95,7 +95,7 @@ final class EdicionController extends AbstractController
                     "nombre" => $alumno->getNombre(),
                     "apellido" => $alumno->getApellido(),
                     "dni" => $alumno->getDni(),
-                    "descuento" => $i->getDescuento()->getValor(),
+                    "descuento" => $i->getDescuento()->getId(),
                     "nota" => $i->getNota() ? $i->getNota()->getValor() : "",
                     "inscripcion" => $i->getId(),
                 ];
