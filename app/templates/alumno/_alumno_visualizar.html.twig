@@ -133,24 +133,6 @@
             const visualizarContainer = document.getElementById('visualizar-container');
             const editarContainer = document.getElementById('editar-container');
 
-            // Evento cuando se abre el modal
-            const deleteModal = document.getElementById('deleteModal');
-            if (deleteModal) {
-                deleteModal.addEventListener('show.bs.modal', (event) => {
-                    const button = event.relatedTarget;
-                    const alumnoId = button.getAttribute('data-alumno-id');
-                    const alumnoNombre = button.getAttribute('data-alumno-nombre');
-                    
-                    // Actualizar nombre en el modal
-                    document.getElementById('alumnoNombreModal').textContent = alumnoNombre;
-                    
-                    // Configurar el botón de confirmar
-                    document.getElementById('confirmDeleteBtn').onclick = () => {
-                        document.getElementById('form-eliminar-alumno-' + alumnoId).submit();
-                    };
-                });
-            }
-
             // Botón volver - redirigir a alumno index
             btnVolver.addEventListener('click', () => {
                 window.location.href = '{{ path('app_alumno_index') }}';

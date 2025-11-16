@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Constraints\Date;
+use Dompdf\Dompdf;
 
 #[Route('/edicion')]
 final class EdicionController extends AbstractController
@@ -229,6 +230,58 @@ final class EdicionController extends AbstractController
             'notas' => $notasData,
             'inscripciones' => $inscripciones,
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}/notas/pdf', name: 'app_edicion_notas_pdf', methods: ['GET'])]
+    public function notasPdf(Edicion $edicion, EntityManagerInterface $entityManager): Response
+    {
+        // Obtener las notas de esta edición
+        $notas = $entityManager->createQueryBuilder()
+            ->select('n', 'ie', 'a')
+            ->from(\App\Entity\Nota::class, 'n')
+            ->innerJoin('n.inscripcionEdicion', 'ie')
+            ->innerJoin('ie.alumno', 'a')
+            ->where('ie.edicion = :edicion')
+            ->setParameter('edicion', $edicion)
+            ->getQuery()
+            ->getResult();
+
+        // Preparar datos para el template de notas
+        $notasData = [];
+        
+        foreach ($notas as $nota) {
+            $inscripcion = $nota->getInscripcionEdicion();
+            $alumno = $inscripcion->getAlumno();
+            
+            $notasData[] = [
+                'id' => $nota->getId(),
+                'alumno' => $alumno->getNombre() . ' ' . $alumno->getApellido(),
+                'nota' => $nota->getValor(),
+                'descripcion' => $nota->getDescripcion(),
+                'fecha_carga' => $nota->getFechaCarga() ? $nota->getFechaCarga()->format('d/m/Y') : 'N/A',
+            ];
+        }
+
+        // Renderizar HTML para el PDF
+        $fechaEmision = new \DateTime('now', new \DateTimeZone('America/Argentina/Buenos_Aires'));
+        $html = $this->renderView('edicion/pdf_notas.html.twig', [
+            'edicion' => $edicion,
+            'notas' => $notasData,
+            'fecha_emision' => $fechaEmision
+        ]);
+
+        // Generar PDF con Dompdf
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // Retornar PDF como descarga
+        $fecha = $fechaEmision->format('d-m-Y');
+        return new Response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="notas_' . $edicion->getNombre() . '_' . $fecha . '.pdf"'
         ]);
     }
 }

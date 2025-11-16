@@ -21,6 +21,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Dompdf\Dompdf;
 
 #[Route('/alumno')]
 final class AlumnoController extends AbstractController
@@ -373,8 +374,8 @@ final class AlumnoController extends AbstractController
             foreach ($pagoCuotas as $pago) {
                 if ($pago->getCuota()->getId() === $cuota->getId()) {
                     $pagosCuota[] = $pago;
-                    $montoPagar = $pago->getPago()->getMontoCuota();
-                    $montoPagado += $pago->getPago()->getMontoPagado();
+                    $montoPagar = $pago->getMontoCuota();
+                    $montoPagado += $pago->getPago()->getMonto();
                     $contadorPagos += 1;
                 }
             }
@@ -567,6 +568,23 @@ final class AlumnoController extends AbstractController
         return $this->redirectToRoute('app_alumno_inscribir', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
     }
 
+    private function eliminarCuotasDeInscripcion(
+            InscripcionCarrera $inscripcion, 
+            EntityManagerInterface $entityManager
+        ): void
+    {
+        // Se buscan todas las cuotas asociadas a esta inscripción
+        $cuotas = $entityManager->getRepository(Cuota::class)
+            ->findBy(['inscripcionCarrera' => $inscripcion]);
+
+        // Eliminar cada cuota
+        foreach ($cuotas as $cuota) {
+            $entityManager->remove($cuota);
+        }
+        
+        // No hacemos flush aquí, se hará junto con la eliminación de la inscripción
+    }
+
     #[Route('/{id}/notas', name: 'app_alumno_notas', methods: ['GET', 'POST'])]
     public function notas(Request $request, Alumno $alumno, EntityManagerInterface $entityManager): Response
     {
@@ -630,22 +648,60 @@ final class AlumnoController extends AbstractController
             'form' => $form,
         ]);
     }
-    private function eliminarCuotasDeInscripcion(
-            InscripcionCarrera $inscripcion, 
-            EntityManagerInterface $entityManager
-        ): void
-    {
-        // Se buscan todas las cuotas asociadas a esta inscripción
-        $cuotas = $entityManager->getRepository(Cuota::class)
-            ->findBy(['inscripcionCarrera' => $inscripcion]);
 
-        // Eliminar cada cuota
-        foreach ($cuotas as $cuota) {
-            $entityManager->remove($cuota);
+    #[Route('/{id}/notas/pdf', name: 'app_alumno_notas_pdf', methods: ['GET'])]
+    public function notasPdf(Alumno $alumno, EntityManagerInterface $entityManager): Response
+    {
+        // Obtener notas del alumno (misma lógica que notas())
+        $notas = $entityManager->createQueryBuilder()
+            ->select('n', 'ie', 'e', 'c')
+            ->from(\App\Entity\Nota::class, 'n')
+            ->innerJoin('n.inscripcionEdicion', 'ie')
+            ->innerJoin('ie.edicion', 'e')
+            ->innerJoin('e.curso', 'c')
+            ->where('ie.alumno = :alumno')
+            ->setParameter('alumno', $alumno)
+            ->getQuery()
+            ->getResult();
+
+        // Preparar datos para el template
+        $notasData = [];
+        foreach ($notas as $nota) {
+            $inscripcion = $nota->getInscripcionEdicion();
+            $edicion = $inscripcion->getEdicion();
+            $curso = $edicion->getCurso();
+            
+            $notasData[] = [
+                'curso' => $curso->getNombre(),
+                'edicion' => $edicion->getNombre(),
+                'nota' => $nota->getValor(),
+                'descripcion' => $nota->getDescripcion(),
+                'fecha_carga' => $nota->getFechaCarga() ? $nota->getFechaCarga()->format('d/m/Y') : 'N/A',
+            ];
         }
-        
-        // No hacemos flush aquí, se hará junto con la eliminación de la inscripción
+
+        // Renderizar HTML para el PDF
+        $fechaEmision = new \DateTime('now', new \DateTimeZone('America/Argentina/Buenos_Aires'));
+        $html = $this->renderView('alumno/pdf_notas.html.twig', [
+            'alumno' => $alumno,
+            'notas' => $notasData,
+            'fecha_emision' => $fechaEmision
+        ]);
+
+        // Generar PDF con Dompdf
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // Retornar PDF como descarga
+        $fecha = $fechaEmision->format('d-m-Y');
+        return new Response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="notas_' . $alumno->getNombre() . '_' . $alumno->getApellido() . '_' . $fecha . '.pdf"'
+        ]);
     }
+
 }
 
   
