@@ -1,0 +1,133 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Alumnos{% endblock %}
+
+{% block body %}
+
+    {# Mensajes Flash #}
+    {% for message in app.flashes('notice') %}
+        <div class="flash-notice">
+            <span>{{ message }}</span>
+            <button class="flash-close" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+    {% endfor %}
+
+    <div class="contenedor-blanco" style="display: flex;">
+        <div class="cuadrado-reutilizable auto-height" style="flex: 1; display: flex; flex-direction: column;">
+            <div class="d-flex justify-content-between align-items-center mb-3" style="flex: 0;">
+                <h4>{{ alumno.nombre }} {{ alumno.apellido }}  |  Notas</h4>
+                <div class="d-flex justify-content-between align-items-right" style="flex: 0; column-gap: 0.5rem">
+                    <button class="btn-alternativo">Exportar</button>
+                    <button class="btn-secundario" id="btn-aniadir">Añadir</button>
+                    <button class="btn-principal" id="btn-volver">Volver</button>
+                </div>
+            </div>
+            <div id="aniadir-container" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-3" style="flex: 0;">
+                    <div>
+                        {{ include('alumno/_form_agregarNotaAlumno.html.twig', {
+                            'inscripcionEdicionId': null,
+                            'form_id': 'nota-form'
+                        }) }}
+                    </div>
+                    <div class="col-md-3">
+                        <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Edicion</div>
+                        <select class="form-control" id="edicion-select" required>
+                            <option value="" disabled selected>Seleccione una edicion</option>
+                            {% for inscripcion in inscripciones %}
+                                <option value="{{ inscripcion.id }}">
+                                    {{ inscripcion.edicion.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-right" style="flex: 0; column-gap: 0.5rem">
+                        <button class="btn-alternativo" id="btn-guardar" type="submit" form="nota-form">Guardar</button>
+                        <button class="btn-secundario" id="btn-cancelar-aniadir">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+            <div id="lista-notas" style="flex: 1; margin: -1rem"
+                data-labels='["Curso","Edicion", "Nota", "Descripcion", "Fecha de carga","Acciones"]'
+                data-attributes='["curso","edicion", "nota", "descripcion", "fecha_carga"]'
+                data-rows='{{ notas|json_encode|raw }}'>
+            </div>
+        </div>
+    </div>
+
+    {# Formularios ocultos para eliminar (uno por cada nota) #}
+    {% for nota in notas %}
+        <div id="delete-form-{{ nota.id }}" style="display: none;">
+            {{ include('nota/_delete_form.html.twig', {
+                'notum': nota, 
+                'redirect_to': 'alumno',
+                'alumno_id': alumno.id
+            }) }}
+        </div>
+    {% endfor %}
+
+    <!-- Modal de Confirmación de Eliminación -->
+    {{ include('alumno/_modal_eliminacion.html.twig') }}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const btnVolver = document.getElementById('btn-volver');
+            const btnAniadir = document.getElementById('btn-aniadir');
+            const btnGuardar = document.getElementById('btn-guardar');
+            const btnCancelar = document.getElementById('btn-cancelar-aniadir');
+            const aniadirContainer = document.getElementById('aniadir-container');
+            const mainContainer = document.getElementById('main-container');
+            const edicionSelect = document.getElementById('edicion-select');
+            const inscripcionField = document.getElementById('nota_inscripcionEdicion');
+
+            // Actualizar el campo oculto cuando se selecciona una edicion
+            edicionSelect.addEventListener('change', function() {
+                if (inscripcionField) {
+                    inscripcionField.value = edicionSelect.value;
+                }
+            });
+
+            // Validar que se haya seleccionado una edicion antes de guardar
+            btnGuardar.addEventListener('click', function(e) {
+                if (!edicionSelect.value) {
+                    e.preventDefault();
+                    alert('Por favor, seleccione una edición antes de guardar.');
+                    edicionSelect.focus();
+                    return false;
+                }
+            });
+
+            // Botón volver - volver a pantalla de visualizar
+            btnVolver.addEventListener('click', () => {
+                window.location.href = '{{ path('app_alumno_visualizar', {'id': alumno.id}) }}';
+            });
+
+            // Cambiar a modo añadir
+            btnAniadir.addEventListener('click', () => {
+                aniadirContainer.style.display = 'block';
+
+                mainContainer.style.display = 'none';
+                
+            });
+
+            // Salir modo añadir
+            btnCancelar.addEventListener('click', () => {
+                aniadirContainer.style.display = 'none';
+
+                mainContainer.style.display = 'flex';
+                
+            });
+
+            
+        });
+    </script>
+    {{ encore_entry_script_tags('alumno') }}
+    {{ encore_entry_link_tags('alumno') }}
+
+{% endblock %}

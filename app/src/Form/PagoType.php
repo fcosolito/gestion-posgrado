@@ -14,8 +14,7 @@ class PagoType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('montoPagado')
-            ->add('montoCuota')
+            ->add('monto')
             ->add('fechaPago')
             ->add('comprobante', EntityType::class, [
                 'class' => Comprobante::class,

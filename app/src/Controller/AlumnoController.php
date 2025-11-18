@@ -8,6 +8,8 @@ use App\Entity\InscripcionCarrera;
 use App\Entity\Carrera;
 use App\Entity\Cuota;
 use App\Form\AlumnoType;
+use App\Entity\Nota;
+use App\Form\NotaType;
 use App\Repository\AlumnoRepository;
 use App\Repository\CarreraRepository;
 use App\Repository\CursoRepository;
@@ -98,81 +100,6 @@ final class AlumnoController extends AbstractController
         ]);
     }
 
-    #[Route('/test', name: 'app_alumnos_test', methods: ['GET', 'POST'])]
-    public function indexAlumnos(Request $request, AlumnoRepository $alumnoRepository, EntityManagerInterface $entityManager): Response
-    {
-        // Crear un formulario sin entidad (solo para búsqueda)
-        $formBuscar = $this->createFormBuilder(null, ['method' => 'GET'])
-            ->add('nombre', null, ['required' => false])
-            ->add('apellido', null, ['required' => false])
-            ->add('dni', null, ['required' => false])
-            ->add('email', null, ['required' => false])
-            ->getForm();
-        
-        $formBuscar->handleRequest($request);
-
-        // Obtener alumnos según los filtros
-        $alumnos = $alumnoRepository->findAll(); // Por defecto, todos
-        
-        if ($formBuscar->isSubmitted() && $formBuscar->isValid()) {
-            $data = $formBuscar->getData();
-            
-            // Crear query builder para búsqueda dinámica
-            $qb = $alumnoRepository->createQueryBuilder('a');
-            
-            if (!empty($data['nombre'])) {
-                $qb->andWhere('a.nombre LIKE :nombre')
-                   ->setParameter('nombre', '%' . $data['nombre'] . '%');
-            }
-            if (!empty($data['apellido'])) {
-                $qb->andWhere('a.apellido LIKE :apellido')
-                   ->setParameter('apellido', '%' . $data['apellido'] . '%');
-            }
-            if (!empty($data['dni'])) {
-                $qb->andWhere('a.dni LIKE :dni')
-                   ->setParameter('dni', '%' . $data['dni'] . '%');
-            }
-            if (!empty($data['email'])) {
-                $qb->andWhere('a.email LIKE :email')
-                   ->setParameter('email', '%' . $data['email'] . '%');
-            }
-            
-            $alumnos = $qb->getQuery()->getResult();
-        }
-
-        // Serializar los alumnos a un array simple
-        $alumnosData = [];
-        foreach ($alumnos as $alumno) {
-            $alumnosData[] = [
-                'id' => $alumno->getId(),
-                'nombre' => $alumno->getNombre(),
-                'apellido' => $alumno->getApellido(),
-                'dni' => $alumno->getDni(),
-                'email' => $alumno->getEmail(),
-            ];
-        }
-
-        $alumno = new Alumno();
-        $formCrear = $this->createForm(AlumnoType::class, $alumno);
-        $formCrear->handleRequest($request);
-
-        if ($formCrear->isSubmitted() && $formCrear->isValid()) {
-            $entityManager->persist($alumno);
-            $entityManager->flush();
-
-            $this->addFlash('notice', 'Alumno creado exitosamente');
-
-            return $this->redirectToRoute('app_alumnos_test', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('alumno/_alumnos_test.html.twig', [
-            'alumnos' => $alumnosData,
-            'formBuscar' => $formBuscar,
-            'alumno' => $alumno,
-            'formCrear' => $formCrear,
-        ]);
-    }
-
     #[Route('/new', name: 'app_alumno_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -193,6 +120,29 @@ final class AlumnoController extends AbstractController
         ]);
     }
 
+    #[Route('/search', name: 'app_alumno_search', methods: ['GET'])]
+    public function search(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $query =  $request->query->get("query", "");
+        $alumnos = $entityManager->getRepository(Alumno::class)->searchXor($query);
+        $alumnos_ser = array_map(
+            function (Alumno $a) {
+                return (
+                    [
+                        "id" => $a->getId(),
+                        "nombre" => $a->getNombre(),
+                        "apellido" => $a->getApellido(),
+                        "dni" => $a->getDni(),
+                        "email" => $a->getEmail(),
+                    ]
+                    );
+            },
+            $alumnos
+        );
+
+        return $this->json($alumnos_ser);
+    }
+
     #[Route('/{id}', name: 'app_alumno_show', methods: ['GET'])]
     public function show(Alumno $alumno): Response
     {
@@ -201,6 +151,7 @@ final class AlumnoController extends AbstractController
         ]);
     }
 
+    
     #[Route('/{id}/edit', name: 'app_alumno_edit', methods: ['GET', 'POST'])]
     public function edit(
             Request $request,
@@ -327,7 +278,7 @@ final class AlumnoController extends AbstractController
             throw $this->createNotFoundException('Alumno no encontrado');
         }
         
-        // Obtener las inscripciones a carreras del alumno con JOIN para cargar los datos
+        // Obtener las inscripciones a carreras del alumno
         $inscripcionesCarrera = $entityManager->createQueryBuilder()
             ->select('ic', 'c')
             ->from(\App\Entity\InscripcionCarrera::class, 'ic')
@@ -337,7 +288,7 @@ final class AlumnoController extends AbstractController
             ->getQuery()
             ->getResult();
 
-        // Obtener las inscripciones a ediciones del alumno con JOIN para cargar los datos
+        // Obtener las inscripciones a ediciones del alumno
         $inscripcionesEdicion = $entityManager->createQueryBuilder()
             ->select('ie', 'e', 'c')
             ->from(\App\Entity\InscripcionEdicion::class, 'ie')
@@ -616,6 +567,69 @@ final class AlumnoController extends AbstractController
         return $this->redirectToRoute('app_alumno_inscribir', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
     }
 
+    #[Route('/{id}/notas', name: 'app_alumno_notas', methods: ['GET', 'POST'])]
+    public function notas(Request $request, Alumno $alumno, EntityManagerInterface $entityManager): Response
+    {
+
+        $notum = new Nota();
+        $form = $this->createForm(NotaType::class, $notum);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($notum);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_alumno_notas', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
+        }
+
+        // Obtener notas del alumno
+        $notas = $entityManager->createQueryBuilder()
+            ->select('n', 'ie', 'e', 'c')
+            ->from(\App\Entity\Nota::class, 'n')
+            ->innerJoin('n.inscripcionEdicion', 'ie')
+            ->innerJoin('ie.edicion', 'e')
+            ->innerJoin('e.curso', 'c')
+            ->where('ie.alumno = :alumno')
+            ->setParameter('alumno', $alumno)
+            ->getQuery()
+            ->getResult();
+
+        // Obtener todas las inscripciones del alumno (para el dropdown)
+        $inscripciones = $entityManager->createQueryBuilder()
+            ->select('ie', 'e', 'c')
+            ->from(\App\Entity\InscripcionEdicion::class, 'ie')
+            ->innerJoin('ie.edicion', 'e')
+            ->innerJoin('e.curso', 'c')
+            ->where('ie.alumno = :alumno')
+            ->setParameter('alumno', $alumno)
+            ->getQuery()
+            ->getResult();
+
+        // Preparar datos para el template
+        $notasData = [];
+
+        foreach ($notas as $nota) {
+            $inscripcion = $nota->getInscripcionEdicion();
+            $edicion = $inscripcion->getEdicion();
+            $curso = $edicion->getCurso();
+            
+            $notasData[] = [
+                'id' => $nota->getId(),
+                'curso' => $curso->getNombre(),
+                'edicion' => $edicion->getNombre(),
+                'nota' => $nota->getValor(),
+                'descripcion' => $nota->getDescripcion(),
+                'fecha_carga' => $nota->getFechaCarga() ? $nota->getFechaCarga()->format('d/m/Y') : 'N/A',
+            ];
+        }
+
+        return $this->render('alumno/notas_alumno.html.twig', [
+            'alumno' => $alumno,
+            'notas' => $notasData,
+            'inscripciones' =>  $inscripciones,
+            'form' => $form,
+        ]);
+    }
     private function eliminarCuotasDeInscripcion(
             InscripcionCarrera $inscripcion, 
             EntityManagerInterface $entityManager
@@ -632,5 +646,6 @@ final class AlumnoController extends AbstractController
         
         // No hacemos flush aquí, se hará junto con la eliminación de la inscripción
     }
-
 }
+
+  

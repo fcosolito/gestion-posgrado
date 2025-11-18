@@ -186,4 +186,48 @@ document.addEventListener("DOMContentLoaded", () => {
     root.render(<ListaInscripciones labels={labels} attributes={attributes} rows={rows} onAccionClick={handleAccionClick} />);
   }
 
+   const listaNotasAlumno = document.getElementById("lista-notas");
+  if (listaNotasAlumno) {
+    const labels = JSON.parse(listaNotasAlumno.dataset.labels || '[]');
+    const attributes = JSON.parse(listaNotasAlumno.dataset.attributes || '[]');
+    const rows = JSON.parse(listaNotasAlumno.dataset.rows || '[]');
+    
+    const opcionesAcciones = [
+      {
+        label: 'Editar (a implementar)',
+        onClick: (rowIndex) => {
+          //const alumnoId = rows[rowIndex].id;
+          //window.location.href = `/alumno/${alumnoId}/visualizar`;
+        }
+      },
+      {
+        label: 'Eliminar',
+        onClick: (rowIndex) => {
+          const nota = rows[rowIndex];
+          const datosNota = `${nota.nota} ${nota.descripcion || 'Sin descripción'} cargada el ${nota.fecha_carga}`;
+          
+          mostrarModalConfirmacion(
+            'Confirmar eliminación',
+            '¿Está seguro de que desea eliminar la nota?',
+            datosNota,
+            () => {
+              const container = document.getElementById(`delete-form-${nota.id}`);
+              if (container) {
+                const form = container.querySelector('form');
+                if (form) {
+                  form.submit();
+                }
+              }
+            }
+          );
+        }
+      },
+    ];
+    
+    
+    const root = createRoot(listaNotasAlumno);
+    root.render(<Lista labels={labels} attributes={attributes} rows={rows} opcionesAcciones={opcionesAcciones} />);
+  }
+
+
 });

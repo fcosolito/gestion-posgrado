@@ -13,11 +13,11 @@
     <body>
         <div class="container-fluid">
             <div class="row">
-                <div class="col-auto p-0">
+                <div class="col-auto p-0 vh-100">
                     <div id="sidebar-root" data-page="{{ currentPage|default('/alumno') }}"></div>
                 </div>
-                <div class="col p-4" id="main-content">
-                    <div class="main-content d-flex flex-column gap-2">
+                <div class="col p-4 vh-100 overflow-scroll" id="main-content">
+                    <div class="main-content ">
                         <div class="cabecera-azul">
                             <h1 class="titulo-principal">
                             {{ block("title") }}
@@ -32,7 +32,5 @@
         {{ encore_entry_script_tags('app') }}
         {{ encore_entry_link_tags('app') }}
 
-    {{ encore_entry_script_tags('alumno') }}
-    {{ encore_entry_link_tags('alumno') }}
     </body>
 </html>

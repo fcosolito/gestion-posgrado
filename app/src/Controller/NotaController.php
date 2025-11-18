@@ -76,6 +76,21 @@ final class NotaController extends AbstractController
             $entityManager->flush();
         }
 
+        // Verificar de dónde viene la solicitud de eliminación
+        $redirectTo = $request->request->get('redirect_to');
+        
+        if ($redirectTo === 'alumno') {
+            $alumnoId = $request->request->get('alumno_id');
+            if ($alumnoId) {
+                return $this->redirectToRoute('app_alumno_notas', ['id' => $alumnoId], Response::HTTP_SEE_OTHER);
+            }
+        } elseif ($redirectTo === 'edicion') {
+            $edicionId = $request->request->get('edicion_id');
+            if ($edicionId) {
+                return $this->redirectToRoute('app_edicion_notas', ['id' => $edicionId], Response::HTTP_SEE_OTHER);
+            }
+        }
+
         return $this->redirectToRoute('app_nota_index', [], Response::HTTP_SEE_OTHER);
     }
 }

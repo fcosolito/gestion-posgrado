@@ -22,6 +22,19 @@ body {
   border-radius: 8px;
 }
 
+.tabla-generica-1 {
+  overflow-y: scroll;
+  position: relative;
+  height: 3em;
+}
+
+.tabla-generica-1.head {
+  position: sticky;
+  top: 0;
+  background-color: #ddd;
+  z-index: 1;
+}
+
 /*-------------CSS VALE-------------*/
 
 .boton-base {

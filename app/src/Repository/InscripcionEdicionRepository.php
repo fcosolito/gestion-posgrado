@@ -2,7 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\Edicion;
 use App\Entity\InscripcionEdicion;
+use App\Entity\Nota;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -38,6 +40,19 @@ class InscripcionEdicionRepository extends ServiceEntityRepository
         }
 
         return $cursos;
+    }
+
+    public function findByEdicionConNota(Edicion $edicion) {
+        $inscripciones = $this->createQueryBuilder('ie')
+            ->leftJoin('ie.nota', 'n')
+            ->addSelect('n')
+            ->where('ie.edicion = :edicion')
+            ->setParameter('edicion', $edicion->getId())
+            ->getQuery()
+            ->getResult()
+        ;
+
+        return $inscripciones;
     }
 
     //    /**

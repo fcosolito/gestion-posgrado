@@ -35,9 +35,9 @@ export default function Curso({edicion, deleteFormHtml}) {
     };
 
     return (
-        <div className="container-fluid p-2 rounded bg-white">
-            <div className="row">
-                <div className="col-4">
+        <>
+            <div className="row d-flex justify-content-start">
+                <div className="col">
                     {isEditing ? (
                         <input
                             type="text"
@@ -46,32 +46,30 @@ export default function Curso({edicion, deleteFormHtml}) {
                             className="border"
                         />
                     ) : (
-                        <h2 className="m-1">{edicion.nombre}</h2>
-                    )}
-                </div>
-                <div className="col-5 ms-auto">
-                    {isEditing ? (
-                    <div className="row justify-content-end">
-                        <div className="col">
-                            <button className="btn btn-primary" onClick={() => handleSave()}>Guardar</button>
-                        </div>
-                        <div className="col">
-                            <button className="btn btn-danger" onClick={() => handleCancel()}>Cancelar</button>
-                        </div>
-                    </div>
-                    ) : (
-                    <div className="row justify-content-end">
-                        <div className="col">
-                            <button className="btn btn-secondary" onClick={() => handleEdit(edicion)}>Editar</button>
-                        </div>
-                        <div className="col"
-                            dangerouslySetInnerHTML={{ __html: deleteFormHtml }}
-                        >
-                        </div>
-                    </div>
+                        <span className="m-1 fs-5 fw-bold">{edicion.nombre}</span>
                     )}
                 </div>
             </div>
+            {isEditing ? (
+            <div className="row d-flex justify-content-end">
+                <div className="col-auto">
+                    <button className="btn btn-primary" onClick={() => handleSave()}>Guardar</button>
+                </div>
+                <div className="col-auto">
+                    <button className="btn btn-danger" onClick={() => handleCancel()}>Cancelar</button>
+                </div>
+            </div>
+            ) : (
+            <div className="row d-flex justify-content-end">
+                <div className="col-auto">
+                    <button className="btn btn-secondary" onClick={() => handleEdit(edicion)}>Editar</button>
+                </div>
+                <div className="col-auto"
+                    dangerouslySetInnerHTML={{ __html: deleteFormHtml }}
+                >
+                </div>
+            </div>
+            )}
             <div className="row m-1">
                 <div className="col-4 fw-bold">Inicio</div>
                 <div className="col-4 fw-bold">Fin</div>
@@ -111,7 +109,7 @@ export default function Curso({edicion, deleteFormHtml}) {
                     <div className="col-4">{edicion.precio}</div>
                 </div>
             )}
-        </div>
+        </>
 
     );
 }

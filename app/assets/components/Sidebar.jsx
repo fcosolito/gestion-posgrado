@@ -14,6 +14,10 @@ export default function Sidebar({ initialPage }) {
             path: "/curso"
         },
         {
+            name: "Cuotas",
+            path: "/cuota"
+        },
+        {
             name: "Pagos",
             path: "/pago"
         },

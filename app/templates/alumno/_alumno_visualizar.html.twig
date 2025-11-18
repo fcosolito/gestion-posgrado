@@ -151,14 +151,20 @@
                 });
             }
 
-            // Botón volver - redirigir a alumno/test
+            // Botón volver - redirigir a alumno index
             btnVolver.addEventListener('click', () => {
-                window.location.href = '{{ path('app_alumnos_test') }}';
+                window.location.href = '{{ path('app_alumno_index') }}';
             });
 
             // Botón inscribir - redirigir a pantalla de inscripciones
             btnInscribir.addEventListener('click', () => {
                 window.location.href = '{{ path('app_alumno_inscribir', {'id': alumno.id}) }}';
+            });
+
+            
+            // Botón notas - redirigir a pantalla de notas de alumno
+            btnNotas.addEventListener('click', () => {
+                window.location.href = '{{ path('app_alumno_notas', {'id': alumno.id}) }}';
             });
 
             // Cambiar a modo editar
