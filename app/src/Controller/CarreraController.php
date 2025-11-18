@@ -9,6 +9,7 @@ use App\Form\CarreraType;
 use App\Form\CarreraSearchType;
 use App\Repository\CarreraRepository;
 use App\Repository\InscripcionCarreraRepository;
+use App\Repository\PrecioCarreraRepository;
 use App\Repository\CursoRepository;
 use App\Repository\PerteneceARepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -105,36 +106,41 @@ final class CarreraController extends AbstractController
         Carrera $carrera, 
         InscripcionCarreraRepository $inscripcionCarreraRepository,
         PerteneceARepository $perteneceARepository,
+        PrecioCarreraRepository $precioCarreraRepository,
         EntityManagerInterface $entityManager
     ): Response
     {   
-    // Obtenemos todos los cursos de la carrera
-    $cursosRelacionados = $perteneceARepository->findBy(['carrera' => $carrera]);
-    $cursosObligatorios = [];
-    $cursosElectivos = [];
-    
-    foreach ($cursosRelacionados as $relacion) {
-        if ($relacion->isEsElectivo()) {
-            $cursosElectivos[] = $relacion->getCurso();
-        } else {
-            $cursosObligatorios[] = $relacion->getCurso();
+        // Obtenemos todos los cursos de la carrera
+        $cursosRelacionados = $perteneceARepository->findBy(['carrera' => $carrera]);
+        $cursosObligatorios = [];
+        $cursosElectivos = [];
+        
+        foreach ($cursosRelacionados as $relacion) {
+            if ($relacion->isEsElectivo()) {
+                $cursosElectivos[] = $relacion->getCurso();
+            } else {
+                $cursosObligatorios[] = $relacion->getCurso();
+            }
         }
+        
+        // Obtenemos los alumnos inscriptos a la carrera
+        $inscripciones = $inscripcionCarreraRepository->findByCarrera($carrera->getId());
+        $alumnos = array_map(function($inscripcion) {
+            return $inscripcion->getAlumno();
+        }, $inscripciones);
+
+        //buscamos el precio vigente de la carrera
+        $precioVigente = $precioCarreraRepository->findPrecioVigentePorCarrera($carrera->getId());
+        
+        return $this->render('carrera/show.html.twig', [
+            'carrera' => $carrera,
+            'inscriptosCarrera' => count($inscripciones),
+            'cursosObligatorios' => $cursosObligatorios,
+            'cursosElectivos' => $cursosElectivos,
+            'alumnos' => $alumnos,
+            'precioVigente'=> $precioVigente,
+        ]);
     }
-    
-    // Obtenemos los alumnos inscriptos a la carrera
-    $inscripciones = $inscripcionCarreraRepository->findByCarrera($carrera->getId());
-    $alumnos = array_map(function($inscripcion) {
-        return $inscripcion->getAlumno();
-    }, $inscripciones);
-    
-    return $this->render('carrera/show.html.twig', [
-        'carrera' => $carrera,
-        'inscriptosCarrera' => count($inscripciones),
-        'cursosObligatorios' => $cursosObligatorios,
-        'cursosElectivos' => $cursosElectivos,
-        'alumnos' => $alumnos,
-    ]);
-}
 
     #[Route('/{id}/edit', name: 'app_carrera_edit', methods: ['GET', 'POST'])]
     public function edit(
@@ -293,6 +299,24 @@ final class CarreraController extends AbstractController
 
         return $this->json([
 
+        ]);
+    }
+
+    // Método para ver el historial de precios de la carrera
+    #[Route('/{id}/historial-precios', name: 'app_carrera_historial_precios', methods: ['GET'])]
+    public function historialPrecios(
+        Carrera $carrera,
+        PrecioCarreraRepository $precioCarreraRepository
+    ): Response
+    {
+        $precios = $precioCarreraRepository->findBy(
+            ['carrera' => $carrera],
+            ['fechaVigencia' => 'DESC']
+        );
+
+        return $this->render('carrera/historial_precios.html.twig', [
+            'carrera' => $carrera,
+            'precios' => $precios,
         ]);
     }
 }

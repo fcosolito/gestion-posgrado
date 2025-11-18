@@ -1,66 +1,212 @@
-.agregar-curso{
-    width:90%;
-    margin:0 auto;
-    padding: 8px 30px;
+/* styles/carrera/agregar_curso.css */
+.agregar-curso {
+    width: 95%;
+    margin: 0 1rem 1rem 1rem;
+    padding: 1.5rem;
     border: none;
-    background-color: #efefef;
-    border-radius: 8px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 12px;
     display: flex;
+    gap: 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
 }
 
 .cursos-restantes,
-.formulario-agregar{
+.formulario-agregar {
     width: 50%;
+    padding: 1rem;
 }
 
-.lista-cursos-restantes{
-    list-style:none;
+.cursos-restantes {
+    border-right: 2px solid #e2e8f0;
+    padding-right: 2rem;
+}
+
+.formulario-agregar {
+    padding-left: 2rem;
+}
+
+h4 {
+    display: flex;
+    justify-content: center;
+    color: #1e293b;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f5ba04;
+}
+
+/* Estilos para la lista de cursos disponibles */
+.lista-cursos-restantes {
+    list-style: none;
     width: 100%;
     padding: 0;
     box-sizing: border-box;
+    max-height: 50vh;
+    overflow-y: auto;
 }
 
-h4{
-    display: flex;
-    justify-content: center;
+.lista-cursos-restantes::-webkit-scrollbar {
+    width: 6px;
 }
 
-.cursos-restantes{
-    border-right: white solid 1px;
+.lista-cursos-restantes::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
 }
 
-.lista-item{
+.lista-cursos-restantes::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.lista-cursos-restantes::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+.lista-item {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 100%;
-    margin-bottom: 1vh;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
 }
 
-.button-asignar-curso{
-    background-color: transparent;
-    color: #adadad;
-    margin-right: 20px;
+.lista-item:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-color: #cbd5e1;
+}
+
+.curso-nombre {
+    flex: 1;
+    color: #374151;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+    padding-right: 1rem;
+}
+
+/* Estilos para el formulario de crear curso */
+.form-crear-curso {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-crear-curso input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    background-color: white;
+    box-sizing: border-box;
+}
+
+.form-crear-curso input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-crear-curso input::placeholder {
+    color: #9ca3af;
+}
+
+/* Botones */
+.button-asignar-curso {
+    background-color: #f5ba04;
+    color: white;
     border: none;
-    transition: color 0.3s ease;
-    position: relative;
-    overflow: hidden;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 80px;
 }
 
-.button-asignar-curso:hover{
-    color: #000000;
+.button-asignar-curso:hover {
+    background-color: #d39e01;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Subrayado del botón */
-.button-asignar-curso::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    height: 1px;
-    width: 0;
-    background: #000;
-    transition: width 0.3s cubic-bezier(0.4,0,0.2,1);
+.form-crear-curso button {
+    background-color: #10b981;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
 }
-.button-asignar-curso:hover::after {
-    width: 100%;
+
+.form-crear-curso button:hover {
+    background-color: #059669;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2);
+}
+
+/* Mensaje cuando no hay cursos */
+.cursos-restantes p {
+    text-align: center;
+    color: #6b7280;
+    font-style: italic;
+    padding: 2rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px dashed #d1d5db;
+}
+
+/* Estilos responsivos */
+@media (max-width: 1024px) {
+    .agregar-curso {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .cursos-restantes,
+    .formulario-agregar {
+        width: 100%;
+        padding: 0;
+    }
+    
+    .cursos-restantes {
+        border-right: none;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 1.5rem;
+    }
+    
+    .formulario-agregar {
+        padding-left: 0;
+        padding-top: 1.5rem;
+    }
+}
+
+/* Estados de carga y deshabilitado */
+.button-asignar-curso:disabled,
+.form-crear-curso button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.button-asignar-curso:disabled:hover,
+.form-crear-curso button:disabled:hover {
+    background-color: #9ca3af;
+    transform: none;
+    box-shadow: none;
 }

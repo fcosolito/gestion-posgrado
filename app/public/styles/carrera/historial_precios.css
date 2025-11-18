@@ -1,0 +1,150 @@
+/* styles/carrera/historial_precios.css */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.header-historial {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 0 1rem;
+}
+
+.header-historial h1 {
+    color: #1e40af;
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.btn-volver {
+    background-color: #6b7280;
+    color: white;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-volver:hover {
+    background-color: #4b5563;
+    color: white;
+    text-decoration: none;
+}
+
+/* Tabla de historial de precios */
+.table-responsive {
+    background-color: #ffffff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0;
+}
+
+/* CORREGIDO: Solo una regla para el thead */
+.table thead {
+    background-color: #efefef; /* Este es el color que quieres */
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+}
+
+.table th {
+    padding: 8px 12px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+    height: 40px;
+    vertical-align: middle;
+    color: #374151; /* Color de texto para mejor contraste */
+}
+
+.table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    color: #4b5563;
+    font-size: 0.9rem;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Estilos específicos para columnas de precio */
+.precio-col {
+    font-weight: 600;
+    color: #059669;
+}
+
+.fecha-col {
+    color: #6b7280;
+}
+
+/* Estado cuando no hay datos */
+.alert-info {
+    background-color: #eff6ff;
+    border: 1px solid #dbeafe;
+    color: #1e40af;
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+    margin: 2rem 0;
+}
+
+/* Badge para el precio vigente actual */
+.badge-vigente {
+    background-color: #10b981;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 0.5rem;
+    }
+    
+    .header-historial {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .header-historial h1 {
+        font-size: 1.5rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 0.75rem 1rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+}

@@ -15,6 +15,16 @@ class PrecioCarreraRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, PrecioCarrera::class);
     }
+    public function findPrecioVigentePorCarrera(int $carreraId): ?PrecioCarrera
+    {
+        return $this->createQueryBuilder('pc')
+            ->andWhere('pc.carrera = :carreraId')
+            ->setParameter('carreraId', $carreraId)
+            ->orderBy('pc.fechaVigencia', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 
     //    /**
     //     * @return PrecioCarrera[] Returns an array of PrecioCarrera objects

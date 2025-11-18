@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/carrera/historial_precios.css') }}">
+{% endblock %}
+
+{% block title %}Historial de Precios - {{ carrera.nombre }}{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="header-historial">
+            <h1>Historial de Precios - {{ carrera.nombre }}</h1>
+            <button class="btn-volver" onclick="window.history.back()">Volver</button>
+        </div>
+
+        {% if precios|length > 0 %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Precio</th>
+                            <th>Fecha de Vigencia</th>
+                            <th>Fecha de Creación</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for precio in precios %}
+                            <tr>
+                                <td class="precio-col">${{ precio.precio|number_format(2, ',', '.') }}</td>
+                                <td class="fecha-col">{{ precio.fechaVigencia|date('d/m/Y') }}</td>
+                                <td class="fecha-col">{{ precio.fechaCreacion|date('d/m/Y H:i') }}</td>
+                                <td>
+                                    {% if loop.first %}
+                                        <span class="badge-vigente">Vigente</span>
+                                    {% else %}
+                                        <span style="color: #9ca3af;">Histórico</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert-info">
+                <p>No hay historial de precios para esta carrera.</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -8,7 +8,11 @@
     margin: 1rem;
     border-radius:8px;
     width: 30%;
-    height: 80vh;
+    height: 100%;
+}
+.editor-carrera h2{
+    padding: 20px 0px 8px 25px;
+    border-bottom: 1px solid #e5e7eb;
 }
 .header{
     display: flex;
@@ -48,12 +52,12 @@
 }
 /* Estado expandido */
 .cursos-obligatorios.expandido {
-    height: 80vh;
+    height:auto;
     z-index: 10;
     box-shadow: 0 0 10px #aaa;
 }
 .cursos-electivos.expandido {
-    height: 80vh;
+    height:auto;
     z-index: 10;
     box-shadow: 0 0 10px #aaa;
 }

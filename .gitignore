@@ -9,5 +9,5 @@ app/var/
 app/vendor/
 ###< symfony/framework-bundle ###
 home/
-app/node_modules/
+node_modules/
 .env

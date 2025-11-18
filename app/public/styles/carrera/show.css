@@ -78,6 +78,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.75rem;
+    background-color: #e5e7eb;
+    border-radius: 8px;
     border-bottom: 1px solid #f0f0f0;
 }
 
@@ -92,7 +94,39 @@
     color: #212529;
 }
 
-/* Sección de cursos y alumnos */
+/* Estilos para botón de  historial de precios de la carrera */
+.precio-carrera-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-historial-precios {
+    background: none;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #6b7280;
+    background-color: #f9fafb;
+}
+
+.btn-historial-precios:hover {
+    background-color: #f3f4f6;
+    border-color: #9ca3af;
+    color: #374151;
+    transform: translateY(-1px);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.btn-historial-precios:active {
+    transform: translateY(0);
+}
+
+
+/* Estilos para la sección de cursos y alumnos */
 .cursos-alumnos {
     display: flex;
     gap: 1rem;

@@ -40,6 +40,26 @@
                         {% endif %}
                     </dd>
                 </div>
+                <div class="info-item">
+                    <dt>Precio de la carrera</dt> 
+                    <dd>
+                        {% if precioVigente %}
+                            ${{ precioVigente.precio }}
+                            <button class="btn-historial-precios" 
+                                onclick="window.location.href='{{ path('app_carrera_historial_precios', {'id': carrera.id}) }}'"
+                                title="Ver historial de precios">
+                                📊
+                            </button>
+                        {% else %}
+                            No definido
+                                <button class="btn-historial-precios" 
+                                    onclick="window.location.href='{{ path('app_carrera_historial_precios', {'id': carrera.id}) }}'"
+                                    title="Ver historial de precios">
+                                📊
+                            </button>
+                        {% endif %}
+                    </dd>
+                </div> 
                 <div class="info-item"> 
                     <dt>Alumnos Inscriptos</dt>
                     <dd>{{ inscriptosCarrera }}</dd>
