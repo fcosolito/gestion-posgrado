@@ -16,11 +16,28 @@ export default function ListaInscripciones ({ alumnos, descuentos }) {
 
     const handleChange = (field, value) => {
         setEditValues((prev) => ({ ...prev, [field]: value }));
-        console.log(`Edit values: ${editValues}`);
     };
 
+    const handleSave = async (id) => {
+        try {
+            const res = await fetch(`/descuento/${editValues.descuento}/asoc-insc-e`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ inscripcion: id}),
+            });
+
+            if (!res.ok) throw new Error("Error al guardar");
+            alert("Cambios guardados");
+        } catch (err) {
+            alert(err.message);
+        }
+        setEditingRow(null);
+        setEditValues({});
+        window.location.reload();
+    }
+
     return (
-        <div className="rounded bg-white h-100 p-3">
+        <div className="rounded bg-white vh-100 p-3">
                 <div className="row p-2 d-flex justify-content-between">
                     <div className="col d-flex align-items-center justify-content-start">
                         <span className="m-1 fs-5 fw-bold">Alumnos</span>
@@ -29,7 +46,7 @@ export default function ListaInscripciones ({ alumnos, descuentos }) {
                         <button className="btn btn-primary">Inscribir</button>
                     </div>
                 </div>
-                <div className="h-25 overflow-scroll">
+                <div className="h-100 overflow-scroll">
                     <table className="table table-striped table-bordered table-hover">
                         <thead className="sticky-top table-secondary">
                             <tr>
@@ -51,21 +68,24 @@ export default function ListaInscripciones ({ alumnos, descuentos }) {
                                     <td>{alumno.dni}</td>
                                     <td>
                                     {editingRow === alumno.inscripcion ? (
-                                        <select 
-                                            className="form-select"
-                                            onChange={(e) => handleChange("descuento", e.target.value)}
-                                        >
-                                            {descuentos.map((descuento) => (
-                                                <option 
-                                                    selected={alumno.descuento === descuento.id}
-                                                    value={descuento.id}
-                                                >
-                                                    <div><strong>{descuento.valor}</strong></div>
-                                                    <div>{`${descuento.descripcion.slice(0, 20)}...`}</div>
-                                                </option>
-
-                                            ))}
-                                        </select>
+                                        <div className="dropdown">
+                                            <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                {descuentos.filter(d => d.id === editValues.descuento)[0].valor}
+                                            </button>
+                                            <ul className="dropdown-menu w-100" style={{ zIndex: 1050,}}>
+                                                {descuentos.map((descuento) => (
+                                                    <li key={descuento.id}>
+                                                        <button
+                                                            className="dropdown-item"
+                                                            onClick={() => handleChange("descuento", descuento.id)}
+                                                        >
+                                                            <div><strong>{descuento.valor}</strong></div>
+                                                            <div className="text-truncate">{`${descuento.descripcion}`}</div>
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
                                     ) : (
                                         // Esto tiene pinta de poder fallar muy facil
                                         // TODO manejar errores

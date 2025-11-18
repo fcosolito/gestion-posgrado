@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\InscripcionEdicionRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: InscripcionEdicionRepository::class)]
@@ -27,6 +28,12 @@ class InscripcionEdicion
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Nota $nota = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTime $fechaInscripcion = null;
+
+    #[ORM\Column(type: Types::BIGINT, nullable: true)]
+    private ?string $nroLegajo = null;
 
     public function getId(): ?int
     {
@@ -77,6 +84,30 @@ class InscripcionEdicion
     public function setNota(?Nota $nota): static
     {
         $this->nota = $nota;
+
+        return $this;
+    }
+
+    public function getFechaInscripcion(): ?\DateTime
+    {
+        return $this->fechaInscripcion;
+    }
+
+    public function setFechaInscripcion(?\DateTime $fechaInscripcion): static
+    {
+        $this->fechaInscripcion = $fechaInscripcion;
+
+        return $this;
+    }
+
+    public function getNroLegajo(): ?string
+    {
+        return $this->nroLegajo;
+    }
+
+    public function setNroLegajo(?string $nroLegajo): static
+    {
+        $this->nroLegajo = $nroLegajo;
 
         return $this;
     }

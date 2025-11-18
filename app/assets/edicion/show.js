@@ -7,7 +7,6 @@ import ListaInscripciones from './ListaInscripciones';
 document.addEventListener("DOMContentLoaded", () => {
   const el = document.getElementById("edicion");
   if (el) {
-    console.log("Cargando edicion")
     const root = createRoot(el);
     const edicion = JSON.parse(el.dataset.edicion);
     const deleteForm = el.dataset.deleteForm;

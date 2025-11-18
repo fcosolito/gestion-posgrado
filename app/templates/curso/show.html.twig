@@ -59,40 +59,6 @@
                     data-carreras="{{ carreras|json_encode }}"
                 >
                 </div>
-                {#
-                <h3 class="m-1">Carreras</h3>
-                <div class="row m-1">
-                    <div class="col bg-grey fw-bold">Nombre</div>
-                    <div class="col bg-grey fw-bold">Relacion</div>
-                    <div class="col bg-grey fw-bold">Acciones</div>
-                </div>
-                {% for carrera in carreras %}
-                <div class="row m-1">
-                    <div class="col">{{ carrera.nombre }}</div>
-                    <div class="col">
-                    {% if carrera.electivo %}
-                        Electivo
-                    {% else %}
-                        Obligatorio
-                    {% endif %}
-                    </div>
-                    <div class="col">
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Acciones
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li>Ver</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                {% else %}
-                <p class="m-1">No hay carreras asociadas</p>
-                {% endfor %}
-                #}
-
-
             </div>
         </div>
     </div>

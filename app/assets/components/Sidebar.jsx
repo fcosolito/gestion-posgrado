@@ -21,6 +21,10 @@ export default function Sidebar({ initialPage }) {
             name: "Pagos",
             path: "/pago"
         },
+        {
+            name: "Descuentos",
+            path: "/descuento"
+        },
     ];
 
     return (

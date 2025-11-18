@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Descuento{% endblock %}
+
+{% block body %}
+    <h1>Descuento</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ descuento.id }}</td>
+            </tr>
+            <tr>
+                <th>Descripcion</th>
+                <td>{{ descuento.descripcion }}</td>
+            </tr>
+            <tr>
+                <th>Valor</th>
+                <td>{{ descuento.valor }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_descuento_index') }}">back to list</a>
+
+    <a href="{{ path('app_descuento_edit', {'id': descuento.id}) }}">edit</a>
+
+    {{ include('descuento/_delete_form.html.twig') }}
+{% endblock %}
