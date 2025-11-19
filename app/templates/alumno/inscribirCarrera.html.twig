@@ -27,16 +27,22 @@
         </div>
         <div class="cuadrado-reutilizable fill-remaining">
             <div id="lista-inscripciones"
-                 data-labels='["Nombre","Ordenanza","Implementación","Estado","Acción"]'
-                 data-attributes='["nombre","ordenanza","implementacion","estado","accion"]'
+                 data-labels='["Nombre","Ordenanza","Implementación","Legajo","Descuento","Descripción","Fecha inscripción","Estado","Acción"]'
+                 data-attributes='["nombre","ordenanza","implementacion","legajo","descuento","descripcion","fechaInscripcion","estado","accion"]'
                  data-rows='{{ carrerasData|json_encode(constant('JSON_UNESCAPED_UNICODE'))|e('html_attr') }}'
                  data-alumno-id='{{ alumno.id }}'>
             </div>
         </div>
     </div>
 
+    {# Modal de Inscripción #}
+    {% include 'alumno/_modal_inscripcion.html.twig' %}
+
     {# Modal de confirmación #}
     {{ include('alumno/_modal_eliminacion.html.twig') }}
+
+    {# Modal de eliminación con cuotas #}
+    {{ include('alumno/_modal_eliminacion_cuotas.html.twig') }}
 
 {% endblock %}
 

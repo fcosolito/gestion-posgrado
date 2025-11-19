@@ -22,7 +22,8 @@
         "symfony/twig-bundle": "7.3.*",
         "symfony/validator": "7.3.*",
         "symfony/webpack-encore-bundle": "^2.3",
-        "symfony/yaml": "7.3.*"
+        "symfony/yaml": "7.3.*",
+        "vich/uploader-bundle": "^2.8"
     },
     "config": {
         "allow-plugins": {

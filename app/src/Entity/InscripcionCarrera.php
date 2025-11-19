@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\InscripcionCarreraRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: InscripcionCarreraRepository::class)]
@@ -24,6 +25,12 @@ class InscripcionCarrera
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Alumno $alumno = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $nroLegajo = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $fechaInscripcion = null;
 
     public function getId(): ?int
     {
@@ -62,6 +69,30 @@ class InscripcionCarrera
     public function setAlumno(?Alumno $alumno): static
     {
         $this->alumno = $alumno;
+
+        return $this;
+    }
+
+    public function getNroLegajo(): ?int
+    {
+        return $this->nroLegajo;
+    }
+
+    public function setNroLegajo(?int $nroLegajo): static
+    {
+        $this->nroLegajo = $nroLegajo;
+
+        return $this;
+    }
+
+    public function getFechaInscripcion(): ?\DateTimeInterface
+    {
+        return $this->fechaInscripcion;
+    }
+
+    public function setFechaInscripcion(?\DateTimeInterface $fechaInscripcion): static
+    {
+        $this->fechaInscripcion = $fechaInscripcion;
 
         return $this;
     }

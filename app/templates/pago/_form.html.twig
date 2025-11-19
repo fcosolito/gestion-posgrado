@@ -24,7 +24,13 @@
                         Comprobante
                     </div>
                     <div class="col">
-                        {{ form_widget(form.comprobante) }}
+                        {{ form_widget(form.comprobanteFile) }}
+                        {% if pago.comprobante and pago.comprobante.archivo %}
+                            <small class="text-muted d-block mt-2">
+                                Archivo actual: {{ pago.comprobante.archivo }}
+                                ({{ (pago.comprobante.tamano / 1024)|round(2) }} KB)
+                            </small>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="row mt-2 mb-2">

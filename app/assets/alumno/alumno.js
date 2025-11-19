@@ -8,7 +8,7 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 document.addEventListener("DOMContentLoaded", () => {
-  const listaDiv = document.getElementById("lista-generica");
+  const listaDiv = document.getElementById("lista-alumnos");
   if (listaDiv) {
     const labels = JSON.parse(listaDiv.dataset.labels || '[]');
     const attributes = JSON.parse(listaDiv.dataset.attributes || '[]');
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const alumno = rows[rowIndex];
           const alumnoNombre = `${alumno.nombre} ${alumno.apellido}`;
           
-          mostrarModalConfirmacion(
+          window.mostrarModalEliminar(
             'Confirmar eliminación',
             '¿Está seguro de que desea eliminar al alumno?',
             alumnoNombre,
@@ -108,29 +108,30 @@ document.addEventListener("DOMContentLoaded", () => {
     const attributes = JSON.parse(listaInscripciones.dataset.attributes || '[]');
     const rows = JSON.parse(listaInscripciones.dataset.rows || '[]');
     const alumnoId = listaInscripciones.dataset.alumnoId;
+    // Detectar si es carrera o edición por la presencia del atributo 'curso' en la tabla
+    const tipo = attributes.includes('curso') ? 'edicion' : 'carrera';
     
     const handleAccionClick = (row) => {
       if (row.accion === 'Inscribir') {
-        // Crear formulario POST para inscribir
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/alumno/${alumnoId}/inscribir-carrera/${row.id}`;
-        document.body.appendChild(form);
-        form.submit();
+
+        const nombre = row.nombre;
+        const id= row.id;
+
+        // Abrir modal de confirmación de inscripción
+        window.mostrarModalConfirmar(nombre, alumnoId, id, tipo)
+
       } else if (row.accion === 'Borrar') {
-        // Mostrar modal de confirmación antes de desinscribir
-        mostrarModalConfirmacion(
-          'Confirmar desinscripción',
-          '¿Está seguro que desea eliminar la inscripción de la carrera?',
-          row.nombre,
-          () => {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/alumno/${alumnoId}/desinscribir-carrera/${row.id}`;
-            document.body.appendChild(form);
-            form.submit();
-          }
-        );
+        // Verificar si tiene cuotas
+        if (row.cuotas && row.cuotas.length > 0) {
+          // Mostrar modal con detalle de cuotas (pasando el tipo)
+          window.mostrarModalEliminarConCuotas(
+            row.nombre,
+            row.cuotas,
+            alumnoId,
+            row.id,
+            tipo
+          );
+        } 
       }
     };
     

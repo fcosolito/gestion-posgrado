@@ -6,8 +6,10 @@ use App\Entity\Comprobante;
 use App\Entity\Pago;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class PagoType extends AbstractType
 {
@@ -16,9 +18,21 @@ class PagoType extends AbstractType
         $builder
             ->add('monto')
             ->add('fechaPago')
-            ->add('comprobante', EntityType::class, [
-                'class' => Comprobante::class,
-                'choice_label' => 'id',
+            ->add('comprobanteFile', FileType::class, [
+                'label' => 'Comprobante (PDF, JPG o PNG)',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '5M',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png',
+                            'application/pdf',
+                        ],
+                        'mimeTypesMessage' => 'Por favor sube un archivo válido (JPG, PNG o PDF)',
+                    ])
+                ],
             ])
         ;
     }

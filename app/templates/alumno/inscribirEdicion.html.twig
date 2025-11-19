@@ -1,0 +1,68 @@
+
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Alumnos{% endblock %}
+
+{% block body %}
+
+    {# Mensajes Flash #}
+    {% for message in app.flashes('notice') %}
+        <div class="flash-notice">
+            <span>{{ message }}</span>
+            <button class="flash-close" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+    {% endfor %}
+
+    <div class="contenedor-blanco">
+        <div class="cuadrado-reutilizable auto-height">
+            {# Header con título y botones #}
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0" id="form-title">{{ alumno.nombre }} {{ alumno.apellido }} | Inscripción a Ediciones</h4>
+                <div class="d-flex gap-2">
+                    {# Botones para modo búsqueda #}
+                    <button class="btn-principal" id="btn-volver">Volver</button>
+                </div>
+            </div>
+        </div>
+        <div class="cuadrado-reutilizable fill-remaining">
+            <div id="lista-inscripciones"
+                 data-labels='["Nombre","Curso","Ordenanza","Implementacion","Legajo","Descuento","Descripción","Fecha inscripción","Estado","Acción"]'
+                 data-attributes='["nombre","curso","ordenanza","implementacion","legajo","descuento","descripcion","fechaInscripcion","estado","accion"]'
+                 data-rows='{{ edicionesData|json_encode(constant('JSON_UNESCAPED_UNICODE'))|e('html_attr') }}'
+                 data-alumno-id='{{ alumno.id }}'>
+            </div>
+        </div>
+    </div>
+
+    {# Modal de Inscripción #}
+    {% include 'alumno/_modal_inscripcion.html.twig' %}
+
+    {# Modal de confirmación #}
+    {{ include('alumno/_modal_eliminacion.html.twig') }}
+
+    {# Modal de eliminación con cuotas #}
+    {{ include('alumno/_modal_eliminacion_cuotas.html.twig') }}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Toggle entre modo búsqueda y registro
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const btnVolver = document.getElementById('btn-volver');
+
+            // Botón volver - volver a pantalla de visualizar
+            btnVolver.addEventListener('click', () => {
+                window.location.href = '{{ path('app_alumno_visualizar', {'id': alumno.id}) }}';
+            });
+
+        });
+    </script>
+
+    {{ encore_entry_script_tags('alumno') }}
+    {{ encore_entry_link_tags('alumno') }}
+{% endblock %}
+
