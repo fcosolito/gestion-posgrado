@@ -3,39 +3,57 @@
 {% block title %}Docente index{% endblock %}
 
 {% block body %}
-    <h1>Docente index</h1>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Dni</th>
-                <th>Email</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for docente in docentes %}
-            <tr>
-                <td>{{ docente.id }}</td>
-                <td>{{ docente.nombre }}</td>
-                <td>{{ docente.apellido }}</td>
-                <td>{{ docente.dni }}</td>
-                <td>{{ docente.email }}</td>
-                <td>
-                    <a href="{{ path('app_docente_show', {'id': docente.id}) }}">show</a>
-                    <a href="{{ path('app_docente_edit', {'id': docente.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_docente_new') }}">Create new</a>
+<div class="p-3">
+<div class="rounded bg-white vh-100 p-0">
+    <div class="row p-3">
+        <div class="col">
+            <h3>Docentes</h3>
+        </div>
+        <div class="col text-end">
+            <a class="btn btn-primary" href="{{ path('app_docente_new') }}">Nuevo</a>
+        </div>
+    </div>
+    <div class="h-100 overflow-scroll p-0">
+        <table class="table table-striped table-bordered table-hover">
+            <thead class="sticky-top table-secondary">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>DNI</th>
+                    <th>Correo</th>
+                    <th>Telefono</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for docente in docentes %}
+                    <tr>
+                        <td>{{ docente.nombre }}</td>
+                        <td>{{ docente.apellido }}</td>
+                        <td>{{ docente.dni }}</td>
+                        <td>{{ docente.email }}</td>
+                        <td>{{ docente.telefono }}</td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Acciones
+                                </button>
+                                <ul class="dropdown-menu" >
+                                    <li><a class="dropdown-item" href="{{ path('app_docente_show', {'id': docente.id}) }}">Ver</a></li>
+                                    <li><a class="dropdown-item" href="{{ path('app_docente_edit', {'id': docente.id}) }}">Editar</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </div>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6"><i>No se registraron docentes</i></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
 {% endblock %}

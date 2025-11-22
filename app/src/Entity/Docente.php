@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\DocenteRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DocenteRepository::class)]
@@ -24,6 +25,9 @@ class Docente
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $email = null;
+
+    #[ORM\Column(type: Types::BIGINT, nullable: true)]
+    private ?string $telefono = null;
 
     public function getId(): ?int
     {
@@ -74,6 +78,18 @@ class Docente
     public function setEmail(?string $email): static
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getTelefono(): ?string
+    {
+        return $this->telefono;
+    }
+
+    public function setTelefono(?string $telefono): static
+    {
+        $this->telefono = $telefono;
 
         return $this;
     }

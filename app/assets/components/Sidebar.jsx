@@ -25,6 +25,10 @@ export default function Sidebar({ initialPage }) {
             name: "Descuentos",
             path: "/descuento"
         },
+        {
+            name: "Docentes",
+            path: "/docente"
+        },
     ];
 
     return (
