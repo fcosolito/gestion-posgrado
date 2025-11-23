@@ -7,6 +7,7 @@ use App\Entity\InscripcionEdicion;
 use App\Entity\InscripcionCarrera;
 use App\Entity\Carrera;
 use App\Entity\Cuota;
+use App\Entity\DocumentacionNota;
 use App\Form\AlumnoType;
 use App\Entity\Nota;
 use App\Form\NotaType;
@@ -570,25 +571,53 @@ final class AlumnoController extends AbstractController
     #[Route('/{id}/notas', name: 'app_alumno_notas', methods: ['GET', 'POST'])]
     public function notas(Request $request, Alumno $alumno, EntityManagerInterface $entityManager): Response
     {
-
         $notum = new Nota();
         $form = $this->createForm(NotaType::class, $notum);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Manejar la subida del archivo
+            $archivoFile = $form->get('archivo')->getData();
+            
+            if ($archivoFile) {
+                $documentacionNota = new DocumentacionNota();
+                
+                // Generar nombre único para el archivo
+                $originalFilename = pathinfo($archivoFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $newFilename = $originalFilename.'-'.uniqid().'.'.$archivoFile->guessExtension();
+                
+                // Mover el archivo al directorio de uploads
+                try {
+                    $archivoFile->move(
+                        $this->getParameter('documentos_notas_directory'),
+                        $newFilename
+                    );
+                    
+                    $documentacionNota->setArchivo($newFilename);
+                    $entityManager->persist($documentacionNota);
+                    
+                    $notum->setDocumentacionNota($documentacionNota);
+                    
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Error al subir el archivo: '.$e->getMessage());
+                }
+            }
+
             $entityManager->persist($notum);
             $entityManager->flush();
 
+            $this->addFlash('success', 'Nota guardada correctamente.');
             return $this->redirectToRoute('app_alumno_notas', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
         }
 
         // Obtener notas del alumno
         $notas = $entityManager->createQueryBuilder()
-            ->select('n', 'ie', 'e', 'c')
+            ->select('n', 'ie', 'e', 'c', 'dn')
             ->from(\App\Entity\Nota::class, 'n')
             ->innerJoin('n.inscripcionEdicion', 'ie')
             ->innerJoin('ie.edicion', 'e')
             ->innerJoin('e.curso', 'c')
+            ->leftJoin('n.documentacionNota', 'dn')
             ->where('ie.alumno = :alumno')
             ->setParameter('alumno', $alumno)
             ->getQuery()
@@ -613,12 +642,23 @@ final class AlumnoController extends AbstractController
             $edicion = $inscripcion->getEdicion();
             $curso = $edicion->getCurso();
             
+            // Generar enlace para el archivo si existe
+            $documentacionHtml = 'Sin documentación';
+            if ($nota->getDocumentacionNota()) {
+                $archivo = $nota->getDocumentacionNota()->getArchivo();
+                $documentacionHtml = sprintf(
+                    '<a href="/uploads/documentos_notas/%s" target="_blank" class="btn-documento">Ver archivo</a>',
+                    $archivo
+                );
+            }
+            
             $notasData[] = [
                 'id' => $nota->getId(),
                 'curso' => $curso->getNombre(),
                 'edicion' => $edicion->getNombre(),
                 'nota' => $nota->getValor(),
                 'descripcion' => $nota->getDescripcion(),
+                'documentacion' => $documentacionHtml,
                 'fecha_carga' => $nota->getFechaCarga() ? $nota->getFechaCarga()->format('d/m/Y') : 'N/A',
             ];
         }
@@ -626,7 +666,7 @@ final class AlumnoController extends AbstractController
         return $this->render('alumno/notas_alumno.html.twig', [
             'alumno' => $alumno,
             'notas' => $notasData,
-            'inscripciones' =>  $inscripciones,
+            'inscripciones' => $inscripciones,
             'form' => $form,
         ]);
     }

@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 import '../styles/app.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import ListaNotas from "../components/ListaNotas.jsx";
 
 // Variables globales para el modal de confirmación reutilizable
 let confirmModal = null;
@@ -226,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     
     const root = createRoot(listaNotasAlumno);
-    root.render(<Lista labels={labels} attributes={attributes} rows={rows} opcionesAcciones={opcionesAcciones} />);
+    root.render(<ListaNotas labels={labels} attributes={attributes} rows={rows} opcionesAcciones={opcionesAcciones} />);
   }
 
 

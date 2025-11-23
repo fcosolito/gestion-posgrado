@@ -27,7 +27,9 @@ class Nota
     #[ORM\JoinColumn(nullable: false)]
     private ?InscripcionEdicion $inscripcionEdicion = null;
 
-    #[ORM\ManyToOne]
+
+    #[ORM\OneToOne(targetEntity: DocumentacionNota::class, cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?DocumentacionNota $documentacionNota = null;
 
     public function getId(): ?int
