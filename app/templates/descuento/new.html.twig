@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Registrar Descuento{% endblock %}
+
+{% block body %}
+<div class="p-2">
+    {{ include('descuento/_form.html.twig', {'button_label': "Registrar"}) }}
+
+    <div class="m-3">
+        <a class="btn btn-secondary" href="{{ path('app_descuento_index') }}">Volver</a>
+    </div>
+</div>
+{% endblock %}

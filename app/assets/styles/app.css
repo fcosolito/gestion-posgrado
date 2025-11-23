@@ -22,19 +22,17 @@ body {
   border-radius: 8px;
 }
 
-.tabla-generica-1 {
-  overflow-y: scroll;
-  position: relative;
-  height: 3em;
+.seleccion-buscador {
+  background-color: #8fecb6;
+  border-color: #2feb7d;
 }
 
-.tabla-generica-1.head {
-  position: sticky;
-  top: 0;
-  background-color: #ddd;
-  z-index: 1;
+.bg-secundario {
+  background-color: #77a4c9;
 }
-
+.bg-secundario:hover {
+  background-color: #54738d;
+}
 /*-------------CSS VALE-------------*/
 
 .boton-base {

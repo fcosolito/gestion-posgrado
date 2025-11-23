@@ -1,46 +1,40 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Docente index{% endblock %}
+{% block title %}Descuentos{% endblock %}
 
 {% block body %}
 <div class="p-3">
 <div class="rounded bg-white vh-100 p-0">
     <div class="row p-3">
         <div class="col">
-            <h3>Docentes</h3>
+            <h3>Descuentos</h3>
         </div>
         <div class="col text-end">
-            <a class="btn btn-primary" href="{{ path('app_docente_new') }}">Nuevo</a>
+            <a class="btn btn-primary" href="{{ path('app_descuento_new') }}">Nuevo</a>
         </div>
     </div>
     <div class="h-100 overflow-scroll p-0">
-        <table class="table table-striped table-bordered table-hover">
+        <table class="table table-responsive table-striped table-bordered table-hover">
             <thead class="sticky-top table-secondary">
                 <tr>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>DNI</th>
-                    <th>Correo</th>
-                    <th>Telefono</th>
+                    <th>Valor</th>
+                    <th>Descripcion</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                {% for docente in docentes %}
+                {% for descuento in descuentos %}
                     <tr>
-                        <td>{{ docente.nombre }}</td>
-                        <td>{{ docente.apellido }}</td>
-                        <td>{{ docente.dni }}</td>
-                        <td>{{ docente.email }}</td>
-                        <td>{{ docente.telefono }}</td>
-                        <td>
+                        <td style="width: 15%;">{{ descuento.valor}}</td>
+                        <td class="text-wrap">{{ descuento.descripcion}}</td>
+                        <td style="width: 15%;">
                             <div class="dropdown">
                                 <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Acciones
                                 </button>
                                 <ul class="dropdown-menu" >
-                                    <li><a class="dropdown-item" href="{{ path('app_docente_show', {'id': docente.id}) }}">Ver</a></li>
-                                    <li><a class="dropdown-item" href="{{ path('app_docente_edit', {'id': docente.id}) }}">Editar</a></li>
+                                    <li><a class="dropdown-item" href="{{ path('app_descuento_show', {'id': descuento.id}) }}">Ver</a></li>
+                                    <li><a class="dropdown-item" href="{{ path('app_descuento_edit', {'id': descuento.id}) }}">Editar</a></li>
                                 </ul>
                             </div>
                         </td>
@@ -48,7 +42,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="6"><i>No se registraron docentes</i></td>
+                        <td colspan="5"><i>No se registraron descuentos</i></td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -56,4 +50,5 @@
     </div>
 </div>
 </div>
+
 {% endblock %}

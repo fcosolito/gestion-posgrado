@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar Descuento{% endblock %}
+
+{% block body %}
+<div class="p-2">
+    {{ include('descuento/_form.html.twig', {'button_label': 'Guardar'}) }}
+
+    <div class="row p-2">
+        <div class="col-auto">
+            <a class="btn btn-secondary" href="{{ path('app_descuento_index') }}">Volver</a>
+        </div>
+        <div class="col-auto">
+            {{ include('descuento/_delete_form.html.twig') }}
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Curso;
 use App\Entity\Descuento;
+use App\Entity\Dicta;
+use App\Entity\Docente;
 use App\Entity\Edicion;
 use App\Entity\Nota;
 use App\Form\NotaType;
@@ -81,7 +83,7 @@ final class EdicionController extends AbstractController
                     "id" => $docente->getId(),
                     "nombre" => $docente->getNombre(),
                     "apellido" => $docente->getApellido(),
-                    "esFirmante" => $dicta->getEsFirmante(),
+                    "esFirmante" => $dicta->isEsFirmante(),
                 ];
             },
             $dictaRepository->findBy(["edicion" => $edicion])
@@ -96,7 +98,7 @@ final class EdicionController extends AbstractController
                     "nombre" => $alumno->getNombre(),
                     "apellido" => $alumno->getApellido(),
                     "dni" => $alumno->getDni(),
-                    "descuento" => $i->getDescuento()->getValor(),
+                    "descuento" => $i->getDescuento()->getId(),
                     "nota" => $i->getNota() ? $i->getNota()->getValor() : "",
                     "inscripcion" => $i->getId(),
                 ];
@@ -282,6 +284,53 @@ final class EdicionController extends AbstractController
         return new Response($dompdf->output(), 200, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="notas_' . $edicion->getNombre() . '_' . $fecha . '.pdf"'
+    #[Route('/{id}/asoc-docente/{idDocente}', name: 'api_edicion_asociar_docente', methods: ['PUT'])]
+    public function asociarDocente(Request $request, Edicion $edicion, Docente $idDocente, EntityManagerInterface $entityManager): Response
+    {
+        // Validacion:
+        // Comprobar que la edicion y el docente existen
+        // lo hace symfony al usar variables de path
+
+        $dictaRepository = $entityManager->getRepository(Dicta::class);
+        $dicta = $dictaRepository->findOneBy(["docente" => $idDocente, "edicion" => $edicion]) ?? new Dicta();
+
+        $dicta->setDocente($idDocente);
+        $dicta->setEdicion($edicion);
+
+        // En el body de la request puede pasarse "esFirmante: true"
+        // para modificar la condicion o setearla por primera vez.
+        // Se asume falso si no se indica.
+        $data = $request->toArray();
+        $esFirmante = $data['esFirmante'];
+
+        $dicta->setEsFirmante($esFirmante ? true : false);
+
+        $entityManager->persist($dicta);
+        $entityManager->flush();
+
+        return $this->json([
+            "dicta" => [
+                "docente" => $dicta->getDocente()->getNombre(),
+                "edicion" => $dicta->getEdicion()->getNombre(),
+            ],
+        ]);
+    }
+
+    #[Route('/{id}/desasoc-docente/{idDocente}', name: 'api_edicion_desasociar_docente', methods: ['PUT'])]
+    public function desasociarDocente(Request $request, Edicion $edicion, Docente $idDocente, EntityManagerInterface $entityManager): Response
+    {
+        // Validacion:
+        // Comprobar que la edicion y el docente existen
+        // lo hace symfony al usar variables de path
+
+        $dictaRepository = $entityManager->getRepository(Dicta::class);
+        $dicta = $dictaRepository->findOneBy(["docente" => $idDocente, "edicion" => $edicion]) ?? new Dicta();
+
+        $entityManager->remove($dicta);
+        $entityManager->flush();
+
+        return $this->json([
+            "success" => true,
         ]);
     }
 }

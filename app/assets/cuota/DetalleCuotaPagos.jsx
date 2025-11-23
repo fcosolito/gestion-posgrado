@@ -26,7 +26,7 @@ export default function DetalleCuotaPagos({ cuota }){
                     <h3>Alumno</h3>
                 </div>
                 <div className="col">
-                    <button className="btn btn-secondary">Ver inscripcion</button>
+                    <button className="btn btn-secondary bg-secundario">Ver inscripcion</button>
                 </div>
             </div>
             <hr></hr>

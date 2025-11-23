@@ -29,11 +29,11 @@ class InscripcionEdicion
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Nota $nota = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $nroLegajo = null;
-
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $fechaInscripcion = null;
+    private ?\DateTime $fechaInscripcion = null;
+
+    #[ORM\Column(type: Types::BIGINT, nullable: true)]
+    private ?string $nroLegajo = null;
 
     public function getId(): ?int
     {
@@ -88,6 +88,7 @@ class InscripcionEdicion
         return $this;
     }
 
+<<<<<<< HEAD
     public function getNroLegajo(): ?int
     {
         return $this->nroLegajo;
@@ -101,14 +102,36 @@ class InscripcionEdicion
     }
 
     public function getFechaInscripcion(): ?\DateTimeInterface
+=======
+    public function getFechaInscripcion(): ?\DateTime
+>>>>>>> feat/correcciones-it2-franco
     {
         return $this->fechaInscripcion;
     }
 
+<<<<<<< HEAD
     public function setFechaInscripcion(?\DateTimeInterface $fechaInscripcion): static
+=======
+    public function setFechaInscripcion(?\DateTime $fechaInscripcion): static
+>>>>>>> feat/correcciones-it2-franco
     {
         $this->fechaInscripcion = $fechaInscripcion;
 
         return $this;
     }
+<<<<<<< HEAD
+=======
+
+    public function getNroLegajo(): ?string
+    {
+        return $this->nroLegajo;
+    }
+
+    public function setNroLegajo(?string $nroLegajo): static
+    {
+        $this->nroLegajo = $nroLegajo;
+
+        return $this;
+    }
+>>>>>>> feat/correcciones-it2-franco
 }
