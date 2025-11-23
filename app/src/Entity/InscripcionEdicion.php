@@ -88,39 +88,17 @@ class InscripcionEdicion
         return $this;
     }
 
-<<<<<<< HEAD
-    public function getNroLegajo(): ?int
-    {
-        return $this->nroLegajo;
-    }
-
-    public function setNroLegajo(?int $nroLegajo): static
-    {
-        $this->nroLegajo = $nroLegajo;
-
-        return $this;
-    }
-
-    public function getFechaInscripcion(): ?\DateTimeInterface
-=======
     public function getFechaInscripcion(): ?\DateTime
->>>>>>> feat/correcciones-it2-franco
     {
         return $this->fechaInscripcion;
     }
 
-<<<<<<< HEAD
-    public function setFechaInscripcion(?\DateTimeInterface $fechaInscripcion): static
-=======
     public function setFechaInscripcion(?\DateTime $fechaInscripcion): static
->>>>>>> feat/correcciones-it2-franco
     {
         $this->fechaInscripcion = $fechaInscripcion;
 
         return $this;
     }
-<<<<<<< HEAD
-=======
 
     public function getNroLegajo(): ?string
     {
@@ -133,5 +111,4 @@ class InscripcionEdicion
 
         return $this;
     }
->>>>>>> feat/correcciones-it2-franco
 }

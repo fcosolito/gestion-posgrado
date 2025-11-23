@@ -238,7 +238,7 @@ final class AlumnoController extends AbstractController
         $inscripcionEdicion = new InscripcionEdicion();
         $inscripcionEdicion->setEdicion($ultimaEdicion);
         $inscripcionEdicion->setAlumno($alumno);
-        $inscripcionEdicion->setDescuento(0);
+        $inscripcionEdicion->setDescuento(new Descuento());
 
         $entityManager->persist($inscripcionEdicion);
         $entityManager->flush();

@@ -8,7 +8,6 @@ use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: ComprobanteRepository::class)]
-#[Vich\Uploadable]
 class Comprobante
 {
     #[ORM\Id]
@@ -16,38 +15,12 @@ class Comprobante
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Vich\UploadableField(mapping: 'comprobantes', fileNameProperty: 'archivo', size: 'tamano', mimeType: 'mimeType')]
-    private ?File $archivoFile = null;
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $archivo = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $mimeType = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?int $tamano = null;
-
-    #[ORM\Column(type: 'datetime', nullable: true)]
-    private ?\DateTimeInterface $fechaActualizacion = null;
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function setArchivoFile(?File $archivo = null): void
-    {
-        $this->archivoFile = $archivo;
-
-        if (null !== $archivo) {
-            $this->fechaActualizacion = new \DateTimeImmutable();
-        }
-    }
-
-    public function getArchivoFile(): ?File
-    {
-        return $this->archivoFile;
     }
 
     public function getArchivo(): ?string

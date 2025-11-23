@@ -284,6 +284,9 @@ final class EdicionController extends AbstractController
         return new Response($dompdf->output(), 200, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="notas_' . $edicion->getNombre() . '_' . $fecha . '.pdf"'
+        ]);
+    }
+
     #[Route('/{id}/asoc-docente/{idDocente}', name: 'api_edicion_asociar_docente', methods: ['PUT'])]
     public function asociarDocente(Request $request, Edicion $edicion, Docente $idDocente, EntityManagerInterface $entityManager): Response
     {
