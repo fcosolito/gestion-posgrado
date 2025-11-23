@@ -29,74 +29,35 @@
         <div class="row m-2">
 
             {# Edicion show #}
-            <div class="col-5 rounded bg-white p-2">
-                <div id="edicion"
-                    data-edicion="{{ edicion|json_encode }}"
-                    data-delete-form="{{ include('edicion/_delete_form.html.twig')|e('html_attr') }}"
-                >
+            <div class="col-5 pe-1 ps-0">
+                <div class="rounded bg-white p-2">
+                    <div id="edicion"
+                        data-edicion="{{ edicion|json_encode }}"
+                        data-delete-form="{{ include('edicion/_delete_form.html.twig')|e('html_attr') }}"
+                    >
+                    </div>
                 </div>
             </div>
 
             {# Listado de docentes #}
-            <div class="col-6 ms-auto rounded bg-white p-0 ">
-                <div class="row d-flex p-2 justify-content-between align-items-center">
-                    <div class="col-2 d-flex align-items-end ">
-                        <span class="m-1 fs-5 fw-bold">Docentes</span>
-                    </div>
-                    <div class="col-2 d-flex justify-content-end align-items-end">
-                        <button
-                            class="btn btn-primary"
-                            onclick="alert('agregar docente');"
-                        >
-                            Agregar
-                        </button>
-                    </div>
+            <div class="col-7 pe-0">
+                <div id="listado-docentes" 
+                    class="rounded bg-white p-0"
+                    data-docentes="{{docentes|json_encode}}"
+                    data-edicion="{{edicion|json_encode}}"
+                >
                 </div>
-                <div class="row p-2">
-                    <div class="col bg-grey fw-bold">Nombre</div>
-                    <div class="col bg-grey fw-bold">Apellido</div>
-                    <div class="col bg-grey fw-bold">Firmante</div>
-                    <div class="col bg-grey fw-bold">Acciones</div>
-                </div>
-                {% for docente in docentes %}
-                <div class="row m-1">
-                    <div class="col">{{ docente.nombre }}</div>
-                    <div class="col">{{ docente.apellido }}</div>
-                    <div class="col">
-                    {% if docente.esFirmante %}
-                        Si
-                    {% else %}
-                        No
-                    {% endif %}
-                    </div>
-                    <div class="col">
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Acciones
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a class="dropdown-item btn btn-secondary" href="{{ path('app_docente_show', {'id': docente.id }) }}">
-                                        Ver
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                {% else %}
-                <div class="d-flex justify-content-center">
-                    <p class="m-1"><i>No hay docentes asociados</i></p>
-                </div>
-                {% endfor %}
+                
             </div>
         </div>
 
         {# Listado de alumnos #}
-        <div id="listado-alumnos"
-            data-alumnos="{{ alumnos|json_encode }}"
-            data-descuentos="{{ descuentos|json_encode }}"
-        >
+        <div class="p-2">
+            <div id="listado-alumnos"
+                data-alumnos="{{ alumnos|json_encode }}"
+                data-descuentos="{{ descuentos|json_encode }}"
+            >
+            </div>
         </div>
     </div>
 

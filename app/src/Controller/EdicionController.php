@@ -265,4 +265,22 @@ final class EdicionController extends AbstractController
             ],
         ]);
     }
+
+    #[Route('/{id}/desasoc-docente/{idDocente}', name: 'api_edicion_desasociar_docente', methods: ['PUT'])]
+    public function desasociarDocente(Request $request, Edicion $edicion, Docente $idDocente, EntityManagerInterface $entityManager): Response
+    {
+        // Validacion:
+        // Comprobar que la edicion y el docente existen
+        // lo hace symfony al usar variables de path
+
+        $dictaRepository = $entityManager->getRepository(Dicta::class);
+        $dicta = $dictaRepository->findOneBy(["docente" => $idDocente, "edicion" => $edicion]) ?? new Dicta();
+
+        $entityManager->remove($dicta);
+        $entityManager->flush();
+
+        return $this->json([
+            "success" => true,
+        ]);
+    }
 }

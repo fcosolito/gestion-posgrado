@@ -16,6 +16,21 @@ class DocenteRepository extends ServiceEntityRepository
         parent::__construct($registry, Docente::class);
     }
 
+    public function searchXor(string $query): array {
+        $qb =  $this->createQueryBuilder('d')
+            ->where('d.nombre LIKE :nombre')
+            ->setParameter('nombre', "%".$query."%")
+            ->orWhere('d.apellido LIKE :apellido')
+            ->setParameter('apellido', "%".$query."%")
+            ->orWhere('d.email LIKE :email')
+            ->setParameter('email', "%".$query."%");
+        if (ctype_digit($query)){
+            $qb->orWhere('d.dni = :dni')
+                ->setParameter('dni', (int) $query);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
     //    /**
     //     * @return Docente[] Returns an array of Docente objects
     //     */

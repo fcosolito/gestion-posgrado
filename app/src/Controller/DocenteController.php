@@ -42,6 +42,29 @@ final class DocenteController extends AbstractController
         ]);
     }
 
+    #[Route('/search', name: 'app_docente_search', methods: ['GET'])]
+    public function search(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $query =  $request->query->get("query", "");
+        $docentes = $entityManager->getRepository(Docente::class)->searchXor($query);
+        $docentes_ser = array_map(
+            function ($d) {
+                return (
+                    [
+                        "id" => $d->getId(),
+                        "nombre" => $d->getNombre(),
+                        "apellido" => $d->getApellido(),
+                        "dni" => $d->getDni(),
+                        "email" => $d->getEmail(),
+                        "telefono" => $d->getTelefono(),
+                    ]
+                    );
+            },
+            $docentes
+        );
+
+        return $this->json($docentes_ser);
+    }
     #[Route('/{id}', name: 'app_docente_show', methods: ['GET'])]
     public function show(Docente $docente): Response
     {
