@@ -5,6 +5,9 @@ namespace App\Entity;
 use App\Repository\PagoRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 
 #[ORM\Entity(repositoryClass: PagoRepository::class)]
 class Pago
@@ -20,8 +23,11 @@ class Pago
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTime $fechaPago = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Comprobante $comprobante = null;
+
+    #[ORM\OneToMany(mappedBy: 'pago', targetEntity: PagoCuota::class, cascade: ['persist', 'remove'])]
+    private Collection $pagoCuotas;
 
     public function getId(): ?int
     {
@@ -60,6 +66,32 @@ class Pago
     public function setComprobante(?Comprobante $comprobante): static
     {
         $this->comprobante = $comprobante;
+
+        return $this;
+    }
+
+    public function getPagoCuotas(): Collection
+    {
+        return $this->pagoCuotas;
+    }
+
+    public function addPagoCuota(PagoCuota $pagoCuota): static
+    {
+        if (!$this->pagoCuotas->contains($pagoCuota)) {
+            $this->pagoCuotas->add($pagoCuota);
+            $pagoCuota->setPago($this);
+        }
+
+        return $this;
+    }
+
+    public function removePagoCuota(PagoCuota $pagoCuota): static
+    {
+        if ($this->pagoCuotas->removeElement($pagoCuota)) {
+            if ($pagoCuota->getPago() === $this) {
+                $pagoCuota->setPago(null);
+            }
+        }
 
         return $this;
     }

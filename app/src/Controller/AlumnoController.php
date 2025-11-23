@@ -368,26 +368,28 @@ final class AlumnoController extends AbstractController
         foreach ($cuotas as $cuota) {
 
             $pagosCuota = [];
-            $montoPagar = 0;
             $montoPagado = 0;
             $contadorPagos = 0;
-            foreach ($pagoCuotas as $pago) {
-                if ($pago->getCuota()->getId() === $cuota->getId()) {
-                    $pagosCuota[] = $pago;
-                    $montoPagar = $pago->getPago()->getMontoCuota();
-                    $montoPagado += $pago->getPago()->getMontoPagado();
+            foreach ($pagoCuotas as $pagoCuota) {
+                if ($pagoCuota->getCuota()->getId() === $cuota->getId()) {
+                    $pagosCuota[] = $pagoCuota;
+                    // Sumar el monto de cada PagoCuota (que es la parte del pago asignada a esta cuota)
+                    $montoPagado += $pagoCuota->getMontoCuota();
                     $contadorPagos += 1;
                 }
             }
             
+            // Determinar el estado de pago
+            // Nota: Como no tenemos el monto exacto que se debe pagar por la cuota,
+            // asumimos que si hay pagos registrados, la cuota está pagada
             if($contadorPagos === 0){
                 $estadoPago = 'Pendiente';
-            } elseif ($montoPagado >= $montoPagar) {
+            } elseif ($montoPagado > 0) {
+                // Si hay pagos con monto mayor a 0, consideramos la cuota como pagada
+                // En el futuro, esto debería compararse con el monto real de la cuota
                 $estadoPago = 'Paga'; 
-            } elseif ($montoPagado === 0) {
-                $estadoPago = 'Pendiente';
             } else {
-                $estadoPago = 'Faltante';
+                $estadoPago = 'Pendiente';
             }
 
 

@@ -1,11 +1,301 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}New Cuota{% endblock %}
+{% block title %}Registrar Pago{% endblock %}
+
+{% block stylesheets %}
+    <style>
+        .cuota-item {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .cuota-item:hover {
+            background-color: #f8f9fa;
+        }
+        .cuota-item.selected {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
+        .cuota-checkbox {
+            margin-right: 10px;
+        }
+        .filter-section {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        #cuotas-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .monto-calculado {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #28a745;
+        }
+    </style>
+{% endblock %}
 
 {% block body %}
-    <h1>Create new Cuota</h1>
+<div class="container-fluid">
+    <div class="row">
+        <!-- Panel de selección de cuotas -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Seleccionar Cuotas a Pagar</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Filtros -->
+                    <div class="filter-section">
+                        <div class="mb-3">
+                            <label class="form-label">Seleccionar Alumno</label>
+                            <select class="form-control" id="alumno-select">
+                                <option value="">-- Seleccione un alumno --</option>
+                                {% for alumno in alumnos %}
+                                    <option value="{{ alumno.id }}">
+                                        {{ alumno.apellido }}, {{ alumno.nombre }} - DNI: {{ alumno.dni }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
 
-    {{ include('cuota/_form.html.twig') }}
+                    <!-- Lista de cuotas pendientes -->
+                    <div id="cuotas-list" class="d-none">
+                        <h6>Cuotas Pendientes:</h6>
+                        <div id="cuotas-container"></div>
+                        <div class="mt-3">
+                            <strong>Total seleccionado: </strong>
+                            <span id="total-cuotas">0</span> cuotas
+                        </div>
+                    </div>
 
-    <a href="{{ path('app_cuota_index') }}">back to list</a>
+                    <div id="sin-cuotas" class="alert alert-info d-none">
+                        No hay cuotas pendientes para este alumno.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de pago -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Datos del Pago</h5>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    
+                    <div class="mb-3">
+                        {{ form_label(form.monto) }}
+                        {{ form_widget(form.monto) }}
+                        <small class="text-muted">Monto total que cubrirá las cuotas seleccionadas</small>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.fechaPago) }}
+                        {{ form_widget(form.fechaPago) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.archivoComprobante) }}
+                        {{ form_widget(form.archivoComprobante) }}
+                        <small class="text-muted">Formatos permitidos: PDF, JPEG, PNG (máx. 5MB)</small>
+                    </div>
+
+                    {{ form_widget(form.cuotasSeleccionadas) }}
+
+                    <div class="alert alert-warning d-none" id="alerta-cuotas">
+                        Debe seleccionar al menos una cuota para pagar.
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary" id="btn-registrar">
+                            Registrar Pago
+                        </button>
+                        <a href="{{ path('app_pago_index') }}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const alumnoSelect = document.getElementById('alumno-select');
+        const cuotasContainer = document.getElementById('cuotas-container');
+        const cuotasList = document.getElementById('cuotas-list');
+        const sinCuotas = document.getElementById('sin-cuotas');
+        const cuotasSeleccionadasInput = document.getElementById('cuotas-seleccionadas');
+        const totalCuotasSpan = document.getElementById('total-cuotas');
+        const alertaCuotas = document.getElementById('alerta-cuotas');
+        const btnRegistrar = document.getElementById('btn-registrar');
+        const form = document.querySelector('form');
+
+        let cuotasSeleccionadas = [];
+
+        function actualizarInputCuotas() {
+            if (cuotasSeleccionadasInput) {
+                cuotasSeleccionadasInput.value = JSON.stringify(cuotasSeleccionadas);
+                console.log('✅ Campo hidden actualizado:', cuotasSeleccionadasInput.value);
+            }
+            if (totalCuotasSpan) {
+                totalCuotasSpan.textContent = cuotasSeleccionadas.length;
+            }
+            if (alertaCuotas) {
+                alertaCuotas.classList.toggle('d-none', cuotasSeleccionadas.length > 0);
+            }
+            if (btnRegistrar) {
+                btnRegistrar.disabled = cuotasSeleccionadas.length === 0;
+            }
+        }
+
+        function cargarCuotasPendientes(alumnoId) {
+            if (!alumnoId) {
+                resetearCuotas();
+                return;
+            }
+
+            console.log('🔄 Cargando cuotas para alumno:', alumnoId);
+            
+            if (cuotasList) cuotasList.classList.add('d-none');
+            if (sinCuotas) sinCuotas.classList.add('d-none');
+            if (cuotasContainer) cuotasContainer.innerHTML = '';
+            
+            cuotasSeleccionadas = [];
+            actualizarInputCuotas();
+
+            fetch(`/pago/api/cuotas-pendientes/${alumnoId}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('📦 Cuotas recibidas:', data);
+                    
+                    if (!data.success) {
+                        throw new Error(data.error || 'Error del servidor');
+                    }
+
+                    const cuotas = data.cuotas || [];
+                    cuotasSeleccionadas = [];
+
+                    if (cuotas.length === 0) {
+                        console.log('ℹ️ No hay cuotas pendientes');
+                        if (cuotasList) cuotasList.classList.add('d-none');
+                        if (sinCuotas) sinCuotas.classList.remove('d-none');
+                    } else {
+                        console.log(`✅ ${cuotas.length} cuotas encontradas`);
+                        if (cuotasList) cuotasList.classList.remove('d-none');
+                        if (sinCuotas) sinCuotas.classList.add('d-none');
+
+                        cuotas.forEach(cuota => {
+                            if (!cuotasContainer) return;
+                            
+                            const cuotaElement = document.createElement('div');
+                            cuotaElement.className = 'cuota-item';
+                            cuotaElement.innerHTML = `
+                                <div class="form-check">
+                                    <input class="form-check-input cuota-checkbox" type="checkbox" 
+                                           value="${cuota.id}" id="cuota-${cuota.id}">
+                                    <label class="form-check-label w-100" for="cuota-${cuota.id}">
+                                        <strong>Cuota ${cuota.numero_cuota}</strong><br>
+                                        <small class="text-muted">
+                                            ${cuota.tipo}: ${cuota.concepto}
+                                        </small>
+                                    </label>
+                                </div>
+                            `;
+                            cuotasContainer.appendChild(cuotaElement);
+
+                            const checkbox = cuotaElement.querySelector('.cuota-checkbox');
+                            checkbox.addEventListener('change', function() {
+                                const cuotaId = parseInt(cuota.id);
+                                if (this.checked) {
+                                    cuotasSeleccionadas.push(cuotaId);
+                                    cuotaElement.classList.add('selected');
+                                    console.log(`➕ Cuota ${cuotaId} agregada`);
+                                } else {
+                                    cuotasSeleccionadas = cuotasSeleccionadas.filter(id => id !== cuotaId);
+                                    cuotaElement.classList.remove('selected');
+                                    console.log(`➖ Cuota ${cuotaId} removida`);
+                                }
+                                actualizarInputCuotas();
+                            });
+                        });
+                    }
+                    actualizarInputCuotas();
+                })
+                .catch(error => {
+                    console.error('❌ Error:', error);
+                    alert('Error al cargar las cuotas: ' + error.message);
+                });
+        }
+
+        function resetearCuotas() {
+            if (cuotasList) cuotasList.classList.add('d-none');
+            if (sinCuotas) sinCuotas.classList.add('d-none');
+            if (cuotasContainer) cuotasContainer.innerHTML = '';
+            cuotasSeleccionadas = [];
+            actualizarInputCuotas();
+        }
+
+        // UN SOLO event listener para el select de alumnos
+        if (alumnoSelect) {
+            alumnoSelect.addEventListener('change', function() {
+                cargarCuotasPendientes(this.value);
+            });
+        }
+
+        // UN SOLO event listener para el submit del formulario
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                console.log('🚀 === INICIANDO ENVÍO DEL FORMULARIO ===');
+                console.log('📋 Cuotas a enviar:', cuotasSeleccionadas);
+                console.log('🏷️ Campo hidden value:', cuotasSeleccionadasInput ? cuotasSeleccionadasInput.value : 'N/A');
+                console.log('🏷️ Campo hidden name:', cuotasSeleccionadasInput ? cuotasSeleccionadasInput.name : 'N/A');
+
+                // Validación 1: Cuotas seleccionadas
+                if (cuotasSeleccionadas.length === 0) {
+                    e.preventDefault();
+                    console.log('❌ Bloqueado: No hay cuotas seleccionadas');
+                    alertaCuotas.classList.remove('d-none');
+                    alertaCuotas.scrollIntoView({ behavior: 'smooth' });
+                    alert('ERROR: Debe seleccionar al menos una cuota para pagar.');
+                    return false;
+                }
+
+                // Validación 2: Monto válido
+                const montoInput = document.getElementById('pago_monto');
+                if (montoInput && parseFloat(montoInput.value) <= 0) {
+                    e.preventDefault();
+                    console.log('❌ Bloqueado: Monto inválido');
+                    alert('El monto debe ser mayor a 0.');
+                    return false;
+                }
+
+                // Asegurar que el campo hidden tenga el valor correcto
+                if (cuotasSeleccionadasInput) {
+                    cuotasSeleccionadasInput.value = JSON.stringify(cuotasSeleccionadas);
+                    console.log('✅ Campo hidden forzado a:', cuotasSeleccionadasInput.value);
+                }
+
+                console.log('✅ Formulario enviado correctamente');
+                return true;
+            });
+        }
+
+        // Inicializar
+        console.log('🎯 Sistema de pagos inicializado');
+        actualizarInputCuotas();
+    });
+    </script>
 {% endblock %}

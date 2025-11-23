@@ -4,14 +4,19 @@ namespace App\DataFixtures;
 
 use App\Entity\Alumno;
 use App\Entity\Carrera;
+use App\Entity\Comprobante;
 use App\Entity\Cuota;
 use App\Entity\Curso;
 use App\Entity\Descuento;
+use App\Entity\Dicta;
+use App\Entity\Docente;
+use App\Entity\DocumentacionNota;
 use App\Entity\Edicion;
 use App\Entity\InscripcionCarrera;
 use App\Entity\InscripcionEdicion;
 use App\Entity\Nota;
 use App\Entity\Pago;
+use App\Entity\PagoCuota;
 use App\Entity\PerteneceA;
 use App\Entity\PrecioCarrera;
 use DateTime;
@@ -20,304 +25,381 @@ use Doctrine\Persistence\ObjectManager;
 
 class AppFixtures extends Fixture
 {
-    public function load(ObjectManager $manager): void
+     public function load(ObjectManager $manager): void
     {
-        // Carreras
+        // Carreras (ampliadas)
         $carreras = [];
-        $carrera1 = new Carrera();
-        $carrera1->setNombre("Maestría en Ingeniería de Software");
-        $carrera1->setNroImplementacion(5678);
-        $carrera1->setNroOrdenanza(1234);
-        $carrera1->setCantidadCuotas(12);
-        $carrera1->setPrecioInscripcion(5000.00);
-        $manager->persist($carrera1);
-        $carreras[] = $carrera1;
+        $carreraData = [
+            ["Maestría en Ingeniería de Software", 1234, 5678, 12, 5000.00],
+            ["Especialización en Data Science", 1235, 5679, 10, 4500.00],
+            ["Doctorado en Ciencias de la Computación", 1236, 5680, 24, 8000.00],
+            ["Licenciatura en Sistemas", 1237, 5681, 8, 3000.00],
+            ["Tecnicatura en Desarrollo Web", 1238, 5682, 6, 2000.00],
+            ["Maestría en Inteligencia Artificial", 1239, 5683, 18, 6000.00],
+        ];
 
-        $carrera2 = new Carrera();
-        $carrera2->setNombre("Especialización en Data Science");
-        $carrera2->setNroImplementacion(5679);
-        $carrera2->setNroOrdenanza(1235);
-        $carrera2->setCantidadCuotas(10);
-        $carrera2->setPrecioInscripcion(4500.00);
-        $manager->persist($carrera2);
-        $carreras[] = $carrera2;
+        foreach ($carreraData as $data) {
+            $carrera = new Carrera();
+            $carrera->setNombre($data[0]);
+            $carrera->setNroOrdenanza($data[1]);
+            $carrera->setNroImplementacion($data[2]);
+            $carrera->setCantidadCuotas($data[3]);
+            $carrera->setPrecioInscripcion($data[4]);
+            $manager->persist($carrera);
+            $carreras[] = $carrera;
+        }
 
-        $carrera3 = new Carrera();
-        $carrera3->setNombre("Doctorado en Ciencias de la Computación");
-        $carrera3->setNroImplementacion(5680);
-        $carrera3->setNroOrdenanza(1236);
-        $carrera3->setCantidadCuotas(24);
-        $carrera3->setPrecioInscripcion(8000.00);
-        $manager->persist($carrera3);
-        $carreras[] = $carrera3;
+        // Precios de Carrera (ampliados)
+        $precioCarreraData = [
+            [$carreras[0], 120000.00, '2024-01-01'],
+            [$carreras[0], 135000.00, '2024-06-01'],
+            [$carreras[1], 95000.00, '2024-01-01'],
+            [$carreras[1], 105000.00, '2024-07-01'],
+            [$carreras[2], 180000.00, '2024-01-01'],
+            [$carreras[3], 80000.00, '2024-01-01'],
+            [$carreras[4], 50000.00, '2024-01-01'],
+            [$carreras[5], 150000.00, '2024-01-01'],
+        ];
 
-        // Precios de Carrera
-        $precioCarrera1 = new PrecioCarrera();
-        $precioCarrera1->setCarrera($carrera1);
-        $precioCarrera1->setPrecio(120000.00);
-        $precioCarrera1->setFechaVigencia(new DateTime('2024-01-01'));
-        $precioCarrera1->setFechaCreacion(new DateTime('2024-01-01 10:00:00'));
-        $manager->persist($precioCarrera1);
+        foreach ($precioCarreraData as $i => $data) {
+            $precioCarrera = new PrecioCarrera();
+            $precioCarrera->setCarrera($data[0]);
+            $precioCarrera->setPrecio($data[1]);
+            $precioCarrera->setFechaVigencia(new DateTime($data[2]));
+            $precioCarrera->setFechaCreacion(new DateTime($data[2] . ' ' . ($i + 9) . ':00:00'));
+            $manager->persist($precioCarrera);
+        }
 
-        $precioCarrera2 = new PrecioCarrera();
-        $precioCarrera2->setCarrera($carrera1);
-        $precioCarrera2->setPrecio(135000.00);
-        $precioCarrera2->setFechaVigencia(new DateTime('2024-06-01'));
-        $precioCarrera2->setFechaCreacion(new DateTime('2024-05-15 09:30:00'));
-        $manager->persist($precioCarrera2);
-
-        $precioCarrera3 = new PrecioCarrera();
-        $precioCarrera3->setCarrera($carrera2);
-        $precioCarrera3->setPrecio(95000.00);
-        $precioCarrera3->setFechaVigencia(new DateTime('2024-01-01'));
-        $precioCarrera3->setFechaCreacion(new DateTime('2024-01-01 11:00:00'));
-        $manager->persist($precioCarrera3);
-
-        // Cursos
+        // Cursos (ampliados)
         $cursos = [];
-        $curso1 = new Curso();
-        $curso1->setNombre("Matemática Avanzada");
-        $curso1->setNroImplementacion(1001);
-        $curso1->setNroOrdenanza(2001);
-        $curso1->setHoras(60);
-        $manager->persist($curso1);
-        $cursos[] = $curso1;
+        $cursoData = [
+            ["Matemática Avanzada", 2001, 1001, 60],
+            ["Programación en Python", 2002, 1002, 80],
+            ["Machine Learning", 2003, 1003, 100],
+            ["Bases de Datos", 2004, 1004, 70],
+            ["Estadística Aplicada", 2005, 1005, 50],
+            ["Desarrollo Web Full Stack", 2006, 1006, 90],
+            ["Redes y Comunicaciones", 2007, 1007, 65],
+            ["Seguridad Informática", 2008, 1008, 75],
+            ["Cloud Computing", 2009, 1009, 85],
+            ["Big Data Analytics", 2010, 1010, 95],
+        ];
 
-        $curso2 = new Curso();
-        $curso2->setNombre("Programación en Python");
-        $curso2->setNroImplementacion(1002);
-        $curso2->setNroOrdenanza(2002);
-        $curso2->setHoras(80);
-        $manager->persist($curso2);
-        $cursos[] = $curso2;
+        foreach ($cursoData as $data) {
+            $curso = new Curso();
+            $curso->setNombre($data[0]);
+            $curso->setNroOrdenanza($data[1]);
+            $curso->setNroImplementacion($data[2]);
+            $curso->setHoras($data[3]);
+            $manager->persist($curso);
+            $cursos[] = $curso;
+        }
 
-        $curso3 = new Curso();
-        $curso3->setNombre("Machine Learning");
-        $curso3->setNroImplementacion(1003);
-        $curso3->setNroOrdenanza(2003);
-        $curso3->setHoras(100);
-        $manager->persist($curso3);
-        $cursos[] = $curso3;
-
-        $curso4 = new Curso();
-        $curso4->setNombre("Bases de Datos");
-        $curso4->setNroImplementacion(1004);
-        $curso4->setNroOrdenanza(2004);
-        $curso4->setHoras(70);
-        $manager->persist($curso4);
-        $cursos[] = $curso4;
-
-        $curso5 = new Curso();
-        $curso5->setNombre("Estadística Aplicada");
-        $curso5->setNroImplementacion(1005);
-        $curso5->setNroOrdenanza(2005);
-        $curso5->setHoras(50);
-        $manager->persist($curso5);
-        $cursos[] = $curso5;
-
-        // Alumnos
+        // Alumnos (ampliados)
         $alumnos = [];
-        $alumno1 = new Alumno();
-        $alumno1->setNombre("Franco");
-        $alumno1->setApellido("Cosolito");
-        $alumno1->setDni(30123456);
-        $alumno1->setEmail("franco@mail.com");
-        $manager->persist($alumno1);
-        $alumnos[] = $alumno1;
+        $alumnoData = [
+            ["Franco", "Cosolito", 30123456, "franco@mail.com"],
+            ["Enzo", "Garello", 32123456, "enzo@mail.com"],
+            ["María", "Gómez", 34123456, "maria.gomez@email.com"],
+            ["Carlos", "López", 36123456, "carlos.lopez@email.com"],
+            ["Ana", "Martínez", 38123456, "ana.martinez@email.com"],
+            ["Lucía", "Rodríguez", 40123456, "lucia.rodriguez@email.com"],
+            ["Diego", "Fernández", 42123456, "diego.fernandez@email.com"],
+            ["Sofía", "Pérez", 44123456, "sofia.perez@email.com"],
+            ["Javier", "García", 46123456, "javier.garcia@email.com"],
+            ["Laura", "Silva", 48123456, "laura.silva@email.com"],
+            ["Miguel", "Torres", 50123456, "miguel.torres@email.com"],
+            ["Elena", "Ramírez", 52123456, "elena.ramirez@email.com"],
+        ];
 
-        $alumno2 = new Alumno();
-        $alumno2->setNombre("Enzo");
-        $alumno2->setApellido("Garello");
-        $alumno2->setDni(32123456);
-        $alumno2->setEmail("enzo@mail.com");
-        $manager->persist($alumno2);
-        $alumnos[] = $alumno2;
+        foreach ($alumnoData as $data) {
+            $alumno = new Alumno();
+            $alumno->setNombre($data[0]);
+            $alumno->setApellido($data[1]);
+            $alumno->setDni($data[2]);
+            $alumno->setEmail($data[3]);
+            $manager->persist($alumno);
+            $alumnos[] = $alumno;
+        }
 
-        $alumno3 = new Alumno();
-        $alumno3->setNombre("María");
-        $alumno3->setApellido("Gómez");
-        $alumno3->setDni(34123456);
-        $alumno3->setEmail("maria.gomez@email.com");
-        $manager->persist($alumno3);
-        $alumnos[] = $alumno3;
+        // Docentes (nuevos)
+        $docentes = [];
+        $docenteData = [
+            ["Roberto", "González", 20123456, "roberto.gonzalez@email.com"],
+            ["Patricia", "Mendoza", 21123456, "patricia.mendoza@email.com"],
+            ["Alejandro", "Suárez", 22123456, "alejandro.suarez@email.com"],
+            ["Claudia", "Ríos", 23123456, "claudia.rios@email.com"],
+            ["Ricardo", "Vargas", 24123456, "ricardo.vargas@email.com"],
+        ];
 
-        $alumno4 = new Alumno();
-        $alumno4->setNombre("Carlos");
-        $alumno4->setApellido("López");
-        $alumno4->setDni(36123456);
-        $alumno4->setEmail("carlos.lopez@email.com");
-        $manager->persist($alumno4);
-        $alumnos[] = $alumno4;
+        foreach ($docenteData as $data) {
+            $docente = new Docente();
+            $docente->setNombre($data[0]);
+            $docente->setApellido($data[1]);
+            $docente->setDni($data[2]);
+            $docente->setEmail($data[3]);
+            $manager->persist($docente);
+            $docentes[] = $docente;
+        }
 
-        $alumno5 = new Alumno();
-        $alumno5->setNombre("Ana");
-        $alumno5->setApellido("Martínez");
-        $alumno5->setDni(38123456);
-        $alumno5->setEmail("ana.martinez@email.com");
-        $manager->persist($alumno5);
-        $alumnos[] = $alumno5;
+        // PerteneceA - Asignar cursos a carreras (ampliado)
+        $perteneceData = [
+            [$cursos[0], $carreras[0], false],
+            [$cursos[1], $carreras[0], false],
+            [$cursos[2], $carreras[1], false],
+            [$cursos[3], $carreras[0], true],
+            [$cursos[4], $carreras[1], true],
+            [$cursos[5], $carreras[3], false],
+            [$cursos[6], $carreras[0], true],
+            [$cursos[7], $carreras[2], false],
+            [$cursos[8], $carreras[5], false],
+            [$cursos[9], $carreras[1], false],
+            [$cursos[5], $carreras[4], false],
+            [$cursos[1], $carreras[3], false],
+        ];
 
-        // PerteneceA - Asignar cursos a carreras
-        $pertenece1 = new PerteneceA();
-        $pertenece1->setCurso($curso1);
-        $pertenece1->setCarrera($carrera1);
-        $pertenece1->setEsElectivo(false);
-        $manager->persist($pertenece1);
+        foreach ($perteneceData as $data) {
+            $pertenece = new PerteneceA();
+            $pertenece->setCurso($data[0]);
+            $pertenece->setCarrera($data[1]);
+            $pertenece->setEsElectivo($data[2]);
+            $manager->persist($pertenece);
+        }
 
-        $pertenece2 = new PerteneceA();
-        $pertenece2->setCurso($curso2);
-        $pertenece2->setCarrera($carrera1);
-        $pertenece2->setEsElectivo(false);
-        $manager->persist($pertenece2);
-
-        $pertenece3 = new PerteneceA();
-        $pertenece3->setCurso($curso3);
-        $pertenece3->setCarrera($carrera2);
-        $pertenece3->setEsElectivo(false);
-        $manager->persist($pertenece3);
-
-        $pertenece4 = new PerteneceA();
-        $pertenece4->setCurso($curso4);
-        $pertenece4->setCarrera($carrera1);
-        $pertenece4->setEsElectivo(true);
-        $manager->persist($pertenece4);
-
-        $pertenece5 = new PerteneceA();
-        $pertenece5->setCurso($curso5);
-        $pertenece5->setCarrera($carrera2);
-        $pertenece5->setEsElectivo(true);
-        $manager->persist($pertenece5);
-
-        // Ediciones
+        // Ediciones (ampliadas)
         $ediciones = [];
-        $edicion1 = new Edicion();
-        $edicion1->setCurso($curso1);
-        $edicion1->setNombre("Matemática Avanzada 2024-1");
-        $edicion1->setFechaInicio(new DateTime('2024-03-01'));
-        $edicion1->setFechaFin(new DateTime('2024-07-01'));
-        $edicion1->setPrecio(15000.0);
-        $manager->persist($edicion1);
-        $ediciones[] = $edicion1;
+        $edicionData = [
+            [$cursos[0], "Matemática Avanzada 2024-1", '2024-03-01', '2024-07-01', 15000.0],
+            [$cursos[1], "Programación Python 2024-1", '2024-04-01', '2024-08-01', 18000.0],
+            [$cursos[2], "Machine Learning 2024-2", '2024-08-01', '2024-12-01', 25000.0],
+            [$cursos[3], "Bases de Datos 2024-1", '2024-03-15', '2024-07-15', 16000.0],
+            [$cursos[4], "Estadística Aplicada 2024-1", '2024-02-01', '2024-06-01', 14000.0],
+            [$cursos[5], "Desarrollo Web 2024-1", '2024-05-01', '2024-09-01', 20000.0],
+            [$cursos[6], "Redes 2024-2", '2024-09-01', '2025-01-01', 17000.0],
+            [$cursos[7], "Seguridad 2024-2", '2024-10-01', '2025-02-01', 22000.0],
+        ];
 
-        $edicion2 = new Edicion();
-        $edicion2->setCurso($curso2);
-        $edicion2->setNombre("Programación Python 2024-1");
-        $edicion2->setFechaInicio(new DateTime('2024-04-01'));
-        $edicion2->setFechaFin(new DateTime('2024-08-01'));
-        $edicion2->setPrecio(18000.0);
-        $manager->persist($edicion2);
-        $ediciones[] = $edicion2;
+        foreach ($edicionData as $data) {
+            $edicion = new Edicion();
+            $edicion->setCurso($data[0]);
+            $edicion->setNombre($data[1]);
+            $edicion->setFechaInicio(new DateTime($data[2]));
+            $edicion->setFechaFin(new DateTime($data[3]));
+            $edicion->setPrecio($data[4]);
+            $manager->persist($edicion);
+            $ediciones[] = $edicion;
+        }
 
-        $edicion3 = new Edicion();
-        $edicion3->setCurso($curso3);
-        $edicion3->setNombre("Machine Learning 2024-2");
-        $edicion3->setFechaInicio(new DateTime('2024-08-01'));
-        $edicion3->setFechaFin(new DateTime('2024-12-01'));
-        $edicion3->setPrecio(25000.0);
-        $manager->persist($edicion3);
-        $ediciones[] = $edicion3;
+        // Dicta - Asignar docentes a ediciones
+        $dictaData = [
+            [$ediciones[0], $docentes[0], true],
+            [$ediciones[0], $docentes[1], false],
+            [$ediciones[1], $docentes[2], true],
+            [$ediciones[2], $docentes[3], true],
+            [$ediciones[3], $docentes[4], true],
+            [$ediciones[4], $docentes[0], true],
+            [$ediciones[5], $docentes[1], true],
+            [$ediciones[6], $docentes[2], true],
+            [$ediciones[7], $docentes[3], true],
+        ];
 
-        // Descuentos
+        foreach ($dictaData as $data) {
+            $dicta = new Dicta();
+            $dicta->setEdicion($data[0]);
+            $dicta->setDocente($data[1]);
+            $dicta->setEsFirmante($data[2]);
+            $manager->persist($dicta);
+        }
+
+        // Descuentos (ampliados)
         $descuentos = [];
-        $descuento1 = new Descuento();
-        $descuento1->setDescripcion("Beca por excelencia académica");
-        $descuento1->setValor(20.00);
-        $manager->persist($descuento1);
-        $descuentos[] = $descuento1;
+        $descuentoData = [
+            ["Beca por excelencia académica", 20.00],
+            ["Descuento por pago anticipado", 10.00],
+            ["Beca deportiva", 15.00],
+            ["Beca por situación económica", 25.00],
+            ["Descuento por grupo familiar", 30.00],
+            ["Beca por investigación", 40.00],
+            ["Descuento por convenio empresarial", 20.00],
+        ];
 
-        $descuento2 = new Descuento();
-        $descuento2->setDescripcion("Descuento por pago anticipado");
-        $descuento2->setValor(10.00);
-        $manager->persist($descuento2);
-        $descuentos[] = $descuento2;
+        foreach ($descuentoData as $data) {
+            $descuento = new Descuento();
+            $descuento->setDescripcion($data[0]);
+            $descuento->setValor($data[1]);
+            $manager->persist($descuento);
+            $descuentos[] = $descuento;
+        }
 
-        $descuento3 = new Descuento();
-        $descuento3->setDescripcion("Beca deportiva");
-        $descuento3->setValor(15.00);
-        $manager->persist($descuento3);
-        $descuentos[] = $descuento3;
+        // Comprobantes (nuevos)
+        $comprobantes = [];
+        for ($i = 1; $i <= 20; $i++) {
+            $comprobante = new Comprobante();
+            $comprobante->setArchivo("comprobante_$i.pdf");
+            $manager->persist($comprobante);
+            $comprobantes[] = $comprobante;
+        }
 
-        // Inscripciones a Carreras
-        $inscCarrera1 = new InscripcionCarrera();
-        $inscCarrera1->setAlumno($alumno1);
-        $inscCarrera1->setCarrera($carrera1);
-        $inscCarrera1->setDescuento($descuento1);
-        $manager->persist($inscCarrera1);
+        // Documentación de Notas (nuevos)
+        $documentacionesNota = [];
+        for ($i = 1; $i <= 15; $i++) {
+            $docNota = new DocumentacionNota();
+            $docNota->setArchivo("documentacion_nota_$i.pdf");
+            $manager->persist($docNota);
+            $documentacionesNota[] = $docNota;
+        }
 
-        $inscCarrera2 = new InscripcionCarrera();
-        $inscCarrera2->setAlumno($alumno2);
-        $inscCarrera2->setCarrera($carrera1);
-        $inscCarrera2->setDescuento($descuento2);
-        $manager->persist($inscCarrera2);
+        // Inscripciones a Carreras (ampliadas)
+        $inscCarreras = [];
+        $inscCarreraData = [
+            [$alumnos[0], $carreras[0], $descuentos[0]],
+            [$alumnos[1], $carreras[0], $descuentos[1]],
+            [$alumnos[2], $carreras[1], $descuentos[2]],
+            [$alumnos[3], $carreras[2], $descuentos[3]],
+            [$alumnos[4], $carreras[3], $descuentos[4]],
+            [$alumnos[5], $carreras[4], $descuentos[5]],
+            [$alumnos[6], $carreras[5], $descuentos[6]],
+            [$alumnos[7], $carreras[0], null],
+            [$alumnos[8], $carreras[1], $descuentos[1]],
+            [$alumnos[9], $carreras[2], $descuentos[2]],
+        ];
 
-        $inscCarrera3 = new InscripcionCarrera();
-        $inscCarrera3->setAlumno($alumno3);
-        $inscCarrera3->setCarrera($carrera2);
-        $inscCarrera3->setDescuento($descuento3);
-        $manager->persist($inscCarrera3);
+        foreach ($inscCarreraData as $data) {
+            $inscCarrera = new InscripcionCarrera();
+            $inscCarrera->setAlumno($data[0]);
+            $inscCarrera->setCarrera($data[1]);
+            $inscCarrera->setDescuento($data[2]);
+            $manager->persist($inscCarrera);
+            $inscCarreras[] = $inscCarrera;
+        }
 
-        // Inscripciones a Ediciones
-        $inscEdicion1 = new InscripcionEdicion();
-        $inscEdicion1->setAlumno($alumno1);
-        $inscEdicion1->setEdicion($edicion1);
-        $inscEdicion1->setDescuento($descuento1);
-        $manager->persist($inscEdicion1);
+        // Inscripciones a Ediciones (ampliadas)
+        $inscEdiciones = [];
+        $inscEdicionData = [
+            [$alumnos[0], $ediciones[0], $descuentos[0]],
+            [$alumnos[1], $ediciones[0], $descuentos[1]],
+            [$alumnos[0], $ediciones[1], null],
+            [$alumnos[2], $ediciones[1], $descuentos[2]],
+            [$alumnos[3], $ediciones[2], $descuentos[3]],
+            [$alumnos[4], $ediciones[3], $descuentos[4]],
+            [$alumnos[5], $ediciones[4], $descuentos[5]],
+            [$alumnos[6], $ediciones[5], $descuentos[6]],
+            [$alumnos[7], $ediciones[6], null],
+            [$alumnos[8], $ediciones[7], $descuentos[1]],
+            [$alumnos[9], $ediciones[0], $descuentos[2]],
+            [$alumnos[10], $ediciones[1], $descuentos[3]],
+            [$alumnos[11], $ediciones[2], $descuentos[4]],
+        ];
 
-        $inscEdicion2 = new InscripcionEdicion();
-        $inscEdicion2->setAlumno($alumno2);
-        $inscEdicion2->setEdicion($edicion1);
-        $inscEdicion2->setDescuento($descuento2);
-        $manager->persist($inscEdicion2);
+        foreach ($inscEdicionData as $data) {
+            $inscEdicion = new InscripcionEdicion();
+            $inscEdicion->setAlumno($data[0]);
+            $inscEdicion->setEdicion($data[1]);
+            $inscEdicion->setDescuento($data[2]);
+            $manager->persist($inscEdicion);
+            $inscEdiciones[] = $inscEdicion;
+        }
 
-        $inscEdicion3 = new InscripcionEdicion();
-        $inscEdicion3->setAlumno($alumno1);
-        $inscEdicion3->setEdicion($edicion2);
-        $inscEdicion3->setDescuento(null);
-        $manager->persist($inscEdicion3);
+        // Notas (ampliadas)
+        $notas = [];
+        $notaData = [
+            [$inscEdiciones[0], 8.5, '2024-07-15', "Examen final", $documentacionesNota[0]],
+            [$inscEdiciones[1], 9.0, '2024-07-15', "Examen final", $documentacionesNota[1]],
+            [$inscEdiciones[2], 7.5, '2024-08-20', "Proyecto integrador", $documentacionesNota[2]],
+            [$inscEdiciones[3], 8.0, '2024-08-20', "Examen práctico", $documentacionesNota[3]],
+            [$inscEdiciones[4], 9.5, '2024-12-10', "Trabajo final", $documentacionesNota[4]],
+            [$inscEdiciones[5], 6.5, '2024-07-20', "Examen parcial", null],
+            [$inscEdiciones[6], 8.8, '2024-06-15', "Evaluación continua", $documentacionesNota[5]],
+            [$inscEdiciones[7], 7.0, '2025-01-20', "Examen final", null],
+            [$inscEdiciones[8], 9.2, '2025-01-20', "Proyecto final", $documentacionesNota[6]],
+        ];
 
-        // Notas
-        $nota1 = new Nota();
-        $nota1->setValor(8.5);
-        $nota1->setInscripcionEdicion($inscEdicion1);
-        $nota1->setFechaCarga(new DateTime('2024-07-15'));
-        $nota1->setDescripcion("Examen final");
-        $inscEdicion1->setNota($nota1);
-        $manager->persist($nota1);
+        foreach ($notaData as $i => $data) {
+            $nota = new Nota();
+            $nota->setValor($data[1]);
+            $nota->setInscripcionEdicion($data[0]);
+            $nota->setFechaCarga(new DateTime($data[2]));
+            $nota->setDescripcion($data[3]);
+            $nota->setDocumentacionNota($data[4]);
+            $data[0]->setNota($nota);
+            $manager->persist($nota);
+            $notas[] = $nota;
+        }
 
-        $nota2 = new Nota();
-        $nota2->setValor(9.0);
-        $nota2->setInscripcionEdicion($inscEdicion2);
-        $nota2->setFechaCarga(new DateTime('2024-07-15'));
-        $nota2->setDescripcion("Examen final");
-        $inscEdicion2->setNota($nota2);
-        $manager->persist($nota2);
+        // Cuotas (ampliadas)
+        $cuotas = [];
+        
+        // Cuotas para inscripciones a ediciones
+        foreach ($inscEdiciones as $inscEdicion) {
+            for ($i = 1; $i <= 3; $i++) {
+                $cuota = new Cuota();
+                $cuota->setInscripcionEdicion($inscEdicion);
+                $cuota->setNumeroCuota($i);
+                $manager->persist($cuota);
+                $cuotas[] = $cuota;
+            }
+        }
 
-        // Cuotas
-        $cuota1 = new Cuota();
-        $cuota1->setInscripcionEdicion($inscEdicion1);
-        $cuota1->setNumeroCuota(1);
-        $manager->persist($cuota1);
+        // Cuotas para inscripciones a carreras
+        foreach ($inscCarreras as $inscCarrera) {
+            $carrera = $inscCarrera->getCarrera();
+            $cantidadCuotas = $carrera->getCantidadCuotas() ?? 6;
+            for ($i = 1; $i <= min(4, $cantidadCuotas); $i++) {
+                $cuota = new Cuota();
+                $cuota->setInscripcionCarrera($inscCarrera);
+                $cuota->setNumeroCuota($i);
+                $manager->persist($cuota);
+                $cuotas[] = $cuota;
+            }
+        }
 
-        $cuota2 = new Cuota();
-        $cuota2->setInscripcionEdicion($inscEdicion1);
-        $cuota2->setNumeroCuota(2);
-        $manager->persist($cuota2);
+        // Pagos (ampliados)
+        $pagos = [];
+        $pagoData = [
+            [15000, '2024-03-05', $comprobantes[0]],
+            [18000, '2024-04-10', $comprobantes[1]],
+            [16000, '2024-03-20', $comprobantes[2]],
+            [14000, '2024-02-15', $comprobantes[3]],
+            [20000, '2024-05-12', $comprobantes[4]],
+            [17000, '2024-09-10', $comprobantes[5]],
+            [22000, '2024-10-05', $comprobantes[6]],
+            [5000, '2024-01-20', $comprobantes[7]],
+            [4500, '2024-02-01', $comprobantes[8]],
+            [8000, '2024-01-25', $comprobantes[9]],
+            [3000, '2024-03-01', $comprobantes[10]],
+            [6000, '2024-02-10', $comprobantes[11]],
+        ];
 
-        $cuota3 = new Cuota();
-        $cuota3->setInscripcionCarrera($inscCarrera1);
-        $cuota3->setNumeroCuota(1);
-        $manager->persist($cuota3);
+        foreach ($pagoData as $data) {
+            $pago = new Pago();
+            $pago->setMonto($data[0]);
+            $pago->setFechaPago(new DateTime($data[1]));
+            $pago->setComprobante($data[2]);
+            $manager->persist($pago);
+            $pagos[] = $pago;
+        }
 
-        // Pagos
-        $pago1 = new Pago();
-        $pago1->setMonto(15000);
-        $pago1->setFechaPago(new DateTime('2024-03-05'));
-        $manager->persist($pago1);
+        // PagoCuota (nuevos)
+        $pagoCuotaData = [
+            [$cuotas[0], $pagos[0], 5000],
+            [$cuotas[1], $pagos[0], 5000],
+            [$cuotas[2], $pagos[0], 5000],
+            [$cuotas[3], $pagos[1], 6000],
+            [$cuotas[4], $pagos[1], 6000],
+            [$cuotas[5], $pagos[1], 6000],
+            [$cuotas[6], $pagos[2], 16000],
+            [$cuotas[15], $pagos[7], 5000],
+            [$cuotas[16], $pagos[8], 4500],
+            [$cuotas[17], $pagos[9], 8000],
+        ];
 
-        $pago2 = new Pago();
-        $pago2->setMonto(18000);
-        $pago2->setFechaPago(new DateTime('2024-04-10'));
-        $manager->persist($pago2);
+        foreach ($pagoCuotaData as $data) {
+            $pagoCuota = new PagoCuota();
+            $pagoCuota->setCuota($data[0]);
+            $pagoCuota->setPago($data[1]);
+            $pagoCuota->setMontoCuota($data[2]);
+            $manager->persist($pagoCuota);
+        }
 
         // Persistir cambios
         $manager->flush();

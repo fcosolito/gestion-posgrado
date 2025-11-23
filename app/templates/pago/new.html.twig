@@ -2,13 +2,367 @@
 
 {% block title %}Registrar Pago{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .cuota-item {
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .cuota-item:hover {
+            background-color: #f8f9fa;
+        }
+        .cuota-item.selected {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
+        .cuota-checkbox {
+            margin-right: 10px;
+        }
+        .filter-section {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        #cuotas-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .monto-calculado {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">
+        <i class="fas fa-money-bill-wave"></i> Registrar Nuevo Pago
+    </h1>
+    
+    <div class="row">
+        <!-- Panel de selección de cuotas -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-list"></i> Seleccionar Cuotas a Pagar
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Filtros -->
+                    <div class="filter-section">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Seleccionar Alumno *</label>
+                            <select class="form-control" id="alumno-select">
+                                <option value="">-- Seleccione un alumno --</option>
+                                {% for alumno in alumnos %}
+                                    <option value="{{ alumno.id }}">
+                                        {{ alumno.apellido }}, {{ alumno.nombre }} - DNI: {{ alumno.dni }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
 
-<div class="p-2">
-    {{ include('pago/_form.html.twig', {'button_label': "Registrar"}) }}
+                    <!-- Lista de cuotas pendientes -->
+                    <div id="cuotas-list" class="d-none">
+                        <h6 class="fw-bold">Cuotas Pendientes:</h6>
+                        <div id="cuotas-container"></div>
+                        <div class="mt-3 p-3 bg-light rounded">
+                            <strong>Total seleccionado: </strong>
+                            <span id="total-cuotas" class="badge bg-primary">0</span> cuotas
+                        </div>
+                    </div>
 
-    <div class="m-3">
-        <a class="btn btn-secondary" href="{{ path('app_pago_index') }}">Volver</a>
+                    <div id="sin-cuotas" class="alert alert-info d-none">
+                        <i class="fas fa-info-circle"></i> No hay cuotas pendientes para este alumno.
+                    </div>
+
+                    <div id="cargando-cuotas" class="alert alert-secondary d-none text-center">
+                        <i class="fas fa-spinner fa-spin"></i> Cargando cuotas pendientes...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario de pago -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-credit-card"></i> Datos del Pago
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {{ include('pago/_form.html.twig', {'button_label': 'Registrar Pago'}) }}
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elementos del DOM
+        const alumnoSelect = document.getElementById('alumno-select');
+        const cuotasContainer = document.getElementById('cuotas-container');
+        const cuotasList = document.getElementById('cuotas-list');
+        const sinCuotas = document.getElementById('sin-cuotas');
+        const cargandoCuotas = document.getElementById('cargando-cuotas');
+        let cuotasSeleccionadasInput = null;
+        const totalCuotasSpan = document.getElementById('total-cuotas');
+        const alertaCuotas = document.getElementById('alerta-cuotas');
+        const btnRegistrar = document.getElementById('btn-registrar');
+
+        let cuotasSeleccionadas = [];
+        
+        // Buscar el campo hidden después de que el DOM esté listo
+        function buscarCampoHidden() {
+            cuotasSeleccionadasInput = document.getElementById('cuotas-seleccionadas');
+            if (!cuotasSeleccionadasInput) {
+                // Intentar buscar por name attribute como alternativa
+                cuotasSeleccionadasInput = document.querySelector('input[name="pago[cuotasSeleccionadas]"]');
+            }
+            if (!cuotasSeleccionadasInput) {
+                console.error('ERROR: No se encontró el campo hidden cuotas-seleccionadas');
+            } else {
+                console.log('Campo hidden encontrado correctamente:', {
+                    id: cuotasSeleccionadasInput.id,
+                    name: cuotasSeleccionadasInput.name,
+                    value: cuotasSeleccionadasInput.value
+                });
+            }
+        }
+        
+        // Buscar inmediatamente y también después de un pequeño delay
+        buscarCampoHidden();
+        setTimeout(buscarCampoHidden, 100);
+
+        function actualizarInputCuotas() {
+            // Buscar el campo si no está definido (por ID o por name)
+            if (!cuotasSeleccionadasInput) {
+                cuotasSeleccionadasInput = document.getElementById('cuotas-seleccionadas');
+                if (!cuotasSeleccionadasInput) {
+                    // Intentar buscar por name attribute
+                    cuotasSeleccionadasInput = document.querySelector('input[name="pago[cuotasSeleccionadas]"]');
+                }
+                if (!cuotasSeleccionadasInput) {
+                    console.error('No se encontró el campo hidden cuotas-seleccionadas');
+                    return;
+                }
+            }
+            
+            const jsonValue = JSON.stringify(cuotasSeleccionadas);
+            cuotasSeleccionadasInput.value = jsonValue;
+            
+            // Debug
+            console.log('Actualizando campo cuotas:', {
+                cuotas: cuotasSeleccionadas,
+                json: jsonValue,
+                campoEncontrado: !!cuotasSeleccionadasInput,
+                valorCampo: cuotasSeleccionadasInput.value,
+                idCampo: cuotasSeleccionadasInput.id,
+                nameCampo: cuotasSeleccionadasInput.name
+            });
+            
+            if (totalCuotasSpan) {
+                totalCuotasSpan.textContent = cuotasSeleccionadas.length;
+            }
+            if (alertaCuotas) {
+                alertaCuotas.classList.toggle('d-none', cuotasSeleccionadas.length > 0);
+            }
+            if (btnRegistrar) {
+                btnRegistrar.disabled = cuotasSeleccionadas.length === 0;
+            }
+        }
+
+        function mostrarError(mensaje) {
+            console.error(mensaje);
+            if (cargandoCuotas) {
+                cargandoCuotas.classList.add('d-none');
+                cargandoCuotas.innerHTML = `<div class="alert alert-danger">${mensaje}</div>`;
+                cargandoCuotas.classList.remove('d-none');
+            }
+        }
+
+        function cargarCuotasPendientes(alumnoId) {
+            if (!alumnoId) {
+                resetearCuotas();
+                return;
+            }
+
+            // Mostrar loading
+            if (cargandoCuotas) {
+                cargandoCuotas.classList.remove('d-none');
+                cargandoCuotas.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cargando cuotas pendientes...';
+            }
+            if (cuotasList) cuotasList.classList.add('d-none');
+            if (sinCuotas) sinCuotas.classList.add('d-none');
+            if (cuotasContainer) cuotasContainer.innerHTML = '';
+            
+            cuotasSeleccionadas = [];
+            actualizarInputCuotas();
+
+            // Cargar cuotas pendientes del alumno
+            fetch(`/pago/api/cuotas-pendientes/${alumnoId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error HTTP: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (cargandoCuotas) cargandoCuotas.classList.add('d-none');
+                    
+                    if (!data.success) {
+                        throw new Error(data.error || 'Error desconocido');
+                    }
+
+                    const cuotas = data.cuotas || [];
+                    cuotasSeleccionadas = [];
+
+                    if (cuotas.length === 0) {
+                        if (cuotasList) cuotasList.classList.add('d-none');
+                        if (sinCuotas) sinCuotas.classList.remove('d-none');
+                    } else {
+                        if (cuotasList) cuotasList.classList.remove('d-none');
+                        if (sinCuotas) sinCuotas.classList.add('d-none');
+
+                        cuotas.forEach(cuota => {
+                            if (!cuotasContainer) return;
+                            
+                            const cuotaElement = document.createElement('div');
+                            cuotaElement.className = 'cuota-item';
+                            cuotaElement.innerHTML = `
+                                <div class="form-check">
+                                    <input class="form-check-input cuota-checkbox" type="checkbox" 
+                                           value="${cuota.id}" id="cuota-${cuota.id}">
+                                    <label class="form-check-label w-100" for="cuota-${cuota.id}">
+                                        <strong>Cuota ${cuota.numero_cuota}</strong><br>
+                                        <small class="text-muted">
+                                            ${cuota.tipo}: ${cuota.concepto}
+                                        </small>
+                                    </label>
+                                </div>
+                            `;
+                            cuotasContainer.appendChild(cuotaElement);
+
+                            // Event listener para el checkbox
+                            const checkbox = cuotaElement.querySelector('.cuota-checkbox');
+                            checkbox.addEventListener('change', function() {
+                                if (this.checked) {
+                                    cuotasSeleccionadas.push(cuota.id);
+                                    cuotaElement.classList.add('selected');
+                                } else {
+                                    cuotasSeleccionadas = cuotasSeleccionadas.filter(id => id !== cuota.id);
+                                    cuotaElement.classList.remove('selected');
+                                }
+                                actualizarInputCuotas();
+                            });
+                        });
+                    }
+                    actualizarInputCuotas();
+                })
+                .catch(error => {
+                    mostrarError('Error al cargar las cuotas: ' + error.message);
+                });
+        }
+
+        function resetearCuotas() {
+            if (cuotasList) cuotasList.classList.add('d-none');
+            if (sinCuotas) sinCuotas.classList.add('d-none');
+            if (cargandoCuotas) cargandoCuotas.classList.add('d-none');
+            if (cuotasContainer) cuotasContainer.innerHTML = '';
+            cuotasSeleccionadas = [];
+            actualizarInputCuotas();
+        }
+
+        // Event listener para el select de alumnos
+        if (alumnoSelect) {
+            alumnoSelect.addEventListener('change', function() {
+                cargarCuotasPendientes(this.value);
+            });
+        }
+
+        // Validación del formulario
+        const form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                // Buscar el campo una vez más antes del submit
+                buscarCampoHidden();
+                
+                // Asegurar que el campo hidden se actualice justo antes del submit
+                actualizarInputCuotas();
+                
+                // Forzar actualización directa si el campo existe
+                if (cuotasSeleccionadasInput) {
+                    const jsonValue = JSON.stringify(cuotasSeleccionadas);
+                    cuotasSeleccionadasInput.value = jsonValue;
+                }
+                
+                // Debug: verificar el valor antes de enviar
+                console.log('=== DEBUG ANTES DE SUBMIT ===');
+                console.log('Cuotas seleccionadas:', cuotasSeleccionadas);
+                console.log('Campo hidden encontrado:', !!cuotasSeleccionadasInput);
+                if (cuotasSeleccionadasInput) {
+                    console.log('ID del campo:', cuotasSeleccionadasInput.id);
+                    console.log('Name del campo:', cuotasSeleccionadasInput.name);
+                    console.log('Valor del campo hidden:', cuotasSeleccionadasInput.value);
+                } else {
+                    console.error('ERROR: Campo hidden no encontrado');
+                }
+                
+                if (cuotasSeleccionadas.length === 0) {
+                    e.preventDefault();
+                    if (alertaCuotas) {
+                        alertaCuotas.classList.remove('d-none');
+                        alertaCuotas.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    alert('Debe seleccionar al menos una cuota para pagar.');
+                    return false;
+                }
+                
+                // Verificar una vez más que el campo tenga valor
+                if (!cuotasSeleccionadasInput) {
+                    e.preventDefault();
+                    alert('Error: No se encontró el campo de cuotas seleccionadas. Por favor, recargue la página.');
+                    return false;
+                }
+                
+                if (!cuotasSeleccionadasInput.value || cuotasSeleccionadasInput.value === '[]') {
+                    e.preventDefault();
+                    alert('Error: No se pudo guardar la selección de cuotas. Por favor, seleccione las cuotas nuevamente.');
+                    return false;
+                }
+                
+                console.log('Formulario enviado correctamente con cuotas:', cuotasSeleccionadasInput.value);
+            });
+        }
+
+        // Inicializar
+        actualizarInputCuotas();
+        
+        // Debug en consola
+        console.log('Sistema de pagos inicializado correctamente');
+    });
+    </script>
 {% endblock %}

@@ -1,50 +1,52 @@
+{# templates/pago/_form.html.twig #}
 <div class="container-fluid">
     <div class="row">
-        <div class="col-4">
-            <div class="bg-white rounded p-2 mt-2">
+        <div class="col-12">
+            <div class="bg-white rounded p-4 mt-2">
                 {{ form_start(form) }}
-                <div class="row mt-2 mb-2">
-                    <div class="col-4">
-                        Monto
+                
+                <div class="row mt-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Monto del Pago *</label>
+                        {{ form_widget(form.monto, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.monto) }}
                     </div>
-                    <div class="col-2">
-                        {{ form_widget(form.monto) }}
-                    </div>
-                </div>
-                <div class="row mt-2 mb-2">
-                    <div class="col-4">
-                        Fecha de Pago
-                    </div>
-                    <div class="col">
-                        {{ form_widget(form.fechaPago) }}
+                    <div class="col-md-6">
+                        <label class="form-label">Fecha de Pago *</label>
+                        {{ form_widget(form.fechaPago, {'attr': {'class': 'form-control'}}) }}
+                        {{ form_errors(form.fechaPago) }}
                     </div>
                 </div>
-                <div class="row mt-2 mb-2">
-                    <div class="col-4">
-                        Comprobante
-                    </div>
-                    <div class="col">
-                        {{ form_widget(form.comprobante) }}
+                
+                <div class="row mt-3 mb-3">
+                    <div class="col-12">
+                        <label class="form-label">Comprobante de Pago</label>
+                        {{ form_widget(form.archivoComprobante, {'attr': {'class': 'form-control'}}) }}
+                        <small class="text-muted">Formatos permitidos: PDF, JPEG, PNG (máx. 5MB)</small>
+                        {{ form_errors(form.archivoComprobante) }}
                     </div>
                 </div>
-                <div class="row mt-2 mb-2">
-                    <div class="col-4">
-                    </div>
-                    <div class="col">
-                        <div class="row">
-                            <div class="col">
-                                <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
-                            </div>
-                            <div class="col">
 
-                            </div>
-                        </div>
+                <!-- Campo oculto para las cuotas seleccionadas -->
+                {{ form_widget(form.cuotasSeleccionadas) }}
+                
+                <div class="alert alert-warning mt-3 d-none" id="alerta-cuotas">
+                    <i class="fas fa-exclamation-triangle"></i> Debe seleccionar al menos una cuota para pagar.
+                </div>
+                
+                <div class="row mt-4 mb-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary" id="btn-registrar">
+                            <i class="fas fa-save"></i> {{ button_label|default('Registrar Pago') }}
+                        </button>
+                        <a href="{{ path('app_pago_index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver al listado
+                        </a>
                     </div>
                 </div>
+                
                 {{ form_end(form) }}
             </div>
         </div>
     </div>
-    
 </div>
-

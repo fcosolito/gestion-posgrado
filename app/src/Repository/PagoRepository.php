@@ -15,6 +15,16 @@ class PagoRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Pago::class);
     }
+    public function findAllWithRelations()
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.comprobante', 'c')
+            ->leftJoin('p.pagoCuotas', 'pc')
+            ->leftJoin('pc.cuota', 'cu')
+            ->addSelect('c', 'pc', 'cu')
+            ->getQuery()
+            ->getResult();
+    }
 
     //    /**
     //     * @return Pago[] Returns an array of Pago objects

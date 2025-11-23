@@ -32,4 +32,8 @@ class Comprobante
 
         return $this;
     }
+    public function __toString(): string
+    {
+        return $this->archivo ?? 'Comprobante #' . $this->id;
+    }
 }
