@@ -1,0 +1,68 @@
+<!-- Modal Inscripción a Carrera -->
+<div class="modal fade" id="inscribirModal" tabindex="-1" aria-labelledby="modalInscripcionCarreraLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h1 class="modal-title fs-5" id="modalInscripcionCarreraLabel">
+                Inscribir <span id="alumno-nombre-modal"></span> en <span id="carrera-nombre-modal"></span>
+            </h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form id="form-inscripcion-carrera">
+                <input type="hidden" id="inscripcion-id-hidden" name="carrera_id">
+                <input type="hidden" id="alumno-id-hidden" name="alumno_id">
+                
+                <div class="mb-3">
+                    <label for="nro-legajo-input" class="form-label" style="color: #000000; font-weight: 500;">Número de Legajo <small class="text-muted">(Opcional)</small></label>
+                    <input type="number" 
+                           class="form-control" 
+                           id="nro-legajo-input" 
+                           name="nro_legajo" 
+                           min="0"
+                           placeholder="Ej: 12345">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="descuento-input" class="form-label" style="color: #000000; font-weight: 500;">Descuento (%)</label>
+                    <input type="number" 
+                           class="form-control" 
+                           id="descuento-input" 
+                           name="descuento" 
+                           min="0" 
+                           max="100" 
+                           maxlength="3"
+                           value="0"
+                           placeholder="Ej: 10"
+                           required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="descripcion-descuento-input" class="form-label" style="color: #000000; font-weight: 500;">Descripción del Descuento</label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="descripcion-descuento-input" 
+                           name="descripcion_descuento"
+                           maxlength="255"
+                           placeholder="">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="fecha-inscripcion-input" class="form-label" style="color: #000000; font-weight: 500;">Fecha de Inscripción</label>
+                    <input type="date" 
+                           class="form-control" 
+                           id="fecha-inscripcion-input" 
+                           name="fecha_inscripcion"
+                           required>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-alternativo" data-bs-dismiss="modal">Cancelar</button>
+            <button type="button" class="btn-secundario" id="btn-confirmar-inscripcion">
+                Confirmar inscripción
+            </button>
+        </div>
+        </div>
+    </div>
+</div>

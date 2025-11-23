@@ -30,9 +30,10 @@ export default function ListaInscripciones({ labels, attributes, rows, onAccionC
               if (attr === 'accion') {
                 return (
                   <span key={attr} className="lista-cell">
-                    <button 
+                    <button
+                      type="button"
                       className={getButtonClass(row[attr])}
-                      onClick={() => handleAccionClick(row)}
+                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAccionClick(row); }}
                       style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}
                     >
                       {row[attr]}

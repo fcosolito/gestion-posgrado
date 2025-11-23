@@ -2,9 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Comprobante;
 use App\Entity\Pago;
 use App\Entity\PagoCuota;
-use App\Entity\Comprobante;
 use App\Entity\Alumno;
 use App\Entity\Cuota;
 use App\Form\PagoType;
@@ -212,6 +212,19 @@ final class PagoController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Manejar el archivo del comprobante
+            $archivoFile = $form->get('comprobanteFile')->getData();
+            if ($archivoFile) {
+                // Si ya existe un comprobante, actualizarlo, sino crear uno nuevo
+                $comprobante = $pago->getComprobante();
+                if (!$comprobante) {
+                    $comprobante = new Comprobante();
+                    $pago->setComprobante($comprobante);
+                    $entityManager->persist($comprobante);
+                }
+                $comprobante->setArchivoFile($archivoFile);
+            }
+
             $entityManager->flush();
 
             return $this->redirectToRoute('app_pago_index', [], Response::HTTP_SEE_OTHER);

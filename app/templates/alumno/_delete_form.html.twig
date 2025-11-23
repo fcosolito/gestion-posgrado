@@ -1,9 +1,11 @@
 <button class="btn-peligro" 
         type="button" 
-        data-bs-toggle="modal" 
-        data-bs-target="#deleteModal"
-        data-alumno-id="{{ alumno.id }}"
-        data-alumno-nombre="{{ alumno.nombre }} {{ alumno.apellido }}">
+        onclick="mostrarModalEliminar(
+            'Confirmar eliminación',
+            '¿Está seguro de que desea eliminar este alumno?',
+            '{{ alumno.nombre }} {{ alumno.apellido }}',
+            () => document.getElementById('form-eliminar-alumno-{{ alumno.id }}').submit()
+        )">
     Eliminar
 </button>
 

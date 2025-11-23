@@ -83,7 +83,7 @@
                     <div class="cuadrado-reutilizable fill-remaining" style="flex: 1; display: flexbox; flex-direction: column">
                         <div class="d-flex justify-content-between align-items-center" style="height: fit-content; flex: 0; padding: 1.5rem 1.5rem 0 1rem;">
                             <h4 class="mb-0">Carreras</h4>
-                            <button class="btn-principal" id="btn-inscribir" type="button">Inscribir</button>
+                            <button class="btn-principal" id="btn-inscribir-carrera" type="button">Inscribir</button>
                         </div>
                         <div id="lista-carreras" style="flex: 1;"
                             data-labels='["Carrera","Ordenanza","Implementación", "Acciones"]'
@@ -94,6 +94,7 @@
                     <div class="cuadrado-reutilizable fill-remaining" style=" flex: 1; display: flexbox; flex-direction: column">
                         <div class="d-flex justify-content-between align-items-center" style="height: fit-content; flex: 0; padding: 1.5rem 1.5rem 0 1rem;">
                             <h4 class="mb-0">Cursos</h4>
+                            <button class="btn-principal" id="btn-inscribir-edicion" type="button">Inscribir</button>
                         </div>
                         <div id="lista-cursos"
                             data-labels='["Curso","Edición","Horas","Estado","Acciones"]'
@@ -126,41 +127,28 @@
             const btnNotas = document.getElementById('btn-notas');
             const btnEditar = document.getElementById('btn-editar');
             const btnVolver = document.getElementById('btn-volver');
-            const btnInscribir = document.getElementById('btn-inscribir');
+            const btnInscribirCarrera = document.getElementById('btn-inscribir-carrera');
+            const btnInscribirEdicion = document.getElementById('btn-inscribir-edicion');
             const btnGuardar = document.getElementById('btn-guardar');
             const btnCancelar = document.getElementById('btn-cancelar');
             
             const visualizarContainer = document.getElementById('visualizar-container');
             const editarContainer = document.getElementById('editar-container');
 
-            // Evento cuando se abre el modal
-            const deleteModal = document.getElementById('deleteModal');
-            if (deleteModal) {
-                deleteModal.addEventListener('show.bs.modal', (event) => {
-                    const button = event.relatedTarget;
-                    const alumnoId = button.getAttribute('data-alumno-id');
-                    const alumnoNombre = button.getAttribute('data-alumno-nombre');
-                    
-                    // Actualizar nombre en el modal
-                    document.getElementById('alumnoNombreModal').textContent = alumnoNombre;
-                    
-                    // Configurar el botón de confirmar
-                    document.getElementById('confirmDeleteBtn').onclick = () => {
-                        document.getElementById('form-eliminar-alumno-' + alumnoId).submit();
-                    };
-                });
-            }
-
             // Botón volver - redirigir a alumno index
             btnVolver.addEventListener('click', () => {
                 window.location.href = '{{ path('app_alumno_index') }}';
             });
 
-            // Botón inscribir - redirigir a pantalla de inscripciones
-            btnInscribir.addEventListener('click', () => {
-                window.location.href = '{{ path('app_alumno_inscribir', {'id': alumno.id}) }}';
+            // Botón inscribir carrera- redirigir a pantalla de inscripciones
+            btnInscribirCarrera.addEventListener('click', () => {
+                window.location.href = '{{ path('app_alumno_inscribir_carrera_view', {'id': alumno.id}) }}';
             });
 
+            // Botón inscribir edicion- redirigir a pantalla de inscripciones
+            btnInscribirEdicion.addEventListener('click', () => {
+                window.location.href = '{{ path('app_alumno_inscribir_edicion_view', {'id': alumno.id}) }}';
+            });
             
             // Botón notas - redirigir a pantalla de notas de alumno
             btnNotas.addEventListener('click', () => {

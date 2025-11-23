@@ -8,56 +8,8 @@ import 'bootstrap/dist/js/bootstrap.min.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ListaNotas from "../components/ListaNotas.jsx";
 
-// Variables globales para el modal de confirmación reutilizable
-let confirmModal = null;
-let currentAction = null; // Función que se ejecutará al confirmar
-
-// Función auxiliar para mostrar el modal de confirmación
-function mostrarModalConfirmacion(titulo, mensaje, detalle, onConfirm) {
-  // Actualizar título
-  const tituloElement = document.querySelector('#deleteModal .modal-title');
-  if (tituloElement) {
-    tituloElement.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i>${titulo}`;
-  }
-  
-  // Actualizar mensaje
-  const mensajeElements = document.querySelectorAll('#deleteModal .modal-body p');
-  if (mensajeElements.length >= 1) {
-    mensajeElements[0].textContent = mensaje;
-  }
-  
-  // Actualizar detalle
-  const detalleElement = document.getElementById('alumnoNombreModal');
-  if (detalleElement) {
-    detalleElement.textContent = detalle;
-  }
-  
-  // Guardar la acción a ejecutar
-  currentAction = onConfirm;
-  
-  // Mostrar el modal
-  if (confirmModal) {
-    confirmModal.show();
-  }
-}
-
 document.addEventListener("DOMContentLoaded", () => {
-  // Inicializar el modal de confirmación si existe
-  const confirmModalElement = document.getElementById('deleteModal');
-  if (confirmModalElement) {
-    confirmModal = new Modal(confirmModalElement);
-    
-    // Evento para confirmar acción
-    document.getElementById('confirmDeleteBtn')?.addEventListener('click', () => {
-      if (currentAction) {
-        currentAction();
-        currentAction = null;
-      }
-      confirmModal.hide();
-    });
-  }
-
-  const listaDiv = document.getElementById("lista-generica");
+  const listaDiv = document.getElementById("lista-alumnos");
   if (listaDiv) {
     const labels = JSON.parse(listaDiv.dataset.labels || '[]');
     const attributes = JSON.parse(listaDiv.dataset.attributes || '[]');
@@ -78,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
           const alumno = rows[rowIndex];
           const alumnoNombre = `${alumno.nombre} ${alumno.apellido}`;
           
-          mostrarModalConfirmacion(
+          window.mostrarModalEliminar(
             'Confirmar eliminación',
             '¿Está seguro de que desea eliminar al alumno?',
             alumnoNombre,
@@ -157,29 +109,30 @@ document.addEventListener("DOMContentLoaded", () => {
     const attributes = JSON.parse(listaInscripciones.dataset.attributes || '[]');
     const rows = JSON.parse(listaInscripciones.dataset.rows || '[]');
     const alumnoId = listaInscripciones.dataset.alumnoId;
+    // Detectar si es carrera o edición por la presencia del atributo 'curso' en la tabla
+    const tipo = attributes.includes('curso') ? 'edicion' : 'carrera';
     
     const handleAccionClick = (row) => {
       if (row.accion === 'Inscribir') {
-        // Crear formulario POST para inscribir
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/alumno/${alumnoId}/inscribir-carrera/${row.id}`;
-        document.body.appendChild(form);
-        form.submit();
+
+        const nombre = row.nombre;
+        const id= row.id;
+
+        // Abrir modal de confirmación de inscripción
+        window.mostrarModalConfirmar(nombre, alumnoId, id, tipo)
+
       } else if (row.accion === 'Borrar') {
-        // Mostrar modal de confirmación antes de desinscribir
-        mostrarModalConfirmacion(
-          'Confirmar desinscripción',
-          '¿Está seguro que desea eliminar la inscripción de la carrera?',
-          row.nombre,
-          () => {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/alumno/${alumnoId}/desinscribir-carrera/${row.id}`;
-            document.body.appendChild(form);
-            form.submit();
-          }
-        );
+        // Verificar si tiene cuotas
+        if (row.cuotas && row.cuotas.length > 0) {
+          // Mostrar modal con detalle de cuotas (pasando el tipo)
+          window.mostrarModalEliminarConCuotas(
+            row.nombre,
+            row.cuotas,
+            alumnoId,
+            row.id,
+            tipo
+          );
+        } 
       }
     };
     

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #2c3e50;
+        }
+        .header p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .info {
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+        .info p {
+            margin: 5px 0;
+        }
+        h3 {
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #bdc3c7;
+            padding: 8px;
+            text-align: left;
+            font-size: 11px;
+        }
+        th {
+            background-color: #2980b9;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #ecf0f1;
+        }
+        .no-data {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Listado de notas de edición</h1>
+        <p>Sistema de Gestión de Posgrado</p>
+    </div>
+    
+    <div class="info">
+        <p><strong>Edición:</strong> {{ edicion.nombre }}</p>
+        <p><strong>Fecha de emisión:</strong> {{ fecha_emision|date('d/m/Y') }}</p>
+    </div>
+
+    <h3>Detalle de Notas</h3>
+    
+    {% if notas|length > 0 %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Alumno</th>
+                    <th>Nota</th>
+                    <th>Descripción</th>
+                    <th>Fecha de Carga</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for nota in notas %}
+                <tr>
+                    <td>{{ nota.alumno }}</td>
+                    <td>{{ nota.nota }}</td>
+                    <td>{{ nota.descripcion }}</td>
+                    <td>{{ nota.fecha_carga }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="no-data">No hay notas registradas para esta edicion.</p>
+    {% endif %}
+</body>
+</html>

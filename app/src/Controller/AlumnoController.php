@@ -6,8 +6,10 @@ use App\Entity\Alumno;
 use App\Entity\InscripcionEdicion;
 use App\Entity\InscripcionCarrera;
 use App\Entity\Carrera;
+use App\Entity\Edicion;
 use App\Entity\Cuota;
 use App\Entity\DocumentacionNota;
+use App\Entity\Descuento;
 use App\Form\AlumnoType;
 use App\Entity\Nota;
 use App\Form\NotaType;
@@ -22,6 +24,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Dompdf\Dompdf;
 
 #[Route('/alumno')]
 final class AlumnoController extends AbstractController
@@ -426,66 +429,169 @@ final class AlumnoController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/inscribir-carrera', name: 'app_alumno_inscribir', methods: ['GET', 'POST'])]
-    public function inscribir(Request $request, Alumno $alumno, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/inscribir-carrera', name: 'app_alumno_inscribir_carrera_view', methods: ['GET', 'POST'])]
+    public function inscribirCarreraView(Request $request, Alumno $alumno, EntityManagerInterface $entityManager): Response
     {
         // Traer todas las carreras de la base de datos
-        $carreras = $entityManager->createQueryBuilder()
-            ->select('c')
-            ->from(\App\Entity\Carrera::class, 'c')
+        $carreras = $entityManager->getRepository(Carrera::class)->findAll();
+
+        // Se obtienen las inscripciones del alumno
+        $inscripcionesCarrera = $entityManager->createQueryBuilder()
+            ->select('ic', 'c', 'd')
+            ->from(\App\Entity\InscripcionCarrera::class, 'ic')
+            ->leftJoin('ic.carrera', 'c')
+            ->leftJoin('ic.descuento', 'd')
+            ->where('ic.alumno = :alumno')
+            ->setParameter('alumno', $alumno)
             ->getQuery()
             ->getResult();
-
-        // Obtener las inscripciones del alumno para verificar en cuáles ya está inscripto
-        $inscripciones = $entityManager->createQueryBuilder()
-            ->select('ic', 'c')
-            ->from(\App\Entity\InscripcionCarrera::class, 'ic')
-            ->innerJoin('ic.carrera', 'c')
+        
+        // Obtener todas las cuotas del alumno (tengan o no pagos)
+        $cuotas = $entityManager->createQueryBuilder()
+            ->select('cu', 'ic', 'c')
+            ->from(\App\Entity\Cuota::class, 'cu')
+            ->leftJoin('cu.inscripcionCarrera', 'ic')
+            ->leftJoin('ic.carrera', 'c')
             ->where('ic.alumno = :alumno')
             ->setParameter('alumno', $alumno)
             ->getQuery()
             ->getResult();
 
-        // Crear un array con los IDs de las carreras en las que el alumno está inscripto
-        $carrerasInscriptas = [];
-        foreach ($inscripciones as $inscripcion) {
-            $carrerasInscriptas[] = $inscripcion->getCarrera()->getId();
+        // Obtener todos los pagos de cuotas del alumno
+        $pagosCuotas = $entityManager->createQueryBuilder()
+            ->select('pc', 'p', 'cu')
+            ->from(\App\Entity\PagoCuota::class, 'pc')
+            ->leftJoin('pc.pago', 'p')
+            ->leftJoin('pc.cuota', 'cu')
+            ->getQuery()
+            ->getResult();
+
+        // Crear mapa de pagos por cuota
+        $pagosPorCuota = [];
+        foreach ($pagosCuotas as $pagoCuota) {
+            $cuotaId = $pagoCuota->getCuota()->getId();
+            if (!isset($pagosPorCuota[$cuotaId])) {
+                $pagosPorCuota[$cuotaId] = [];
+            }
+            $pagosPorCuota[$cuotaId][] = $pagoCuota;
         }
 
+        // Crear mapas de inscripciones y cuotas por carrera
+        $inscripcionesPorCarrera = [];
+        $carrerasInscriptas = [];
+
+        foreach ($inscripcionesCarrera as $inscripcion) {
+            $carreraId = $inscripcion->getCarrera()->getId();
+            $carrerasInscriptas[] = $carreraId;
+            $inscripcionesPorCarrera[$carreraId] = $inscripcion;
+        }
+
+        // Agrupar cuotas por carrera y calcular estados
+        $cuotasPorCarrera = [];
+        
+        foreach ($cuotas as $cuota) {
+            $inscripcion = $cuota->getInscripcionCarrera();
+            
+            if ($inscripcion) {
+                $carreraId = $inscripcion->getCarrera()->getId();
+                $cuotaId = $cuota->getId();
+                
+                if (!isset($cuotasPorCarrera[$carreraId])) {
+                    $cuotasPorCarrera[$carreraId] = [];
+                }
+                
+                // Calcular montos de la cuota
+                $montoPagado = 0;
+                $montoCuota = 0;
+                $contadorPagos = 0;
+                
+                if (isset($pagosPorCuota[$cuotaId])) {
+                    foreach ($pagosPorCuota[$cuotaId] as $pagoCuota) {
+                        $montoCuota = $pagoCuota->getMontoCuota();
+                        $montoPagado += $pagoCuota->getPago()->getMonto();
+                        $contadorPagos++;
+                    }
+                }
+                
+                // Determinar estado
+                if ($contadorPagos === 0) {
+                    $estado = 'Pendiente';
+                } elseif ($montoPagado >= $montoCuota) {
+                    $estado = 'Paga';
+                } else {
+                    $estado = 'Parcial';
+                }
+                
+                $cuotasPorCarrera[$carreraId][] = [
+                    'numero' => $cuota->getNumeroCuota(),
+                    'monto' => $montoCuota,
+                    'pagado' => $montoPagado,
+                    'estado' => $estado
+                ];
+            }
+        }
+
+        // Preparar datos para todas las carreras
         $carrerasData = [];
         foreach ($carreras as $carrera) {
+            $carreraId = $carrera->getId();
 
             // Verificar si el alumno está inscripto en esta carrera
-            if (in_array($carrera->getId(), $carrerasInscriptas)) {
+            if (in_array($carreraId, $carrerasInscriptas)) {
                 $estado = 'Inscripto';
                 $accion = 'Borrar';
+                
+                // Obtener datos de la inscripción
+                $inscripcion = $inscripcionesPorCarrera[$carreraId];
+                $descuento = $inscripcion->getDescuento();
+                
+                // Extraer valores del descuento si existe
+                $valorDescuento = $descuento ? $descuento->getValor() : 0;
+                $descripcionDescuento = $descuento ? $descuento->getDescripcion() : '';
+                
+                // Extraer valores de la inscripción
+                $legajo = $inscripcion->getNroLegajo() ?? 'Sin legajo';
+                $fechaInscripcion = $inscripcion->getFechaInscripcion() ? $inscripcion->getFechaInscripcion()->format('Y-m-d') : null;
+                
+                // Obtener cuotas de esta carrera
+                $cuotasInfo = $cuotasPorCarrera[$carreraId] ?? [];
             } else {
                 $estado = 'No inscripto';
                 $accion = 'Inscribir';
+                $valorDescuento = 0;
+                $descripcionDescuento = '';
+                $legajo = null;
+                $fechaInscripcion = null;
+                $cuotasInfo = [];
             }
 
             $carrerasData[] = [
-                'id' => $carrera->getId(),
+                'id' => $carreraId,
                 'nombre' => $carrera->getNombre(),
                 'ordenanza' => $carrera->getNroOrdenanza(),
                 'implementacion' => $carrera->getNroImplementacion(),
+                'legajo' => $legajo,
+                'descuento' => $valorDescuento,
+                'descripcion' => $descripcionDescuento,
+                'fechaInscripcion' => $fechaInscripcion,
                 'estado' => $estado,
                 'accion' => $accion,
+                'cuotas' => $cuotasInfo
             ];
         }
 
-        // Ordenar carreras por estado
+        // Ordenar carreras por estado (inscriptas primero)
         usort($carrerasData, function($a, $b) {
             if ($a['estado'] === 'Inscripto' && $b['estado'] !== 'Inscripto') {
-                return -1; // $a va primero
+                return -1;
             }
             if ($a['estado'] !== 'Inscripto' && $b['estado'] === 'Inscripto') {
-                return 1; // $b va primero
+                return 1;
             }
-            return 0; // mantener orden original
+            return 0;
         });
 
-        return $this->render('alumno/inscribir.html.twig', [
+        return $this->render('alumno/inscribirCarrera.html.twig', [
             'alumno' => $alumno,
             'carrerasData' => $carrerasData,
         ]);
@@ -493,11 +599,18 @@ final class AlumnoController extends AbstractController
 
     #[Route('/{id}/inscribir-carrera/{carrera}', name: 'app_alumno_inscribir_carrera', methods: ['POST'])]
     public function inscribirCarrera(
+            Request $request,
             Alumno $alumno,
             Carrera $carrera,
             EntityManagerInterface $entityManager
         ): Response
     {
+        // Obtener datos del POST
+        $valorDescuento = (int) $request->request->get('valorDescuento', 0);
+        $fechaInscripcion = $request->request->get('fecha_inscripcion');
+        $descripcionDescuento = $request->request->get('descripcionDescuento', '');
+        $nroLegajo = $request->request->get('nroLegajo') ? (int) $request->request->get('nroLegajo') : null;
+        
         // Verificar si ya existe la inscripción
         $inscripcionExistente = $entityManager->getRepository(InscripcionCarrera::class)
             ->findOneBy(['alumno' => $alumno, 'carrera' => $carrera]);
@@ -509,18 +622,34 @@ final class AlumnoController extends AbstractController
             $inscripcion = new InscripcionCarrera();
             $inscripcion->setAlumno($alumno);
             $inscripcion->setCarrera($carrera);
-            $inscripcion->setDescuento(0); // Descuento por defecto 0
+            
+            // Crear y asociar descuento
+            $descuento = new Descuento();
+            $descuento->setValor($valorDescuento);
+            $descuento->setDescripcion($descripcionDescuento);
+            $inscripcion->setDescuento($descuento);
+            
+            // Establecer número de legajo si existe
+            if ($nroLegajo !== null) {
+                $inscripcion->setNroLegajo($nroLegajo);
+            }
+            
+            // Establecer fecha de inscripción
+            if ($fechaInscripcion) {
+                $inscripcion->setFechaInscripcion(new \DateTime($fechaInscripcion));
+            }
 
+            $entityManager->persist($descuento);
             $entityManager->persist($inscripcion);
             $entityManager->flush();
 
-            // Creamos las cuotas correspodientes a la carrera
+            // Creamos las cuotas correspondientes a la carrera
             $this->crearCuotasParaCarrera($inscripcion, $entityManager);
 
             $this->addFlash('notice', 'Alumno inscripto exitosamente en ' . $carrera->getNombre());
         }
 
-        return $this->redirectToRoute('app_alumno_inscribir', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_alumno_inscribir_carrera_view', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
     }
 
     private function crearCuotasParaCarrera(
@@ -547,6 +676,249 @@ final class AlumnoController extends AbstractController
         $entityManager->flush();
     }
 
+    #[Route('/{id}/inscribir-edicion', name: 'app_alumno_inscribir_edicion_view', methods: ['GET', 'POST'])]
+    public function inscribirEdicionView(Request $request, Alumno $alumno, EntityManagerInterface $entityManager): Response
+    {
+        // Traer todas las edicion de la base de datos
+        $ediciones = $entityManager->getRepository(Edicion::class)->findAll();
+
+        // Se obtienen las inscripciondes del alumno
+        $inscripcionesEdicion = $entityManager->createQueryBuilder()
+            ->select('ie', 'e', 'd', 'c')
+            ->from(\App\Entity\InscripcionEdicion::class, 'ie')
+            ->leftJoin('ie.edicion', 'e')
+            ->leftJoin('ie.descuento', 'd')
+            ->leftJoin('e.curso', 'c')
+            ->where('ie.alumno = :alumno')
+            ->setParameter('alumno', $alumno)
+            ->getQuery()
+            ->getResult();
+
+        // Obtener todas las cuotas del alumno
+        $cuotas = $entityManager->createQueryBuilder()
+            ->select('cu', 'ie', 'e')
+            ->from(\App\Entity\Cuota::class, 'cu')
+            ->leftJoin('cu.inscripcionEdicion', 'ie')
+            ->leftJoin('ie.edicion', 'e')
+            ->where('ie.alumno = :alumno')
+            ->setParameter('alumno', $alumno)
+            ->getQuery()
+            ->getResult();
+
+        // Obtener todos los pagos de cuotas del alumno
+        $pagosCuotas = $entityManager->createQueryBuilder()
+            ->select('pc', 'p', 'cu')
+            ->from(\App\Entity\PagoCuota::class, 'pc')
+            ->leftJoin('pc.pago', 'p')
+            ->leftJoin('pc.cuota', 'cu')
+            ->getQuery()
+            ->getResult();
+
+        // Crear mapa de pagos por cuota
+        $pagosPorCuota = [];
+        foreach ($pagosCuotas as $pagoCuota) {
+            $cuotaId = $pagoCuota->getCuota()->getId();
+            if (!isset($pagosPorCuota[$cuotaId])) {
+                $pagosPorCuota[$cuotaId] = [];
+            }
+            $pagosPorCuota[$cuotaId][] = $pagoCuota;
+        }
+
+        // Crear mapa de inscripciones y cuotas por edicion
+        $inscripcionesPorEdicion = [];
+        $edicionesInscriptas = [];
+
+        foreach ($inscripcionesEdicion as $inscripcion) {
+            $edicionId = $inscripcion->getEdicion()->getId();
+            $edicionesInscriptas[] = $edicionId;
+            $inscripcionesPorEdicion[$edicionId] = $inscripcion;
+        }
+
+        // Agrupar cuotas por edicion y calcular estados
+        $cuotasPorEdicion = [];
+        
+        foreach ($cuotas as $cuota) {
+            $inscripcion = $cuota->getInscripcionEdicion();
+            
+            if ($inscripcion) {
+                $edicionId = $inscripcion->getEdicion()->getId();
+                $cuotaId = $cuota->getId();
+                
+                if (!isset($cuotasPorEdicion[$edicionId])) {
+                    $cuotasPorEdicion[$edicionId] = [];
+                }
+                
+                // Calcular montos de la cuota (misma lógica que visualizar)
+                $montoPagado = 0;
+                $montoCuota = 0;
+                $contadorPagos = 0;
+                
+                if (isset($pagosPorCuota[$cuotaId])) {
+                    foreach ($pagosPorCuota[$cuotaId] as $pagoCuota) {
+                        $montoCuota = $pagoCuota->getMontoCuota();
+                        $montoPagado += $pagoCuota->getPago()->getMonto();
+                        $contadorPagos++;
+                    }
+                }
+                
+                // Determinar estado
+                if ($contadorPagos === 0) {
+                    $estado = 'Pendiente';
+                } elseif ($montoPagado >= $montoCuota) {
+                    $estado = 'Paga';
+                } else {
+                    $estado = 'Parcial';
+                }
+                
+                $cuotasPorEdicion[$edicionId][] = [
+                    'numero' => $cuota->getNumeroCuota(),
+                    'monto' => $montoCuota,
+                    'pagado' => $montoPagado,
+                    'estado' => $estado
+                ];
+            }
+        }
+
+        // Preparar datos para todas las ediciones
+        $edicionesData = [];
+        foreach ($ediciones as $edicion) {
+            $edicionId = $edicion->getId();
+
+            // Verificar si el alumno está inscripto en esta edicion
+            if (in_array($edicionId, $edicionesInscriptas)) {
+                $estado = 'Inscripto';
+                $accion = 'Borrar';
+                
+                // Obtener datos de la inscripción
+                $inscripcion = $inscripcionesPorEdicion[$edicionId];
+                $descuento = $inscripcion->getDescuento();
+                
+                // Extraer valores del descuento si existe
+                $valorDescuento = $descuento ? $descuento->getValor() : 0;
+                $descripcionDescuento = $descuento ? $descuento->getDescripcion() : '';
+                
+                // Extraer valores de la inscripción
+                $legajo = $inscripcion->getNroLegajo() ?? 'Sin legajo';
+                $fechaInscripcion = $inscripcion->getFechaInscripcion() ? $inscripcion->getFechaInscripcion()->format('Y-m-d') : null;
+                
+                // Obtener cuotas de esta edicion
+                $cuotasInfo = $cuotasPorEdicion[$edicionId] ?? [];
+            } else {
+                $estado = 'No inscripto';
+                $accion = 'Inscribir';
+                $valorDescuento = 0;
+                $descripcionDescuento = '';
+                $legajo = null;
+                $fechaInscripcion = null;
+                $cuotasInfo = [];
+            }
+
+            $edicionesData[] = [
+                'id' => $edicionId,
+                'nombre' => $edicion->getNombre(),
+                'curso' => $edicion->getCurso()->getNombre(),
+                'ordenanza' => $edicion->getCurso()->getNroOrdenanza(),
+                'implementacion' => $edicion->getCurso()->getNroImplementacion(),
+                'legajo' => $legajo,
+                'descuento' => $valorDescuento,
+                'descripcion' => $descripcionDescuento,
+                'fechaInscripcion' => $fechaInscripcion,
+                'estado' => $estado,
+                'accion' => $accion,
+                'cuotas' => $cuotasInfo
+            ];
+        }
+
+        // Ordenar ediciones por estado (inscriptas primero)
+        usort($edicionesData, function($a, $b) {
+            if ($a['estado'] === 'Inscripto' && $b['estado'] !== 'Inscripto') {
+                return -1;
+            }
+            if ($a['estado'] !== 'Inscripto' && $b['estado'] === 'Inscripto') {
+                return 1;
+            }
+            return 0;
+        });
+
+        return $this->render('alumno/inscribirEdicion.html.twig', [
+            'alumno' => $alumno,
+            'edicionesData' => $edicionesData,
+        ]);
+
+        
+
+
+    }
+
+    #[Route('/{id}/inscribir-edicion/{edicion}', name: 'app_alumno_inscribir_edicion', methods: ['POST'])]
+    public function inscribirEdicion(
+            Request $request,
+            Alumno $alumno,
+            Edicion $edicion,
+            EntityManagerInterface $entityManager
+        ): Response
+    { 
+        // Obtener datos del POST
+        $valorDescuento = (int) $request->request->get('valorDescuento', 0);
+        $fechaInscripcion = $request->request->get('fecha_inscripcion');
+        $descripcionDescuento = $request->request->get('descripcionDescuento', '');
+        $nroLegajo = $request->request->get('nroLegajo') ? (int) $request->request->get('nroLegajo') : null;
+        
+        // Verificar si ya existe la inscripción
+        $inscripcionExistente = $entityManager->getRepository(InscripcionEdicion::class)
+            ->findOneBy(['alumno' => $alumno, 'edicion' => $edicion]);
+
+        if ($inscripcionExistente) {
+            $this->addFlash('warning', 'El alumno ya está inscripto en esta edición');
+        } else {
+            // Crear la nueva inscripción
+            $inscripcion = new InscripcionEdicion();
+            $inscripcion->setAlumno($alumno);
+            $inscripcion->setEdicion($edicion);
+            
+            // Crear y asociar descuento
+            $descuento = new Descuento();
+            $descuento->setValor($valorDescuento);
+            $descuento->setDescripcion($descripcionDescuento);
+            $inscripcion->setDescuento($descuento);
+            
+            // Establecer número de legajo si existe
+            if ($nroLegajo !== null) {
+                $inscripcion->setNroLegajo($nroLegajo);
+            }
+            
+            // Establecer fecha de inscripción
+            if ($fechaInscripcion) {
+                $inscripcion->setFechaInscripcion(new \DateTime($fechaInscripcion));
+            }
+
+            $entityManager->persist($descuento);
+            $entityManager->persist($inscripcion);
+            $entityManager->flush();
+
+            // Creamos las cuotas correspondientes a la edición
+            $this->crearCuotasParaEdicion($inscripcion, $entityManager);
+
+            $this->addFlash('notice', 'Alumno inscripto exitosamente en ' . $edicion->getNombre());
+        }
+
+        return $this->redirectToRoute('app_alumno_inscribir_edicion_view', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
+    }
+
+    private function crearCuotasParaEdicion(
+        InscripcionEdicion $inscripcion, 
+        EntityManagerInterface $entityManager
+    ): void
+    {
+        // esta funcion crea una sola cuota, en este momento los cursos o ediciones no tienen un atributo de numero de cuotas
+        $cuota = new Cuota();
+        $cuota->setInscripcionEdicion($inscripcion);
+        $cuota->setNumeroCuota(1);
+       
+        $entityManager->persist($cuota);
+        $entityManager->flush();
+    }
+
     #[Route('/{id}/desinscribir-carrera/{carrera}', name: 'app_alumno_desinscribir_carrera', methods: ['POST'])]
     public function desinscribirCarrera(Alumno $alumno, \App\Entity\Carrera $carrera, EntityManagerInterface $entityManager): Response
     {
@@ -558,7 +930,7 @@ final class AlumnoController extends AbstractController
             $this->addFlash('warning', 'El alumno no está inscripto en esta carrera');
         } else {
             // Eliminamos las cuotas asociadas a la inscripción 
-            $this->eliminarCuotasDeInscripcion($inscripcion, $entityManager);
+            $this->eliminarCuotasDeInscripcion($inscripcion, $entityManager, 'carrera');
 
             // Eliminar la inscripción
             $entityManager->remove($inscripcion);
@@ -567,7 +939,73 @@ final class AlumnoController extends AbstractController
             $this->addFlash('notice', 'Inscripción eliminada exitosamente de ' . $carrera->getNombre());
         }
 
-        return $this->redirectToRoute('app_alumno_inscribir', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_alumno_inscribir_carrera_view', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/desinscribir-edicion/{edicion}', name: 'app_alumno_desinscribir_edicion', methods: ['POST'])]
+    public function desinscribirEdicion(Alumno $alumno, \App\Entity\Edicion $edicion, EntityManagerInterface $entityManager): Response
+    {
+        // Buscar la inscripción
+        $inscripcion = $entityManager->getRepository(\App\Ent;ity\InscripcionEdicion::class)
+            ->findOneBy(['alumno' => $alumno, 'edicion' => $edicion]);
+
+        if (!$inscripcion) {
+            $this->addFlash('warning', 'El alumno no está inscripto en esta edicion');
+        } else {
+            // Eliminamos las cuotas asociadas a la inscripción 
+            $this->eliminarCuotasDeInscripcion($inscripcion, $entityManager, 'edicion');
+
+            // Eliminar la inscripción
+            $entityManager->remove($inscripcion);
+            $entityManager->flush();
+
+            $this->addFlash('notice', 'Inscripción eliminada exitosamente de ' . $edicion->getNombre());
+        }
+
+        return $this->redirectToRoute('app_alumno_inscribir_edicion_view', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
+    }
+
+    private function eliminarCuotasDeInscripcion(
+            $inscripcion, 
+            EntityManagerInterface $entityManager,
+            string $tipo = 'carrera'
+        ): void
+    {
+        // Se buscan todas las cuotas asociadas a esta inscripción según el tipo
+        if ($tipo === 'carrera') {
+            $cuotas = $entityManager->getRepository(Cuota::class)
+                ->findBy(['inscripcionCarrera' => $inscripcion]);
+        } else if ($tipo === 'edicion') {
+            $cuotas = $entityManager->getRepository(Cuota::class)
+                ->findBy(['inscripcionEdicion' => $inscripcion]);
+        } else{
+            throw new \InvalidArgumentException("Tipo de inscripción inválido: $tipo. Debe ser 'carrera' o 'edicion'.");
+        }
+
+        // Eliminar cada cuota y sus pagos asociados
+        foreach ($cuotas as $cuota) {
+            // Primero obtener los pagos de cuota asociados
+            $pagosCuotas = $entityManager->getRepository(\App\Entity\PagoCuota::class)
+                ->findBy(['cuota' => $cuota]);
+            
+            foreach ($pagosCuotas as $pagoCuota) {
+                // Obtener el pago antes de eliminar la relación
+                $pago = $pagoCuota->getPago();
+                
+                // Eliminar la relación PagoCuota
+                $entityManager->remove($pagoCuota);
+                
+                // Eliminar el Pago
+                if ($pago) {
+                    $entityManager->remove($pago);
+                }
+            }
+            
+            // Luego eliminar la cuota
+            $entityManager->remove($cuota);
+        }
+        
+        // No hacemos flush aquí, se hará junto con la eliminación de la inscripción
     }
 
     #[Route('/{id}/notas', name: 'app_alumno_notas', methods: ['GET', 'POST'])]
@@ -672,22 +1110,60 @@ final class AlumnoController extends AbstractController
             'form' => $form,
         ]);
     }
-    private function eliminarCuotasDeInscripcion(
-            InscripcionCarrera $inscripcion, 
-            EntityManagerInterface $entityManager
-        ): void
-    {
-        // Se buscan todas las cuotas asociadas a esta inscripción
-        $cuotas = $entityManager->getRepository(Cuota::class)
-            ->findBy(['inscripcionCarrera' => $inscripcion]);
 
-        // Eliminar cada cuota
-        foreach ($cuotas as $cuota) {
-            $entityManager->remove($cuota);
+    #[Route('/{id}/notas/pdf', name: 'app_alumno_notas_pdf', methods: ['GET'])]
+    public function notasPdf(Alumno $alumno, EntityManagerInterface $entityManager): Response
+    {
+        // Obtener notas del alumno (misma lógica que notas())
+        $notas = $entityManager->createQueryBuilder()
+            ->select('n', 'ie', 'e', 'c')
+            ->from(\App\Entity\Nota::class, 'n')
+            ->innerJoin('n.inscripcionEdicion', 'ie')
+            ->innerJoin('ie.edicion', 'e')
+            ->innerJoin('e.curso', 'c')
+            ->where('ie.alumno = :alumno')
+            ->setParameter('alumno', $alumno)
+            ->getQuery()
+            ->getResult();
+
+        // Preparar datos para el template
+        $notasData = [];
+        foreach ($notas as $nota) {
+            $inscripcion = $nota->getInscripcionEdicion();
+            $edicion = $inscripcion->getEdicion();
+            $curso = $edicion->getCurso();
+            
+            $notasData[] = [
+                'curso' => $curso->getNombre(),
+                'edicion' => $edicion->getNombre(),
+                'nota' => $nota->getValor(),
+                'descripcion' => $nota->getDescripcion(),
+                'fecha_carga' => $nota->getFechaCarga() ? $nota->getFechaCarga()->format('d/m/Y') : 'N/A',
+            ];
         }
-        
-        // No hacemos flush aquí, se hará junto con la eliminación de la inscripción
+
+        // Renderizar HTML para el PDF
+        $fechaEmision = new \DateTime('now', new \DateTimeZone('America/Argentina/Buenos_Aires'));
+        $html = $this->renderView('alumno/pdf_notas.html.twig', [
+            'alumno' => $alumno,
+            'notas' => $notasData,
+            'fecha_emision' => $fechaEmision
+        ]);
+
+        // Generar PDF con Dompdf
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        // Retornar PDF como descarga
+        $fecha = $fechaEmision->format('d-m-Y');
+        return new Response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="notas_' . $alumno->getNombre() . '_' . $alumno->getApellido() . '_' . $fecha . '.pdf"'
+        ]);
     }
+
 }
 
   

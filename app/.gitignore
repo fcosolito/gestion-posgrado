@@ -5,3 +5,7 @@
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
+
+###> vich/uploader-bundle ###
+/public/uploads/
+###< vich/uploader-bundle ###

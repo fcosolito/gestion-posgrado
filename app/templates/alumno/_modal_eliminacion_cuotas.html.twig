@@ -1,0 +1,46 @@
+<div class="modal fade" id="modalEliminacionCuotas" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Confirmar desinscripción
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">
+                    ¿Está seguro que desea eliminar la inscripción en 
+                    <strong id="modalCuotasCarreraNombre"></strong>?
+                </p>
+                
+                <div id="advertenciaPagos" class="alert alert-warning d-none">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Advertencia:</strong> Esta inscripción tiene cuotas con pagos asociados.
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <strong>Cuotas asociadas a esta inscripción:</strong>
+                    </div>
+                    <ul class="list-group list-group-flush" id="listaCuotasEliminar">
+                        <!-- Se llenará dinámicamente -->
+                    </ul>
+                </div>
+                
+                <p class="text-danger mt-3 mb-0">
+                    <small>
+                        <i class="bi bi-info-circle me-1"></i>
+                        Al eliminar la inscripción, se eliminarán todas las cuotas asociadas y sus registros de pago.
+                    </small>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarEliminacionCuotas">
+                    <i class="bi bi-trash me-2"></i>Eliminar de todas formas
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
