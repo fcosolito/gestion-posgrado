@@ -946,7 +946,7 @@ final class AlumnoController extends AbstractController
     public function desinscribirEdicion(Alumno $alumno, \App\Entity\Edicion $edicion, EntityManagerInterface $entityManager): Response
     {
         // Buscar la inscripción
-        $inscripcion = $entityManager->getRepository(\App\Ent;ity\InscripcionEdicion::class)
+        $inscripcion = $entityManager->getRepository(\App\Entity\InscripcionEdicion::class)
             ->findOneBy(['alumno' => $alumno, 'edicion' => $edicion]);
 
         if (!$inscripcion) {
