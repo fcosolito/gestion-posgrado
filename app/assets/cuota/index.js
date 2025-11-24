@@ -51,8 +51,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (index_el) {
     const index_root = createRoot(index_el);
-    //const cuotas = JSON.parse(index_el.dataset.cuotas);
-    const cuotas = [
+    const cuotas = JSON.parse(index_el.dataset.cuotas);
+    const cuotasEj = [
         {
             id: 0,
             inscripcionId: 0,

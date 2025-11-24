@@ -4,12 +4,14 @@ namespace App\Controller;
 
 use App\Entity\Carrera;
 use App\Entity\Cuota;
+use App\Entity\PagoCuota;
 use App\Form\CuotaType;
 use App\Repository\AlumnoRepository;
 use App\Repository\CarreraRepository;
 use App\Repository\CuotaRepository;
 use App\Repository\CursoRepository;
 use App\Repository\EdicionRepository;
+use App\Repository\PagoCuotaRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +24,8 @@ final class CuotaController extends AbstractController
     #[Route(name: 'app_cuota_index', methods: ['GET'])]
     public function index(Request $request, CuotaRepository $cuotaR, 
         CarreraRepository $carreraR, CursoRepository $cursoR,
-        EdicionRepository $edicionR, AlumnoRepository $alumnoR
+        EdicionRepository $edicionR, AlumnoRepository $alumnoR,
+        PagoCuotaRepository $pagoCuotaR
         ): Response
     {
 
@@ -74,8 +77,54 @@ final class CuotaController extends AbstractController
             }
         }
 
+        $cuotas = $carrera ? $cuotaR->findBy(["carrera" => $carrera]) :
+                    ($edicion ? $cuotaR->findBy(["edicion" => $edicion]) :
+                    ($curso ? $cuotaR->findByCurso($curso) :
+                    ($alumno ? $cuotaR->findByAlumno($alumno) :
+                    $cuotaR->findAll())));
+
+
+        $cuotas_ser = array_map(
+            function (Cuota $cuota) use ($pagoCuotaR) {
+                $pagoCuotas = $pagoCuotaR->findBy(["cuota" => $cuota]);
+                $pagos_ser = array_map(
+                    function (PagoCuota $pagoCuota) {
+                        return [
+                            "id" => $pagoCuota->getPago()->getId(),
+                            "fechaPago" => $pagoCuota->getPago()->getFechaPago()->format("Y-m-d"),
+                            "monto" => $pagoCuota->getPago()->getMonto(),
+                            "comprobanteArchivo" => $pagoCuota->getPago()->getComprobante()->getArchivo(),
+                            "comprobanteId" => $pagoCuota->getPago()->getComprobante()->getId(),
+                        ];
+                    }, $pagoCuotas
+                );
+                $inscCarrera = $cuota->getInscripcionCarrera();
+                $inscEdicion = $cuota->getInscripcionEdicion();
+                return [
+                    "id" => $cuota->getId(),
+                    "inscripcionCarrera" => $inscCarrera ? [
+                        "carreraNombre" => $inscCarrera->getCarrera()->getNombre(),
+                        "carreraId" => $inscCarrera->getCarrera()->getId(),
+                        "alumnoNombre" => $inscCarrera->getAlumno()->getNombre(),
+                        "alumnoApellido" => $inscCarrera->getAlumno()->getApellido(),
+                        "alumnoId" => $inscCarrera->getAlumno()->getId(),
+                    ] : null,
+                    "inscripcionEdicion" => $inscEdicion ? [
+                        "edicionNombre" => $inscEdicion->getEdicion()->getNombre(),
+                        "edicionId" => $inscEdicion->getEdicion()->getId(),
+                        "alumnoNombre" => $inscEdicion->getAlumno()->getNombre(),
+                        "alumnoApellido" => $inscEdicion->getAlumno()->getApellido(),
+                        "alumnoId" => $inscEdicion->getAlumno()->getId(),
+                    ] : null,
+                    "numeroCuota" => $cuota->getNumeroCuota(),
+                    "pagos" => $pagos_ser,
+                ];
+
+            }, $cuotas
+        );
+
         return $this->render('cuota/index.html.twig', [
-            'cuotas' => $cuotaR->findAll(),
+            'cuotas' => $cuotas_ser,
             'carrera' => $carrera_ser ?? null,
             'curso' => $curso_ser ?? null,
             'edicion' => $edicion_ser ?? null,
