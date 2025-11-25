@@ -19,6 +19,7 @@ use App\Repository\CursoRepository;
 use App\Repository\EdicionRepository;
 use App\Repository\InscripcionCarreraRepository;
 use App\Repository\InscripcionEdicionRepository;
+use App\Service\CalculadorCuota;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -272,7 +273,7 @@ final class AlumnoController extends AbstractController
     }
 
     #[Route('/{id}/visualizar', name: 'app_alumno_visualizar', methods: ['GET', 'POST'])]
-    public function visualizar(Request $request, int $id, AlumnoRepository $alumnoRepository, EntityManagerInterface $entityManager): Response
+    public function visualizar(Request $request, int $id, AlumnoRepository $alumnoRepository, EntityManagerInterface $entityManager, CalculadorCuota $calculadorCuota): Response
     {
         // Buscar manualmente el alumno
         $alumno = $alumnoRepository->find($id);
@@ -370,6 +371,7 @@ final class AlumnoController extends AbstractController
         $cuotasData = [];
         foreach ($cuotas as $cuota) {
 
+            /*
             $pagosCuota = [];
             $montoPagado = 0;
             $contadorPagos = 0;
@@ -394,6 +396,10 @@ final class AlumnoController extends AbstractController
             } else {
                 $estadoPago = 'Pendiente';
             }
+            */
+
+            // Factorice lo anterior en este metodo, comprobar si funciona igual
+            $estadoPago = $calculadorCuota->calcularEstado($cuota);
 
 
             if ($cuota->getInscripcionCarrera() === null) {

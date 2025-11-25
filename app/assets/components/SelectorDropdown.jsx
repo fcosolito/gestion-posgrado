@@ -14,8 +14,17 @@ export default function SelectorDropdown({ items, placeholder, item, setItem, ge
     if (item) {
       setQuery(getLabel(item));
       setIsSelected(true);
+      console.log(item)
     }
   }, []);
+
+  useEffect(() => {
+    if (!item) {
+      setQuery("");
+      setIsSelected(false);
+      setIsOpen(false);
+    }
+  }, [item]);
 
   useEffect(() => {
     setResultados(items
@@ -30,8 +39,6 @@ export default function SelectorDropdown({ items, placeholder, item, setItem, ge
       )
     );
 
-    setQuery("");
-    setIsSelected(false);
   }, [items])
   
 

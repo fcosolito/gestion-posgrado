@@ -2,7 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\Alumno;
+use App\Entity\Carrera;
 use App\Entity\Cuota;
+use App\Entity\Curso;
+use App\Entity\Edicion;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -48,8 +52,56 @@ class CuotaRepository extends ServiceEntityRepository
                 return [];
             }
         }
+    
+    public function findByAlumno(Alumno $alumno): array
+    {
+        return $this->createQueryBuilder("c")
+            ->leftJoin('c.inscripcionCarrera', 'ic')
+            ->leftJoin('c.inscripcionEdicion', 'ie')
+            ->leftJoin('ic.alumno', 'ica')
+            ->leftJoin('ie.alumno', 'iea')
+            ->where('(ic IS NOT NULL AND ica.id = :alumnoId) OR (ie IS NOT NULL AND iea.id = :alumnoId)')
+            ->setParameter('alumnoId', $alumno->getId())
+            ->getQuery()
+            ->getResult();
+    }
 
+    public function findByCurso(Curso $curso): array
+    {
+        return $this->createQueryBuilder("c")
+            ->leftJoin("c.inscripcionEdicion", "ie")
+            ->where("ie IS NOT NULL")
+            ->leftJoin("ie.edicion", "ed")
+            ->leftJoin("ed.curso", "cu")
+            ->andWhere("cu.id = :cursoId")
+            ->setParameter("cursoId", $curso->getId())
+            ->getQuery()
+            ->getResult();
+    }
 
+    public function findByEdicion(Edicion $edicion): array
+    {
+        return $this->createQueryBuilder("c")
+            ->leftJoin("c.inscripcionEdicion", "ie")
+            ->where("ie IS NOT NULL")
+            ->leftJoin("ie.edicion", "ed")
+            ->andWhere("ed.id = :edicionId")
+            ->setParameter("edicionId", $edicion->getId())
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByCarrera(Carrera $carrera): array
+    {
+        return $this->createQueryBuilder("c")
+            ->leftJoin("c.inscripcionCarrera", "ic")
+            ->where("ic IS NOT NULL")
+            ->leftJoin("ic.carrera", "ca")
+            ->andWhere("ca.id = :carreraId")
+            ->setParameter("carreraId", $carrera->getId())
+            ->getQuery()
+            ->getResult();
+    }
     //    /**
     //     * @return Cuota[] Returns an array of Cuota objects
     //     */

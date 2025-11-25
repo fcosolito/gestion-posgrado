@@ -87,7 +87,6 @@ export default function ListaInscripciones ({ alumnos, descuentos }) {
                                             </ul>
                                         </div>
                                     ) : (
-                                        // Esto tiene pinta de poder fallar muy facil
                                         // TODO manejar errores
                                         descuentos.filter(d => d.id === alumno.descuento)[0].valor
                                     )}

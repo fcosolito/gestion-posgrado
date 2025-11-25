@@ -52,27 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (index_el) {
     const index_root = createRoot(index_el);
     const cuotas = JSON.parse(index_el.dataset.cuotas);
-    const cuotasEj = [
-        {
-            id: 0,
-            inscripcionId: 0,
-            descuento: 0.10,
-            nombreAlumno: "Franco",
-            apellidoAlumno: "Cosolito",
-            dniAlumno: 43000000,
-            valor: 25000,
-            estado: "No paga",
-            pagos: [
-                {
-                    id: 1,
-                    monto: 30000,
-                    fechaDePago: new Date("2025-08-01"),
-                    comprobante: "comp_1.png"
-                },
-            ]
 
-        },
-    ]
     index_root.render(<Index 
             cuotas={cuotas} 
             carrera={carrera}

@@ -12,32 +12,32 @@ export default function FormBuscarCuotas ({carreraIni, cursoIni, edicionIni, alu
     const isFirstRender = useRef(true);
 
     useEffect(() => {
-        if (isFirstRender.current) {
-            isFirstRender.current = false;
-            return
-        }
+        //if (isFirstRender.current) {
+            //isFirstRender.current = false;
+            //return
+        //}
 
         if (!curso) {
             setEdiciones([]);
             return
+        } else {
+            fetchEdiciones();
         }
-
-        const fetchData = async () => {
-            try {
-                const res = await fetch(`/edicion/${curso.id}/find-by-curso`, {
-                    method: "GET",
-                    headers: { "Content-Type": "application/json" },
-                    });
-                const data = await res.json();
-                
-                setEdiciones(data);
-            } catch (err) {
-                alert(err.message);
-            }
-        }
-
-        fetchData();
     }, [curso])
+
+    const fetchEdiciones = async () => {
+        try {
+            const res = await fetch(`/edicion/${curso.id}/find-by-curso`, {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+                });
+            const data = await res.json();
+            
+            setEdiciones(data);
+        } catch (err) {
+            alert(err.message);
+        }
+    }
 
     const handleSubmit = () => {
         const carreraParam = carrera ? `carrera=${carrera.id}&` : "";
@@ -45,6 +45,25 @@ export default function FormBuscarCuotas ({carreraIni, cursoIni, edicionIni, alu
         const edicionParam = edicion ? `edicion=${edicion.id}&` : "";
         const alumnoParam = alumno ? `alumno=${alumno.id}&` : "";
         window.location.href = `${window.location.pathname}?${carreraParam}${cursoParam}${edicionParam}${alumnoParam}`;
+    }
+
+    const handleLimpiar = () => {
+        setCarrera(null);
+        setCurso(null);
+        setEdicion(null);
+        setAlumno(null);
+    }
+
+    const setCarreraLimpiarCurso = (carrera) => {
+        setCarrera(carrera);
+        setCurso(null);
+        setEdicion(null);
+    }
+
+    const setCursoLimpiarCarrera = (curso) => {
+        setCurso(curso);
+        setEdicion(null);
+        setCarrera(null);
     }
 
     async function fetchCarreras(query) {
@@ -92,7 +111,7 @@ export default function FormBuscarCuotas ({carreraIni, cursoIni, edicionIni, alu
                         fetchItems={fetchCarreras}
                         placeholder={"Seleccionar carrera..."}
                         item={carrera}
-                        setItem={setCarrera}
+                        setItem={setCarreraLimpiarCurso}
                         getId={(carrera) => carrera.id}
                         getLabel={(carrera) => carrera.nombre}
                         getDetalle={getDetalleCarrera}
@@ -105,7 +124,7 @@ export default function FormBuscarCuotas ({carreraIni, cursoIni, edicionIni, alu
                         fetchItems={fetchCursos}
                         placeholder={"Seleccionar curso..."}
                         item={curso}
-                        setItem={setCurso}
+                        setItem={setCursoLimpiarCarrera}
                         getId={(curso) => curso.id}
                         getLabel={(curso) => curso.nombre}
                         getDetalle={getDetalleCurso}
@@ -145,6 +164,16 @@ export default function FormBuscarCuotas ({carreraIni, cursoIni, edicionIni, alu
                         onClick={handleSubmit}
                     >
                         Filtrar
+                    </button>
+                </div>
+            </div>
+            <div className="col-2">
+                <div className="p-1">
+                    <button 
+                        className="btn btn-secondary"
+                        onClick={handleLimpiar}
+                    >
+                        Limpiar
                     </button>
                 </div>
             </div>

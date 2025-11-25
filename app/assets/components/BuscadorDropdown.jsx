@@ -12,6 +12,7 @@ export default function BuscadorDropdown({ fetchItems, placeholder, item, setIte
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Usar un item inicial
   useEffect(() => {
     if (item) {
       setQuery(getLabel(item));
@@ -19,6 +20,17 @@ export default function BuscadorDropdown({ fetchItems, placeholder, item, setIte
     }
   }, []);
 
+  // Limpiar el componente si item es null
+  useEffect(() => {
+    if (!item) {
+      setQuery("");
+      setIsSelected(false);
+      setItems([]);
+      setIsOpen(false);
+    }
+  }, [item])
+
+  // Buscar items cuando cambia la query
   useEffect(() => {
     setLoading(true);
 
@@ -37,6 +49,7 @@ export default function BuscadorDropdown({ fetchItems, placeholder, item, setIte
                     id: getId(item),
                     label: getLabel(item),
                     detalle: getDetalle(item),
+                    item: item,
                 }
             });
             setItems(formatedItems);
@@ -51,7 +64,7 @@ export default function BuscadorDropdown({ fetchItems, placeholder, item, setIte
 
   }, [query]);
   
-
+  // Cambiar query en base al texto escrito
   const handleChange = async (e) => {
     setItem(null);
     setIsSelected(false);
@@ -61,6 +74,7 @@ export default function BuscadorDropdown({ fetchItems, placeholder, item, setIte
     setIsOpen(value.length > 0); 
   };
 
+  // Esto fija un item
   const handleSelect = (item) => {
     setItem(item);
     setIsSelected(true);

@@ -143,7 +143,28 @@ final class PagoController extends AbstractController
             'alumnos' => $alumnoRepository->findAll(),
         ]);
     }
-    
+
+    #[Route('/search', name: 'app_pago_search', methods: ['GET'])]
+    public function search(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        $query =  $request->query->get("query", "");
+        $pagos = $entityManager->getRepository(Pago::class)->searchXor($query);
+        $pagos_ser = array_map(
+            function (Pago $p) {
+                return (
+                    [
+                        "id" => $p->getId(),
+                        "monto" => $p->getMonto(),
+                        "fechaPago" => $p->getFechaPago()->format("Y-m-d"),
+                    ]
+                    );
+            },
+            $pagos
+        );
+
+        return $this->json($pagos_ser);
+    }
+
     #[Route('/api/cuotas-pendientes/{alumnoId}', name: 'app_pago_cuotas_pendientes', methods: ['GET'])]
     public function getCuotasPendientes(int $alumnoId, CuotaRepository $cuotaRepository): JsonResponse
     {
@@ -236,6 +257,52 @@ final class PagoController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/asoc-cuota/{idCuota}', name: 'app_pago_asociar_cuota', methods: ['PUT'])]
+    public function asociarCuota(Request $request, Pago $pago, Cuota $idCuota, EntityManagerInterface $entityManager): Response
+    {
+        $pagoCuotaRepository = $entityManager->getRepository(PagoCuota::class);
+        $pagoCuota = $pagoCuotaRepository->findOneBy(["pago" => $pago, "cuota" => $idCuota]) ?? new PagoCuota();
+
+        $pagoCuota->setCuota($idCuota);
+        $pagoCuota->setPago($pago);
+
+        // En el body de la request puede pasarse "montoCuota: N"
+        // Se toma el monto del pago si no se pasa.
+        $data = $request->toArray();
+        $montoCuota = $data['montoCuota'];
+
+        if ($montoCuota) {
+            $pagoCuota->setMontoCuota($montoCuota <= $pago->getMonto() ? $montoCuota : $pago->getMonto());
+        } else {
+            $pagoCuota->setMontoCuota($pago->getMonto());
+        }
+
+        $entityManager->persist($pagoCuota);
+        $entityManager->flush();
+
+        return $this->json([
+            "pagoCuota" => [
+                "pago" => $pago->getId(),
+                "cuota" => $idCuota->getId(),
+            ],
+        ]);       
+    }
+
+    #[Route('/{id}/desasoc-cuota/{idCuota}', name: 'app_pago_desasociar_cuota', methods: ['PUT'])]
+    public function desasociarCuota(Request $request, Pago $pago, Cuota $idCuota, EntityManagerInterface $entityManager): Response
+    {
+        $pagoCuotaRepository = $entityManager->getRepository(PagoCuota::class);
+        $pagoCuota = $pagoCuotaRepository->findOneBy(["pago" => $pago, "cuota" => $idCuota]) ?? new PagoCuota();
+
+        $entityManager->remove($pagoCuota);
+        $entityManager->flush();
+
+        return $this->json([
+            "success" => true,
+        ]);
+    }
+
+    
     #[Route('/{id}', name: 'app_pago_delete', methods: ['POST'])]
     public function delete(Request $request, Pago $pago, EntityManagerInterface $entityManager): Response
     {

@@ -26,6 +26,17 @@ class PagoRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function searchXor(string $query): array {
+        $qb =  $this->createQueryBuilder('p')
+            ->where('p.descripcion = :descripcion')
+            ->setParameter('descripcion', "%".$query."%");
+        if (ctype_digit($query)){
+            $qb->orWhere('p.id = :id')
+                ->setParameter('id', (int) $query);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
     //    /**
     //     * @return Pago[] Returns an array of Pago objects
     //     */

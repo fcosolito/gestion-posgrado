@@ -29,6 +29,9 @@ class Pago
     #[ORM\OneToMany(mappedBy: 'pago', targetEntity: PagoCuota::class, cascade: ['persist', 'remove'])]
     private Collection $pagoCuotas;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $descripcion = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -92,6 +95,18 @@ class Pago
                 $pagoCuota->setPago(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getDescripcion(): ?string
+    {
+        return $this->descripcion;
+    }
+
+    public function setDescripcion(?string $descripcion): static
+    {
+        $this->descripcion = $descripcion;
 
         return $this;
     }

@@ -9,34 +9,47 @@ export default function ListaCuotas({ cuotas, onSelect }) {
     }
 
     return (
-            <div className="rounded bg-white h-100 p-3">
-                <h3>Cuotas</h3>
-                <div className="h-25 overflow-scroll">
+            <div className="rounded bg-white h-100 p-3 ps-0 pe-0">
+                <h3 className="ms-3">Cuotas</h3>
+                <div className="h-75 overflow-scroll">
                     <table className="table table-striped table-bordered table-hover">
                         <thead className="sticky-top table-secondary">
                             <tr>
-                                <th className="bg-grey">Nombre</th>
+                                <th>Nombre</th>
                                 <th>Apellido</th>
                                 <th>Valor</th>
                                 <th>Estado</th>
-                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             {cuotas.map((cuota) => (
-                                <tr
-                                    key={cuota.id}
-                                    onClick={() => handleClick(cuota)}
-                                    className={`cursor-pointer ${
-                                        idSeleccion === cuota.id ? "table-primary" : ""
-                                    }`}
-                                >
-                                    <td>{cuota.nombreAlumno}</td>
-                                    <td>{cuota.apellidoAlumno}</td>
-                                    <td>{cuota.valor}</td>
-                                    <td>{cuota.estado}</td>
-                                    <td><button className="btn btn-secondary">Acciones</button></td>
-                                </tr>
+                                cuota.inscripcionEdicion ? (
+                                    <tr
+                                        key={cuota.id}
+                                        onClick={() => handleClick(cuota)}
+                                        className={`cursor-pointer ${
+                                            idSeleccion === cuota.id ? "table-primary" : ""
+                                        }`}
+                                    >
+                                        <td>{cuota.inscripcionEdicion.alumnoNombre}</td>
+                                        <td>{cuota.inscripcionEdicion.alumnoApellido}</td>
+                                        <td>{cuota.valor}</td>
+                                        <td>{cuota.estado}</td>
+                                    </tr>
+                                ) : (
+                                    <tr
+                                        key={cuota.id}
+                                        onClick={() => handleClick(cuota)}
+                                        className={`cursor-pointer ${
+                                            idSeleccion === cuota.id ? "table-primary" : ""
+                                        }`}
+                                    >
+                                        <td>{cuota.inscripcionCarrera.alumnoNombre}</td>
+                                        <td>{cuota.inscripcionCarrera.alumnoApellido}</td>
+                                        <td>{cuota.valor}</td>
+                                        <td>{cuota.estado}</td>
+                                    </tr>
+                                )
 
                             ))}
                         </tbody>
