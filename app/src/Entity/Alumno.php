@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\AlumnoRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AlumnoRepository::class)]
@@ -24,6 +25,15 @@ class Alumno
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $email = null;
+
+    #[ORM\Column(type: Types::BIGINT, nullable: true)]
+    private ?string $telefono = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $tituloGrado = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTime $fechaNacimiento = null;
 
     public function getId(): ?int
     {
@@ -74,6 +84,42 @@ class Alumno
     public function setEmail(?string $email): static
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getTelefono(): ?string
+    {
+        return $this->telefono;
+    }
+
+    public function setTelefono(?string $telefono): static
+    {
+        $this->telefono = $telefono;
+
+        return $this;
+    }
+
+    public function getTituloGrado(): ?string
+    {
+        return $this->tituloGrado;
+    }
+
+    public function setTituloGrado(?string $tituloGrado): static
+    {
+        $this->tituloGrado = $tituloGrado;
+
+        return $this;
+    }
+
+    public function getFechaNacimiento(): ?\DateTime
+    {
+        return $this->fechaNacimiento;
+    }
+
+    public function setFechaNacimiento(?\DateTime $fechaNacimiento): static
+    {
+        $this->fechaNacimiento = $fechaNacimiento;
 
         return $this;
     }

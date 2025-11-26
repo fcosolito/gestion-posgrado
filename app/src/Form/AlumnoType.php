@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Alumno;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -27,6 +28,17 @@ class AlumnoType extends AbstractType
             ->add('email', EmailType::class, [
                 'required' => false,
                 'attr' => ['maxlength' => 255]
+            ])
+            ->add('telefono', NumberType::class, [
+                'required' => false,
+                'attr' => ['maxlength' => 255]
+            ])
+            ->add('tituloGrado', TextType::class, [
+                'required' => false,
+                'attr' => ['maxlength' => 255]
+            ])
+            ->add('fechaNacimiento', DateType::class, [
+                'required' => false,
             ])
         ;
     }

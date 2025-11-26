@@ -47,6 +47,20 @@
                                 <div style="color: #4a4a4a;">{{ alumno.email }}</div>
                             </div>
                         </div>
+                        <div class="row g-3 pt-2">
+                            <div class="col-md-3">
+                                <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Telefono</div>
+                                <div style="color: #4a4a4a;">{{ alumno.telefono ?? "<i>Sin registro</i>" }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Titulo de grado</div>
+                                <div style="color: #4a4a4a;">{{ alumno.tituloGrado ?? "<i>Sin registro</i>" }}</div>
+                            </div>
+                            <div class="col-md-3">
+                                <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Fecha de nacimiento</div>
+                                <div style="color: #4a4a4a;">{{ alumno.fechaNacimiento ?? "<i>Sin registro</i>" }}</div>
+                            </div>
+                        </div>
                     </div>
                     <div id="editar-container" style="display: none;">
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -74,6 +88,20 @@
                                 <div class="col-md-3">
                                     <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Email</div>
                                     {{ form_widget(formEditar.email, {'attr': {'class': 'form-control', 'placeholder': 'Ej: mail@ejemplo.com', 'maxlength': '255'}}) }}
+                                </div>
+                            </div>
+                            <div class="row g-3 pt-2">
+                                <div class="col-md-3">
+                                    <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Telefono</div>
+                                    {{ form_widget(formEditar.telefono, {'attr': {'class': 'form-control', 'placeholder': 'Ej: 3424223464', 'maxlength': '255'}}) }}
+                                </div>
+                                <div class="col-md-3">
+                                    <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Titulo de grado</div>
+                                    {{ form_widget(formEditar.tituloGrado, {'attr': {'class': 'form-control', 'placeholder': 'Ej: Ingeniero en Sistemas', 'maxlength': '255'}}) }}
+                                </div>
+                                <div class="col-md-3">
+                                    <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Fecha de nacimiento</div>
+                                    {{ form_widget(formEditar.fechaNacimiento, {'attr': {'class': 'form-control', }}) }}
                                 </div>
                             </div>
                         {{ form_end(formEditar) }}

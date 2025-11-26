@@ -74,6 +74,20 @@
                             {{ form_widget(formCrear.email, {'attr': {'class': 'form-control', 'placeholder': 'Ej: mail@ejemplo.com', 'maxlength': '255'}}) }}
                         </div>
                     </div>
+                    <div class="row g-3 pt-1">
+                        <div class="col-md-3">
+                            {{ form_label(formCrear.telefono) }}
+                            {{ form_widget(formCrear.telefono, {'attr': {'class': 'form-control', 'placeholder': 'Ej: 3424223464', 'maxlength': '255'}}) }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form_label(formCrear.tituloGrado) }}
+                            {{ form_widget(formCrear.tituloGrado, {'attr': {'class': 'form-control', 'placeholder': 'Ej: Ingeniero en Sistemas', 'maxlength': '255'}}) }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ form_label(formCrear.fechaNacimiento) }}
+                            {{ form_widget(formCrear.fechaNacimiento, {'attr': {'class': 'form-control', }}) }}
+                        </div>
+                    </div>
                 {{ form_end(formCrear) }}
             </div>
         </div>
