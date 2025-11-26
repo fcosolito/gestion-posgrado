@@ -13,7 +13,8 @@ import './styles/app.css';
 import { createRoot } from "react-dom/client";
 import Sidebar from "./components/Sidebar.jsx";
 import Lista from "./components/Lista.jsx";
-import { Modal } from 'bootstrap';
+import Modal from 'bootstrap/js/dist/modal';
+import ListaNotas from './components/ListaNotas.jsx';
 
 const el = document.getElementById("sidebar-root");
 if (el) {
@@ -280,7 +281,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ];
     
     const root = createRoot(listaNotas);
-    root.render(<Lista labels={labels} attributes={attributes} rows={rows} opcionesAcciones={opcionesAcciones} />);
+    root.render(<ListaNotas labels={labels} attributes={attributes} rows={rows} opcionesAcciones={opcionesAcciones} />);
   }
 });
 

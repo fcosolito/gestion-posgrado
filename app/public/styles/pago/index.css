@@ -1,0 +1,109 @@
+/* styles/pago/index.css */
+.pagos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem 0;
+}
+
+.pagos-summary {
+    margin-top: 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.pagos-summary strong {
+    color: #333;
+}
+
+.comprobante-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.table-actions {
+    width: 150px;
+}
+
+.table-actions .dropdown-toggle {
+    padding: 4px 12px;
+    font-size: 0.875rem;
+}
+
+.empty {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 2rem !important;
+}
+
+/* Estilos para las filas de la tabla */
+.table-carreras tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Asegurar consistencia con la tabla de carreras */
+.main-content-carreras-body {
+    padding: 0;
+}
+
+.table-carreras th.text-center {
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .pagos-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .pagos-header > div {
+        width: 100%;
+    }
+    
+    .pagos-header > div:last-child {
+        text-align: left;
+    }
+}
+
+.comprobante-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.table-actions {
+    width: 150px;
+}
+
+.table-actions .dropdown-toggle {
+    padding: 4px 12px;
+    font-size: 0.875rem;
+}
+
+.empty {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 2rem !important;
+}
+
+/* Estilos para las filas de la tabla */
+.table-carreras tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Asegurar consistencia con la tabla de carreras */
+.main-content-carreras-body {
+    padding: 0;
+}
+
+.table-carreras th.text-center {
+    text-align: center;
+}

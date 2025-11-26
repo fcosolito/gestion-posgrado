@@ -1,0 +1,399 @@
+/* styles/pago/show.css */
+.main-content-show-pago {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+/* Información del pago */
+.info-pago {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-info-pago {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 1rem;
+}
+
+.titulo-pago {
+    color: #1e40af;
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.header-show-pago-buttons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+/* Botones */
+.btn-principal {
+    background-color: #1e40af;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-principal:hover {
+    background-color: #1e3a8a;
+}
+
+.btn-alternativo {
+    background-color: #f5ba04;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-alternativo:hover {
+    background-color: #d39e01;
+}
+
+.btn-peligro {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-peligro:hover {
+    background-color: #c82333;
+}
+
+/* Información de datos */
+.data-info-pago {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: #e5e7eb;
+    border-radius: 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-item dt {
+    font-weight: 600;
+    color: #495057;
+}
+
+.info-item dd {
+    margin: 0;
+    font-weight: 500;
+    color: #212529;
+}
+
+/* Estilos para botones de comprobante */
+.comprobante-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn-comprobante {
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    color: #495057;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.btn-comprobante:hover {
+    background-color: #f8f9fa;
+    border-color: #adb5bd;
+    color: #212529;
+    text-decoration: none;
+}
+
+.btn-comprobante.primary {
+    background-color: #1e40af;
+    color: white;
+    border-color: #1e40af;
+}
+
+.btn-comprobante.primary:hover {
+    background-color: #1e3a8a;
+    border-color: #1e3a8a;
+}
+
+/* Estilos para la sección de cuotas */
+.detalle-cuotas {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    height: 60vh;
+    overflow: hidden;
+}
+
+.header-cuotas {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #e9ecef;
+    flex-shrink: 0;
+}
+
+.header-cuotas h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1e40af;
+}
+
+.badge-cuotas {
+    background-color: #1e40af;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+/* Tabla de cuotas */
+.body-cuotas {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.tabla-cuotas {
+    flex: 1;
+    overflow: auto;
+    max-height: 100%;
+}
+
+.tabla-cuotas table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+/* HEADER COMPACTO */
+.tabla-cuotas thead th {
+    padding: 8px 12px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+    background-color: #efefef;
+    position: sticky;
+    top: 0;
+    height: 40px;
+    vertical-align: middle;
+}
+
+/* FILAS COMPACTAS */
+.tabla-cuotas tbody td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 0.875rem;
+    height: 42px;
+    vertical-align: middle;
+}
+
+.tabla-cuotas tbody tr {
+    height: 42px;
+}
+
+/* Distribución de columnas para cuotas */
+.tabla-cuotas th:nth-child(1),
+.tabla-cuotas td:nth-child(1) {
+    width: 10%;
+    text-align: center;
+}
+
+.tabla-cuotas th:nth-child(2),
+.tabla-cuotas td:nth-child(2) {
+    width: 35%;
+}
+
+.tabla-cuotas th:nth-child(3),
+.tabla-cuotas td:nth-child(3) {
+    width: 15%;
+    text-align: right;
+}
+
+.tabla-cuotas th:nth-child(4),
+.tabla-cuotas td:nth-child(4) {
+    width: 15%;
+    text-align: center;
+}
+
+.tabla-cuotas th:nth-child(5),
+.tabla-cuotas td:nth-child(5) {
+    width: 25%;
+}
+
+/* Hover effects */
+.tabla-cuotas tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Badges */
+.badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.badge-carrera {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.badge-edicion {
+    background-color: #f59e0b;
+    color: black;
+}
+
+/* Total */
+.total-pago {
+    background-color: #e7f3ff;
+    font-weight: 600;
+}
+
+.total-pago td {
+    padding: 12px !important;
+    font-size: 1rem !important;
+}
+
+/* Estados vacíos */
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+.tabla-cuotas tbody .text-muted {
+    padding: 12px 16px;
+    height: 42px;
+    vertical-align: middle;
+}
+
+/* Scroll personalizado */
+.tabla-cuotas::-webkit-scrollbar {
+    width: 4px;
+}
+
+.tabla-cuotas::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2px;
+}
+
+.tabla-cuotas::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 2px;
+}
+
+.tabla-cuotas::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .detalle-cuotas {
+        height: 50vh;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content-show-pago {
+        padding: 0.5rem;
+    }
+    
+    .header-info-pago {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .header-show-pago-buttons {
+        width: 100%;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+    
+    .data-info-pago {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .titulo-pago {
+        font-size: 1.5rem;
+    }
+    
+    .comprobante-buttons {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    /* Tabla responsive en móviles */
+    .tabla-cuotas {
+        overflow-x: auto;
+    }
+    
+    .tabla-cuotas table {
+        table-layout: auto;
+        min-width: 600px;
+    }
+    
+    /* Ajustar distribución en móviles */
+    .tabla-cuotas th:nth-child(1),
+    .tabla-cuotas td:nth-child(1),
+    .tabla-cuotas th:nth-child(2),
+    .tabla-cuotas td:nth-child(2),
+    .tabla-cuotas th:nth-child(3),
+    .tabla-cuotas td:nth-child(3),
+    .tabla-cuotas th:nth-child(4),
+    .tabla-cuotas td:nth-child(4),
+    .tabla-cuotas th:nth-child(5),
+    .tabla-cuotas td:nth-child(5) {
+        width: auto;
+        text-align: left;
+    }
+}

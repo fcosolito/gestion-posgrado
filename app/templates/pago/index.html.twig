@@ -2,59 +2,110 @@
 
 {% block title %}Pagos{% endblock %}
 
-{% block body %}
-<div class="p-3">
-<div class="rounded bg-white vh-100 p-0">
-    <div class="row p-3">
-        <div class="col">
-            <h3>Pagos</h3>
-        </div>
-        <div class="col text-end">
-            <a class="btn btn-primary" href="{{ path('app_pago_new') }}">Nuevo</a>
-        </div>
-    </div>
-    <div class="h-100 overflow-scroll p-0">
-        <table class="table table-striped table-bordered table-hover">
-            <thead class="sticky-top table-secondary">
-                <tr>
-                    <th>ID</th>
-                    <th>Monto</th>
-                    <th>Fecha</th>
-                    <th>Comprobante</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for pago in pagos %}
-                    <tr>
-                        <td>{{ pago.id }}</td>
-                        <td>{{ pago.monto}}</td>
-                        <td>{{ pago.fechaPago ? pago.fechaPago|date('Y-m-d') : '' }}</td>
-                        <td>{{ pago.comprobante ? pago.comprobante : "<i>Adjuntar</i>" }}</td>
-                        <td>
-                            <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Acciones
-                                </button>
-                                <ul class="dropdown-menu" >
-                                    <li><a class="dropdown-item" href="{{ path('app_pago_show', {'id': pago.id}) }}">Ver</a></li>
-                                    <li><a class="dropdown-item" href="{{ path('app_pago_edit', {'id': pago.id}) }}">Editar</a></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </div>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="5"><i>No se registraron pagos</i></td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-</div>
-    
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/carrera/index.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/pago/index.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/pago/search_form.css') }}">
+{% endblock %}
 
-    
+{% block body %}
+    <div class="buscador-carreras">
+        <h2>Buscar</h2>
+        {{ include('/pago/_search_form.html.twig', {
+            'searchForm': searchForm 
+        }) }}
+    </div>
+
+    <div class="main-content-carreras">
+        <header class="main-content-carreras-header">
+            <h2>Pagos</h2>
+            <a href="{{ path('app_pago_new') }}">+ Nuevo</a>
+        </header>
+        <div class="main-content-carreras-body">
+            <table class="table-carreras">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Monto</th>
+                        <th>Fecha</th>
+                        <th>Alumno</th>
+                        <th>Comprobante</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pago in pagos %}
+                        <tr>
+                            <td>{{ pago.id }}</td>
+                            <td>${{ pago.monto ? pago.monto|number_format(2, ',', '.') : '0.00' }}</td>
+                            <td>{{ pago.fechaPago ? pago.fechaPago|date('Y-m-d') : '' }}</td>
+                            <td>
+                                {% set alumnoNombre = '' %}
+                                {% set alumnoApellido = '' %}
+                                {% if pago.pagoCuotas is not empty %}
+                                    {% for pc in pago.pagoCuotas %}
+                                        {% set cuota = pc.cuota ?? null %}
+                                        {% if cuota is not null %}
+                                            {% if cuota.inscripcionCarrera is not null and cuota.inscripcionCarrera.alumno is not null %}
+                                                {% set alumnoNombre = cuota.inscripcionCarrera.alumno.nombre %}
+                                                {% set alumnoApellido = cuota.inscripcionCarrera.alumno.apellido %}
+                                            {% elseif cuota.inscripcionEdicion is not null and cuota.inscripcionEdicion.alumno is not null %}
+                                                {% set alumnoNombre = cuota.inscripcionEdicion.alumno.nombre %}
+                                                {% set alumnoApellido = cuota.inscripcionEdicion.alumno.apellido %}
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                {{ alumnoNombre and alumnoApellido ? alumnoApellido ~ ', ' ~ alumnoNombre : 'Sin alumno' }}
+                            </td>
+                            <td>
+                                {% if pago.comprobante and pago.comprobante.archivo %}
+                                    {% set filePath = 'uploads/comprobantes/' ~ pago.comprobante.archivo %}
+                                    <a href="{{ asset(filePath) }}" target="_blank" title="Abrir comprobante" class="comprobante-link">
+                                        {% set ext = (pago.comprobante.archivo|split('.')|last)|lower %}
+                                        {% if ext in ['jpg','jpeg','png','gif','webp'] %}
+                                            <img src="{{ asset(filePath) }}" alt="comprobante" class="comprobante-thumb">
+                                        {% else %}
+                                            <span class="btn btn-sm btn-outline-primary">Ver comprobante</span>
+                                        {% endif %}
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">Sin comprobante</span>
+                                {% endif %}
+                            </td>
+                            <td class="table-actions">
+                                <div class="dropdown">
+                                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Acciones
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="{{ path('app_pago_show', {'id': pago.id}) }}">Ver</a></li>
+                                        <li><a class="dropdown-item" href="{{ path('app_pago_edit', {'id': pago.id}) }}">Editar</a></li>
+                                        {% if pago.comprobante and pago.comprobante.archivo %}
+                                            <li><a class="dropdown-item" href="{{ asset('uploads/comprobantes/' ~ pago.comprobante.archivo) }}" target="_blank" download>Descargar comprobante</a></li>
+                                        {% endif %}
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>
+                                            <form method="post" action="{{ path('app_pago_delete', {'id': pago.id}) }}" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este pago?');">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ pago.id) }}">
+                                                <button class="dropdown-item text-danger" type="submit">Eliminar</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="empty">
+                                <i>No se encontraron pagos</i>
+                                <br>
+                                <a href="{{ path('app_pago_new') }}" class="btn btn-primary mt-2">Registrar primer pago</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}

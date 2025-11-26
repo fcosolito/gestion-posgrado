@@ -1,18 +1,170 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Editar Pago{% endblock %}
+{% block title %}Pagos{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/carrera/index.css') }}">
+    <link rel="stylesheet" href="{{ asset('styles/pago/form.css') }}">
+{% endblock %}
 
 {% block body %}
-<div class="p-2">
-    {{ include('pago/_form.html.twig', {'button_label': 'Guardar'}) }}
-
-    <div class="row p-2">
-        <div class="col-auto">
-            <a class="btn btn-secondary" href="{{ path('app_pago_index') }}">Volver</a>
-        </div>
-        <div class="col-auto">
-            {{ include('pago/_delete_form.html.twig') }}
+<div class="buscador-carreras p-3">
+    <div class="pagos-header">
+        <div>
+            <h2>Editar Pago</h2>
+            <div class="pagos-summary">
+                {% if pago.fechaPago %}
+                    Fecha original: <strong>{{ pago.fechaPago|date('d/m/Y') }}</strong>
+                {% endif %}
+                {% if pago.monto %}
+                    — Monto original: <strong>${{ pago.monto|number_format(2, ',', '.') }}</strong>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
+
+<div class="main-content-carreras p-3">
+    <div class="main-content-carreras-body">
+        {{ include('pago/_form.html.twig', {
+            'button_label': 'Actualizar pago',
+            'include_back_button': false
+        }) }}
+
+        {# Información adicional del pago #}
+        <div class="pago-info-adicional mt-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Información del Pago</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>ID:</strong> {{ pago.id }}<br>
+                            <strong>Fecha de pago:</strong> {{ pago.fechaPago ? pago.fechaPago|date('d/m/Y') : 'N/A' }}<br>
+                            <strong>Monto total:</strong> ${{ pago.monto|number_format(2, ',', '.') }}
+                        </div>
+                        <div class="col-md-6">
+                            {% if pago.comprobante %}
+                                <strong>Comprobante:</strong> 
+                                <a href="{{ asset('uploads/comprobantes/' ~ pago.comprobante.archivo) }}" 
+                                   target="_blank" 
+                                   class="btn btn-sm btn-outline-primary ms-2">
+                                    Ver comprobante
+                                </a><br>
+                            {% else %}
+                                <strong>Comprobante:</strong> <span class="text-muted">No adjuntado</span><br>
+                            {% endif %}
+                            
+                            {# Obtener información del alumno a través de las relaciones existentes #}
+                            {% set alumnoInfo = null %}
+                            {% for pagoCuota in pago.pagoCuotas %}
+                                {% set cuota = pagoCuota.cuota %}
+                                {% if cuota.inscripcionCarrera and cuota.inscripcionCarrera.alumno %}
+                                    {% set alumnoInfo = cuota.inscripcionCarrera.alumno %}
+                                {% elseif cuota.inscripcionEdicion and cuota.inscripcionEdicion.alumno %}
+                                    {% set alumnoInfo = cuota.inscripcionEdicion.alumno %}
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if alumnoInfo %}
+                                <strong>Alumno:</strong> {{ alumnoInfo.apellido }}, {{ alumnoInfo.nombre }}<br>
+                                <strong>DNI:</strong> {{ alumnoInfo.dni }}
+                            {% else %}
+                                <strong>Alumno:</strong> <span class="text-muted">No identificado</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {# Cuotas asociadas #}
+                    {% if pago.pagoCuotas is not empty %}
+                        <hr>
+                        <h6>Cuotas pagadas:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th># Cuota</th>
+                                        <th>Concepto</th>
+                                        <th>Monto</th>
+                                        <th>Tipo</th>
+                                        <th>Alumno</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for pagoCuota in pago.pagoCuotas %}
+                                        {% set cuota = pagoCuota.cuota %}
+                                        <tr>
+                                            <td>{{ cuota.numeroCuota }}</td>
+                                            <td>
+                                                {% if cuota.inscripcionCarrera %}
+                                                    {{ cuota.inscripcionCarrera.carrera.nombre }}
+                                                {% elseif cuota.inscripcionEdicion %}
+                                                    {{ cuota.inscripcionEdicion.edicion.nombre }}
+                                                {% else %}
+                                                    <span class="text-muted">N/A</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>${{ pagoCuota.montoCuota|number_format(2, ',', '.') }}</td>
+                                            <td>
+                                                {% if cuota.inscripcionCarrera %}
+                                                    <span class="badge bg-info">Carrera</span>
+                                                {% elseif cuota.inscripcionEdicion %}
+                                                    <span class="badge bg-warning">Edición</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if cuota.inscripcionCarrera and cuota.inscripcionCarrera.alumno %}
+                                                    {{ cuota.inscripcionCarrera.alumno.apellido }}, {{ cuota.inscripcionCarrera.alumno.nombre }}
+                                                {% elseif cuota.inscripcionEdicion and cuota.inscripcionEdicion.alumno %}
+                                                    {{ cuota.inscripcionEdicion.alumno.apellido }}, {{ cuota.inscripcionEdicion.alumno.nombre }}
+                                                {% else %}
+                                                    <span class="text-muted">N/A</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Mostrar confirmación antes de enviar el formulario
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const monto = document.querySelector('#pago_monto')?.value;
+            const fechaPago = document.querySelector('#pago_fechaPago')?.value;
+            
+            if (!monto || monto <= 0) {
+                e.preventDefault();
+                alert('Por favor, ingrese un monto válido.');
+                return;
+            }
+            
+            if (!fechaPago) {
+                e.preventDefault();
+                alert('Por favor, seleccione una fecha de pago.');
+                return;
+            }
+            
+            // Confirmación adicional para cambios importantes
+            if (confirm('¿Está seguro de que desea actualizar este pago?')) {
+                return true;
+            } else {
+                e.preventDefault();
+                return false;
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
