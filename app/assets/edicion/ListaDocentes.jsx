@@ -31,11 +31,7 @@ export default function ListaDocentes ({ docentes, edicion }) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ esFirmante: editValues.esFirmante}),
             });
-
-            if (!res.ok) throw new Error("Error al guardar");
-            alert("Cambios guardados");
         } catch (err) {
-            alert(err.message);
         }
         setEditingRow(null);
         setEditValues({});
@@ -50,13 +46,9 @@ export default function ListaDocentes ({ docentes, edicion }) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ esFirmante: firmante}),
             });
-
-            if (!res.ok) throw new Error("Error al guardar");
-            alert("Cambios guardados");
-            window.location.reload();
         } catch (err) {
-            alert(err.message);
         }
+        window.location.reload();
     }
 
     // Desasociar docente de la edicion
@@ -66,13 +58,9 @@ export default function ListaDocentes ({ docentes, edicion }) {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             });
-
-            if (!res.ok) throw new Error("Error al guardar");
-            alert("Cambios guardados");
-            window.location.reload();
         } catch (err) {
-            alert(err.message);
         }
+        window.location.reload();
     }
     const buscarDocentes = async (query) => {
         return await fetch(`/docente/search?query=${query}`, {

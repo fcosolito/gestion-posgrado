@@ -22,12 +22,9 @@ export default function Carreras ({ asociadas, curso }){
                 headers: { "Content-Type": "application/json" },
                 });
 
-                if (!res.ok) throw new Error("Error al buscar");
-
                 const data = await res.json();
                 setCarreras(data);
             } catch (err) {
-                alert(err.message);
             }
     }
 
@@ -37,11 +34,7 @@ export default function Carreras ({ asociadas, curso }){
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 });
-
-                if (!res.ok) throw new Error("Error al asociar");
-
             } catch (err) {
-                alert(err.message);
             }
     }
 
@@ -51,11 +44,7 @@ export default function Carreras ({ asociadas, curso }){
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 });
-
-                if (!res.ok) throw new Error("Error al asociar");
-
             } catch (err) {
-                alert(err.message);
             }
     }
 
@@ -65,11 +54,7 @@ export default function Carreras ({ asociadas, curso }){
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 });
-
-                if (!res.ok) throw new Error("Error al desasociar");
-
             } catch (err) {
-                alert(err.message);
             }
     }
 

@@ -54,7 +54,6 @@ export default function BuscadorDropdown({ fetchItems, placeholder, item, setIte
             });
             setItems(formatedItems);
         } catch (err) {
-            alert(err.message);
         } finally {
             setLoading(false);
         }

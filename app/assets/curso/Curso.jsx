@@ -25,11 +25,7 @@ export default function Curso({curso, deleteFormHtml}) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(editValues),
             });
-
-            if (!res.ok) throw new Error("Error al guardar");
-            alert("Cambios guardados");
         } catch (err) {
-            alert(err.message);
         }
         window.location.reload();
     };

@@ -28,12 +28,9 @@ export default function DetalleCuotaPagos({ cuota }){
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ montoCuota: montoCuota}),
             });
-
-            if (!res.ok) throw new Error("Error al guardar");
-            alert("Cambios guardados");
             window.location.reload();
         } catch (err) {
-            alert(err.message);
+            window.location.reload();
         }
     }
 
@@ -44,11 +41,9 @@ export default function DetalleCuotaPagos({ cuota }){
             headers: { "Content-Type": "application/json" },
             });
 
-            if (!res.ok) throw new Error("Error al guardar");
-            alert("Cambios guardados");
             window.location.reload();
         } catch (err) {
-            alert(err.message);
+            window.location.reload();
         }
     }
 

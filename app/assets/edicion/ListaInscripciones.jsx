@@ -30,11 +30,7 @@ export default function ListaInscripciones ({ edicion, alumnos, descuentos }) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(editValues),
             });
-
-            if (!res.ok) throw new Error("Error al guardar");
-            alert("Cambios guardados");
         } catch (err) {
-            alert(err.message);
         }
         setEditingRow(null);
         setEditValues({});
@@ -49,11 +45,7 @@ export default function ListaInscripciones ({ edicion, alumnos, descuentos }) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(inscripcion),
             });
-
-            if (!res.ok) throw new Error("Error al guardar");
-            alert("Cambios guardados");
         } catch (err) {
-            alert(err.message);
         }
         setLimpiarAlumno(null);
         setInscripcion(null)

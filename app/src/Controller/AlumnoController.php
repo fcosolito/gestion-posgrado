@@ -116,6 +116,8 @@ final class AlumnoController extends AbstractController
             $entityManager->persist($alumno);
             $entityManager->flush();
 
+            $this->addFlash('notice', "Alumno guardado exitosamente");
+
             return $this->redirectToRoute('app_alumno_index', [], Response::HTTP_SEE_OTHER);
         }
 

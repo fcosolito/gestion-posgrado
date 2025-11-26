@@ -35,7 +35,6 @@ export default function FormBuscarCuotas ({carreraIni, cursoIni, edicionIni, alu
             
             setEdiciones(data);
         } catch (err) {
-            alert(err.message);
         }
     }
 
