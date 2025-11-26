@@ -2,8 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Alumno;
 use App\Entity\Carrera;
+use App\Entity\Cuota;
 use App\Entity\Curso;
+use App\Entity\Descuento;
+use App\Entity\InscripcionCarrera;
 use App\Entity\PerteneceA;
 use App\Form\CarreraType;
 use App\Form\CarreraSearchType;
@@ -11,7 +15,9 @@ use App\Repository\CarreraRepository;
 use App\Repository\InscripcionCarreraRepository;
 use App\Repository\PrecioCarreraRepository;
 use App\Repository\CursoRepository;
+use App\Repository\DescuentoRepository;
 use App\Repository\PerteneceARepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -107,6 +113,7 @@ final class CarreraController extends AbstractController
         InscripcionCarreraRepository $inscripcionCarreraRepository,
         PerteneceARepository $perteneceARepository,
         PrecioCarreraRepository $precioCarreraRepository,
+        DescuentoRepository $descuentoRepository,
         EntityManagerInterface $entityManager
     ): Response
     {   
@@ -126,18 +133,47 @@ final class CarreraController extends AbstractController
         // Obtenemos los alumnos inscriptos a la carrera
         $inscripciones = $inscripcionCarreraRepository->findByCarrera($carrera->getId());
         $alumnos = array_map(function($inscripcion) {
-            return $inscripcion->getAlumno();
+            $alumno = $inscripcion->getAlumno();
+            return [
+                "id" => $alumno->getId(),
+                "nombre" => $alumno->getNombre(),
+                "apellido" => $alumno->getApellido(),
+                "dni" => $alumno->getDni(),
+                "email" => $alumno->getEmail(),
+                "inscripcion" => $inscripcion->getId(),
+                "nroLegajo" => $inscripcion->getNroLegajo(),
+                "fechaInscripcion" => $inscripcion->getFechaInscripcion() ? $inscripcion->getFechaInscripcion()->format("Y-m-d") : null,
+                "descuento" => $inscripcion->getDescuento() ? $inscripcion->getDescuento()->getId() : null,
+            ];
         }, $inscripciones);
+
+        // Todos los descuentos, para poder modificar las inscripciones
+        $descuentos = array_map(
+            function (Descuento $d) {
+                return [
+                    "id" => $d->getId(),
+                    "valor" => $d->getValor(),
+                    "descripcion" => $d->getDescripcion(),
+                ];
+            }, $descuentoRepository->findAll()
+        );
+
+        // Carrera serializada, para el componente de react
+        $carrera_ser = [
+            "id" => $carrera->getId(),
+        ];
 
         //buscamos el precio vigente de la carrera
         $precioVigente = $precioCarreraRepository->findPrecioVigentePorCarrera($carrera->getId());
         
         return $this->render('carrera/show.html.twig', [
             'carrera' => $carrera,
+            'carrera_ser' => $carrera_ser,
             'inscriptosCarrera' => count($inscripciones),
             'cursosObligatorios' => $cursosObligatorios,
             'cursosElectivos' => $cursosElectivos,
             'alumnos' => $alumnos,
+            'descuentos' => $descuentos,
             'precioVigente'=> $precioVigente,
         ]);
     }
@@ -318,5 +354,63 @@ final class CarreraController extends AbstractController
             'carrera' => $carrera,
             'precios' => $precios,
         ]);
+    }
+
+    #[Route('/{id}/edit-insc/{inscripcion}', name: 'api_carrera_editar_inscripcion', methods: ['PUT'])]
+    public function editarInscripcion(
+            Request $request,
+            InscripcionCarrera $inscripcion,
+            Carrera $carrera,
+            EntityManagerInterface $entityManager,
+        ): Response
+    {
+        $descuentoR = $entityManager->getRepository(Descuento::class);
+        $inscripcionR = $entityManager->getRepository(InscripcionCarrera::class);
+
+        $data = $request->toArray();
+
+        // Obtener datos de la request
+        $descuento = $data['descuento'] ? $descuentoR->find($data['descuento']) : null;
+        $fechaInscripcion = isset($data['fechaInscripcion']) ? DateTime::createFromFormat("Y-m-d", $data['fechaInscripcion']) : new DateTime();
+        $nroLegajo = $data['nroLegajo'] ? (int) $data['nroLegajo'] : null;
+        
+        $inscripcion->setDescuento($descuento);
+        $inscripcion->setFechaInscripcion($fechaInscripcion);
+            
+        if ($nroLegajo) {
+            if (!($nroLegajo == $inscripcion->getNroLegajo()) && $inscripcionR->findOneBy(["carrera" => $carrera, "nroLegajo" => $nroLegajo])) {
+                return $this->json(["success" => false, "error" => "El legajo ya existe en la carrera."], 500);
+            } else {
+                $inscripcion->setNroLegajo($nroLegajo);
+            }
+        }
+            
+        $entityManager->persist($inscripcion);
+        $entityManager->flush();
+
+        return $this->json(["success" => true, "inscripcion" => $inscripcion->getId()]);
+
+    }
+
+    #[Route('/{id}/desinsc-alumno/{idAlumno}', name: 'api_carrera_desinscribir_alumno', methods: ['PUT'])]
+    public function desinscribirAlumno(
+            Alumno $idAlumno,
+            Carrera $carrera,
+            EntityManagerInterface $entityManager,
+        ): Response
+    {
+        $inscripcionR = $entityManager->getRepository(InscripcionCarrera::class);
+        $cuotaR = $entityManager->getRepository(Cuota::class);
+
+        $inscripcion = $inscripcionR->findOneBy(["carrera" => $carrera, "alumno" => $idAlumno]) ?? new InscripcionCarrera();
+        $cuotas = $inscripcion ? $cuotaR->findBy(["inscripcionCarrera" => $inscripcion]) : [];
+        foreach ($cuotas as $cuota) {
+            $entityManager->remove($cuota);
+        }
+
+        $entityManager->remove($inscripcion);
+        $entityManager->flush();
+
+        return $this->json(["success" => true]);
     }
 }

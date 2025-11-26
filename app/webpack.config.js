@@ -23,6 +23,7 @@ Encore
     .addEntry('app', './assets/app.js')
     .addEntry('curso_show', './assets/curso/show.js')
     .addEntry('edicion_show', './assets/edicion/show.js')
+    .addEntry('carrera_show', './assets/carrera/show.js')
     .addEntry('alumno', './assets/alumno/alumno.js')
     .addEntry('cuota_index', './assets/cuota/index.js')
 

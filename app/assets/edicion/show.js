@@ -17,9 +17,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const inscripciones_el = document.getElementById("listado-alumnos");
   if (inscripciones_el) {
     const insc_root = createRoot(inscripciones_el);
+    const edicion = JSON.parse(inscripciones_el.dataset.edicion);
     const alumnos = JSON.parse(inscripciones_el.dataset.alumnos);
     const descuentos = JSON.parse(inscripciones_el.dataset.descuentos);
-    insc_root.render(<ListaInscripciones alumnos={alumnos} descuentos={descuentos} />)
+    insc_root.render(<ListaInscripciones edicion={edicion} alumnos={alumnos} descuentos={descuentos} />)
   }
 
   const docentes_el = document.getElementById("listado-docentes");

@@ -54,6 +54,7 @@
         {# Listado de alumnos #}
         <div class="p-2">
             <div id="listado-alumnos"
+                data-edicion="{{edicion|json_encode}}"
                 data-alumnos="{{ alumnos|json_encode }}"
                 data-descuentos="{{ descuentos|json_encode }}"
             >

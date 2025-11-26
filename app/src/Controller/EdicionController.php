@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Alumno;
+use App\Entity\Cuota;
 use App\Entity\Curso;
 use App\Entity\Descuento;
 use App\Entity\Dicta;
@@ -16,6 +18,7 @@ use App\Repository\DictaRepository;
 use App\Repository\DocenteRepository;
 use App\Repository\EdicionRepository;
 use App\Repository\InscripcionEdicionRepository;
+use App\Service\CalculadorCuota;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -90,7 +93,7 @@ final class EdicionController extends AbstractController
         );
 
         $alumnos_ser = array_map(
-            function ($i) {
+            function (InscripcionEdicion $i) {
                 $alumno = $i->getAlumno();
 
                 return [
@@ -98,7 +101,9 @@ final class EdicionController extends AbstractController
                     "nombre" => $alumno->getNombre(),
                     "apellido" => $alumno->getApellido(),
                     "dni" => $alumno->getDni(),
-                    "descuento" => $i->getDescuento()->getId(),
+                    "descuento" => $i->getDescuento() ? $i->getDescuento()->getId() : null,
+                    "nroLegajo" => $i->getNroLegajo() ?? null,
+                    "fechaInscripcion" => $i->getFechaInscripcion() ? $i->getFechaInscripcion()->format("Y-m-d") : null,
                     "nota" => $i->getNota() ? $i->getNota()->getValor() : "",
                     "inscripcion" => $i->getId(),
                 ];
@@ -335,5 +340,108 @@ final class EdicionController extends AbstractController
         return $this->json([
             "success" => true,
         ]);
+    }
+
+    #[Route('/{id}/insc-alumno/{idAlumno}', name: 'api_edicion_inscribir_alumno', methods: ['PUT'])]
+    public function inscribirEdicionApi(
+            Request $request,
+            Alumno $idAlumno,
+            Edicion $edicion,
+            EntityManagerInterface $entityManager,
+        ): Response
+    {
+        $descuentoR = $entityManager->getRepository(Descuento::class);
+        $inscripcionR = $entityManager->getRepository(InscripcionEdicion::class);
+
+        $inscripcion = $inscripcionR->findOneBy(["edicion" => $edicion, "alumno" => $idAlumno]) ?? new InscripcionEdicion();
+        $data = $request->toArray();
+
+        // Obtener datos de la request
+        $descuento = $data['descuento'] ? $descuentoR->find($data['descuento']) : null;
+        $fechaInscripcion = $data['fechaInscripcion'] ? DateTime::createFromFormat("Y-m-d", $data['fechaInscripcion']) : new DateTime();
+        $nroLegajo = $data['nroLegajo'] ? (int) $data['nroLegajo'] : null;
+        
+        $inscripcion->setAlumno($idAlumno);
+        $inscripcion->setEdicion($edicion);
+        $inscripcion->setDescuento($descuento);
+        $inscripcion->setFechaInscripcion($fechaInscripcion);
+            
+        if ($nroLegajo) {
+            if ($inscripcionR->findOneBy(["edicion" => $edicion, "nroLegajo" => $nroLegajo])) {
+                return $this->json(["success" => false, "error" => "El legajo ya existe en la edicion."], 500);
+            } else {
+                $inscripcion->setNroLegajo($nroLegajo);
+            }
+        }
+            
+        // Crear una cuota asociada al alumno
+        $cuotaInscripcion = new Cuota();
+        $cuotaInscripcion->setInscripcionEdicion($inscripcion);
+        $cuotaInscripcion->setNumeroCuota(1);
+
+        $entityManager->persist($cuotaInscripcion);
+        $entityManager->persist($inscripcion);
+        $entityManager->flush();
+
+        return $this->json(["success" => true, "inscripcion" => $inscripcion->getId()]);
+
+    }
+
+    #[Route('/{id}/desinsc-alumno/{idAlumno}', name: 'api_edicion_desinscribir_alumno', methods: ['PUT'])]
+    public function desinscribirEdicionApi(
+            Request $request,
+            Alumno $idAlumno,
+            Edicion $edicion,
+            EntityManagerInterface $entityManager,
+        ): Response
+    {
+        $inscripcionR = $entityManager->getRepository(InscripcionEdicion::class);
+        $cuotaR = $entityManager->getRepository(Cuota::class);
+
+        $inscripcion = $inscripcionR->findOneBy(["edicion" => $edicion, "alumno" => $idAlumno]) ?? new InscripcionEdicion();
+        $cuota = $inscripcion && $cuotaR->findOneBy(["inscripcionEdicion" => $inscripcion]) ?
+            $cuotaR->findOneBy(["inscripcionEdicion" => $inscripcion]) : new Cuota();
+
+        $entityManager->remove($inscripcion);
+        $entityManager->remove($cuota);
+        $entityManager->flush();
+
+        return $this->json(["success" => true]);
+    }
+
+    #[Route('/{id}/edit-insc/{inscripcion}', name: 'api_edicion_editar_inscripcion', methods: ['PUT'])]
+    public function editarInscripcion(
+            Request $request,
+            InscripcionEdicion $inscripcion,
+            Edicion $edicion,
+            EntityManagerInterface $entityManager,
+        ): Response
+    {
+        $descuentoR = $entityManager->getRepository(Descuento::class);
+        $inscripcionR = $entityManager->getRepository(InscripcionEdicion::class);
+
+        $data = $request->toArray();
+
+        // Obtener datos de la request
+        $descuento = $data['descuento'] ? $descuentoR->find($data['descuento']) : null;
+        $fechaInscripcion = isset($data['fechaInscripcion']) ? DateTime::createFromFormat("Y-m-d", $data['fechaInscripcion']) : new DateTime();
+        $nroLegajo = $data['nroLegajo'] ? (int) $data['nroLegajo'] : null;
+        
+        $inscripcion->setDescuento($descuento);
+        $inscripcion->setFechaInscripcion($fechaInscripcion);
+            
+        if ($nroLegajo) {
+            if ($inscripcionR->findOneBy(["edicion" => $edicion, "nroLegajo" => $nroLegajo])) {
+                return $this->json(["success" => false, "error" => "El legajo ya existe en la edicion."], 500);
+            } else {
+                $inscripcion->setNroLegajo($nroLegajo);
+            }
+        }
+            
+        $entityManager->persist($inscripcion);
+        $entityManager->flush();
+
+        return $this->json(["success" => true, "inscripcion" => $inscripcion->getId()]);
+
     }
 }

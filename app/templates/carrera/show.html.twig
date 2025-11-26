@@ -161,6 +161,7 @@
                     </div>
                 </div>
             </div>
+            {#
             <div class="alumnos">
                 <div class="alumnos-inscriptos">
                     <div class="header">
@@ -207,6 +208,11 @@
                     </div>
                 </div>
             </div>
+            #}
+            <div class="alumnos">
+                <div id="listado-alumnos" class="alumnos-inscriptos" data-alumnos="{{ alumnos|json_encode }}" data-carrera="{{ carrera_ser|json_encode }}" data-descuentos="{{ descuentos|json_encode }}">
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -229,4 +235,7 @@
             });
         });
     </script>
+
+    {{ encore_entry_script_tags('carrera_show') }}
+    {{ encore_entry_link_tags('carrera_show') }}
 {% endblock %}
