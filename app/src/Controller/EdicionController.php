@@ -46,6 +46,8 @@ final class EdicionController extends AbstractController
             $entityManager->persist($edicion);
             $entityManager->flush();
 
+            $this->addFlash('notice', "Edicion guardada exitosamente");
+
             return $this->redirectToRoute('app_curso_show', ["id" => $cursoId->getId()], Response::HTTP_SEE_OTHER);
         }
 
@@ -86,6 +88,7 @@ final class EdicionController extends AbstractController
                     "id" => $docente->getId(),
                     "nombre" => $docente->getNombre(),
                     "apellido" => $docente->getApellido(),
+                    "dni" => $docente->getDni(),
                     "esFirmante" => $dicta->isEsFirmante(),
                 ];
             },
@@ -156,6 +159,8 @@ final class EdicionController extends AbstractController
 
         $entityManager->flush();
 
+        $this->addFlash('notice', "Edicion guardada exitosamente");
+
         return $this->json([
             'success' => true,
             'edicion' => [
@@ -175,6 +180,8 @@ final class EdicionController extends AbstractController
             $entityManager->remove($edicion);
             $entityManager->flush();
         }
+
+        $this->addFlash('notice', "Edicion eliminada exitosamente");
 
         return $this->redirectToRoute('app_curso_show', ["id" => $edicion->getCurso()->getId()], Response::HTTP_SEE_OTHER);
     }
@@ -316,6 +323,8 @@ final class EdicionController extends AbstractController
         $entityManager->persist($dicta);
         $entityManager->flush();
 
+        $this->addFlash('notice', "Asociacion guardada exitosamente");
+
         return $this->json([
             "dicta" => [
                 "docente" => $dicta->getDocente()->getNombre(),
@@ -336,6 +345,8 @@ final class EdicionController extends AbstractController
 
         $entityManager->remove($dicta);
         $entityManager->flush();
+
+        $this->addFlash('notice', "Asociacion eliminada exitosamente");
 
         return $this->json([
             "success" => true,
@@ -383,6 +394,8 @@ final class EdicionController extends AbstractController
         $entityManager->persist($inscripcion);
         $entityManager->flush();
 
+        $this->addFlash('notice', "Inscripcion guardada exitosamente");
+
         return $this->json(["success" => true, "inscripcion" => $inscripcion->getId()]);
 
     }
@@ -405,6 +418,8 @@ final class EdicionController extends AbstractController
         $entityManager->remove($inscripcion);
         $entityManager->remove($cuota);
         $entityManager->flush();
+
+        $this->addFlash('notice', "Inscripcion eliminada exitosamente");
 
         return $this->json(["success" => true]);
     }
@@ -440,6 +455,8 @@ final class EdicionController extends AbstractController
             
         $entityManager->persist($inscripcion);
         $entityManager->flush();
+
+        $this->addFlash('notice', "Inscripcion guardada exitosamente");
 
         return $this->json(["success" => true, "inscripcion" => $inscripcion->getId()]);
 

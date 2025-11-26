@@ -6,14 +6,6 @@
 
 {% block body %}
 
-    {# Mensajes Flash #}
-    {% for message in app.flashes('notice') %}
-        <div class="flash-notice">
-            <span>{{ message }}</span>
-            <button class="flash-close" onclick="this.parentElement.remove()">&times;</button>
-        </div>
-    {% endfor %}
-
     <div class="contenedor-blanco">
         <div class="cuadrado-reutilizable auto-height">
             {# Header con título y botones #}

@@ -4,14 +4,6 @@
 
 {% block body %}
 
-    {# Mensajes Flash #}
-    {% for message in app.flashes('notice') %}
-        <div class="flash-notice">
-            <span>{{ message }}</span>
-            <button class="flash-close" onclick="this.parentElement.remove()">&times;</button>
-        </div>
-    {% endfor %}
-
     <div class="contenedor-blanco" style="display: flex;">
         <div class="cuadrado-reutilizable auto-height" style="flex: 1; display: flex; flex-direction: column;">
             <div class="d-flex justify-content-between align-items-center mb-3" style="flex: 0;">
