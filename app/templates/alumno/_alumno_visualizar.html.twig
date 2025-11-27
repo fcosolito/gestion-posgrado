@@ -4,126 +4,126 @@
 
 {% block body %}
 
-    <div class="contenedor-blanco">
-        <div style="display: grid; grid-template-columns: 0.7fr 0.3fr; gap: 1.5rem; flex: 1; min-height: 0;">
-            <div style="display: flex; flex-direction: column; gap: 1.5rem; height: 100%;">
-                <div class="cuadrado-reutilizable auto-height">
-                    {# Header con título y botones #}
-                    <div id="visualizar-container">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h4 class="mb-0" id="form-title">{{ alumno.nombre }} {{ alumno.apellido }}</h4>
-                            <div class="d-flex gap-2">
-                                {# Botones para modo visualizar #}
-                                <button class="btn-azul" type="submit" form="search-form" id="btn-notas">Notas</button>
-                                <button class="btn-gris" id="btn-editar" type="button">Editar</button>
-                                {{ include('alumno/_delete_form.html.twig') }}
-                                <button class="btn-amarillo" id="btn-volver" type="button">Volver</button>
+    <div class="contenedor-blanco-grid">
+        <div style="display: flex; flex-direction: column; gap: 1.5rem; min-height: 0;">
+            <div class="cuadrado-reutilizable auto-height">
+                {# Header con título y botones #}
+                <div id="visualizar-container">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="mb-0" id="form-title">{{ alumno.nombre }} {{ alumno.apellido }}</h4>
+                        <div class="d-flex gap-2">
+                            {# Botones para modo visualizar #}
+                            <button class="btn-alternativo" type="submit" form="search-form" id="btn-notas">Notas</button>
+                            <button class="btn-amarillo" id="btn-editar" type="button">Editar</button>
+                            {{ include('alumno/_delete_form.html.twig') }}
+                            <button class="btn-gris" id="btn-volver" type="button">Volver</button>
 
-                            </div>
                         </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Nombre</div>
+                            <div style="color: #4a4a4a;">{{ alumno.nombre }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Apellido</div>
+                            <div style="color: #4a4a4a;">{{ alumno.apellido }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">DNI</div>
+                            <div style="color: #4a4a4a;">{{ alumno.dni }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Email</div>
+                            <div style="color: #4a4a4a;">{{ alumno.email }}</div>
+                        </div>
+                    </div>
+                    <div class="row g-3 pt-2">
+                        <div class="col-md-3">
+                            <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Teléfono</div>
+                            <div style="color: #4a4a4a;">{{ alumno.telefono ?? "<i>Sin registro</i>" }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Titulo de grado</div>
+                            <div style="color: #4a4a4a;">{{ alumno.tituloGrado ?? "<i>Sin registro</i>" }}</div>
+                        </div>
+                        <div class="col-md-3">
+                            <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Fecha de nacimiento</div>
+                            <div style="color: #4a4a4a;">{{ alumno.fechaNacimiento ?? "<i>Sin registro</i>" }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="editar-container" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="mb-0" id="form-title">{{ alumno.nombre }} {{ alumno.apellido }}</h4>
+                        <div class="d-flex gap-2">
+                            {# Botones para modo editar #}
+                            <button class="btn-verde" id="btn-guardar" type="submit" form="editar-form">Guardar</button>
+                            <button class="btn-rojo" id="btn-cancelar" type="button">Cancelar</button>
+                        </div>
+                    </div>
+                    {{ form_start(formEditar, {'attr': {'id': 'editar-form'}}) }}                        
                         <div class="row g-3">
                             <div class="col-md-3">
                                 <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Nombre</div>
-                                <div style="color: #4a4a4a;">{{ alumno.nombre }}</div>
+                                {{ form_widget(formEditar.nombre, {'attr': {'class': 'form-control', 'placeholder': 'Ej: Nombre', 'maxlength': '255'}}) }}
                             </div>
                             <div class="col-md-3">
                                 <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Apellido</div>
-                                <div style="color: #4a4a4a;">{{ alumno.apellido }}</div>
+                                {{ form_widget(formEditar.apellido, {'attr': {'class': 'form-control', 'placeholder': 'Ej: Apellido', 'maxlength': '255'}}) }}
                             </div>
                             <div class="col-md-3">
                                 <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">DNI</div>
-                                <div style="color: #4a4a4a;">{{ alumno.dni }}</div>
+                                {{ form_widget(formEditar.dni, {'attr': {'class': 'form-control', 'placeholder': 'Ej: 99999999', 'maxlength': '11'}}) }}
                             </div>
                             <div class="col-md-3">
                                 <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Email</div>
-                                <div style="color: #4a4a4a;">{{ alumno.email }}</div>
+                                {{ form_widget(formEditar.email, {'attr': {'class': 'form-control', 'placeholder': 'Ej: mail@ejemplo.com', 'maxlength': '255'}}) }}
                             </div>
                         </div>
                         <div class="row g-3 pt-2">
                             <div class="col-md-3">
                                 <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Telefono</div>
-                                <div style="color: #4a4a4a;">{{ alumno.telefono ?? "<i>Sin registro</i>" }}</div>
+                                {{ form_widget(formEditar.telefono, {'attr': {'class': 'form-control', 'placeholder': 'Ej: 3424223464', 'maxlength': '255'}}) }}
                             </div>
                             <div class="col-md-3">
                                 <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Titulo de grado</div>
-                                <div style="color: #4a4a4a;">{{ alumno.tituloGrado ?? "<i>Sin registro</i>" }}</div>
+                                {{ form_widget(formEditar.tituloGrado, {'attr': {'class': 'form-control', 'placeholder': 'Ej: Ingeniero en Sistemas', 'maxlength': '255'}}) }}
                             </div>
                             <div class="col-md-3">
                                 <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Fecha de nacimiento</div>
-                                <div style="color: #4a4a4a;">{{ alumno.fechaNacimiento ?? "<i>Sin registro</i>" }}</div>
+                                {{ form_widget(formEditar.fechaNacimiento, {'attr': {'class': 'form-control', }}) }}
                             </div>
                         </div>
+                    {{ form_end(formEditar) }}
+                </div>
+            </div>
+            <div style="display: flex; gap: 1.5rem; flex: 1; min-height: 0;">
+                <div class="cuadrado-reutilizable fill-remaining" style="flex: 1; display: flexbox; flex-direction: column;">
+                    <div class="d-flex justify-content-between align-items-center" style="height: fit-content; flex: 0; padding: 1.5rem 1.5rem 0 1rem; margin: 0.5rem 0rem 2rem 0rem">
+                        <h4 class="mb-0">Carreras</h4>
+                        <button class="btn-verde" id="btn-inscribir-carrera" type="button">Administrar</button>
                     </div>
-                    <div id="editar-container" style="display: none;">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h4 class="mb-0" id="form-title">{{ alumno.nombre }} {{ alumno.apellido }}</h4>
-                            <div class="d-flex gap-2">
-                                {# Botones para modo editar #}
-                                <button class="btn-verde" id="btn-guardar" type="submit" form="editar-form">Guardar</button>
-                                <button class="btn-rojo" id="btn-cancelar" type="button">Cancelar</button>
-                            </div>
-                        </div>
-                        {{ form_start(formEditar, {'attr': {'id': 'editar-form'}}) }}                        
-                            <div class="row g-3">
-                                <div class="col-md-3">
-                                    <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Nombre</div>
-                                    {{ form_widget(formEditar.nombre, {'attr': {'class': 'form-control', 'placeholder': 'Ej: Nombre', 'maxlength': '255'}}) }}
-                                </div>
-                                <div class="col-md-3">
-                                    <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Apellido</div>
-                                    {{ form_widget(formEditar.apellido, {'attr': {'class': 'form-control', 'placeholder': 'Ej: Apellido', 'maxlength': '255'}}) }}
-                                </div>
-                                <div class="col-md-3">
-                                    <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">DNI</div>
-                                    {{ form_widget(formEditar.dni, {'attr': {'class': 'form-control', 'placeholder': 'Ej: 99999999', 'maxlength': '11'}}) }}
-                                </div>
-                                <div class="col-md-3">
-                                    <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Email</div>
-                                    {{ form_widget(formEditar.email, {'attr': {'class': 'form-control', 'placeholder': 'Ej: mail@ejemplo.com', 'maxlength': '255'}}) }}
-                                </div>
-                            </div>
-                            <div class="row g-3 pt-2">
-                                <div class="col-md-3">
-                                    <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Telefono</div>
-                                    {{ form_widget(formEditar.telefono, {'attr': {'class': 'form-control', 'placeholder': 'Ej: 3424223464', 'maxlength': '255'}}) }}
-                                </div>
-                                <div class="col-md-3">
-                                    <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Titulo de grado</div>
-                                    {{ form_widget(formEditar.tituloGrado, {'attr': {'class': 'form-control', 'placeholder': 'Ej: Ingeniero en Sistemas', 'maxlength': '255'}}) }}
-                                </div>
-                                <div class="col-md-3">
-                                    <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Fecha de nacimiento</div>
-                                    {{ form_widget(formEditar.fechaNacimiento, {'attr': {'class': 'form-control', }}) }}
-                                </div>
-                            </div>
-                        {{ form_end(formEditar) }}
+                    <div id="lista-carreras"
+                        data-labels='["Carrera","Ordenanza","Implementación", "Acciones"]'
+                        data-attributes='["nombre","nro_ordenanza","nro_implementacion"]'
+                        data-rows='{{ carreras|json_encode|raw }}'>
                     </div>
                 </div>
-                <div style="display: flex; gap: 1.5rem; flex: 1; min-height: 0;">
-                    <div class="cuadrado-reutilizable fill-remaining" style="flex: 1; display: flexbox; flex-direction: column">
-                        <div class="d-flex justify-content-between align-items-center" style="height: fit-content; flex: 0; padding: 1.5rem 1.5rem 0 1rem;">
-                            <h4 class="mb-0">Carreras</h4>
-                            <button class="btn-amarillo" id="btn-inscribir-carrera" type="button">Inscribir</button>
-                        </div>
-                        <div id="lista-carreras" style="flex: 1;"
-                            data-labels='["Carrera","Ordenanza","Implementación", "Acciones"]'
-                            data-attributes='["nombre","nro_ordenanza","nro_implementacion"]'
-                            data-rows='{{ carreras|json_encode|raw }}'>
-                        </div>
+                <div class="cuadrado-reutilizable fill-remaining" style=" flex: 1; display: flexbox; flex-direction: column">
+                    <div class="d-flex justify-content-between align-items-center" style="height: fit-content; flex: 0; padding: 1.5rem 1.5rem 0 1rem; margin: 0.5rem 0rem 2rem 0rem">
+                        <h4 class="mb-0">Cursos</h4>
+                        <button class="btn-verde" id="btn-inscribir-edicion" type="button">Administrar</button>
                     </div>
-                    <div class="cuadrado-reutilizable fill-remaining" style=" flex: 1; display: flexbox; flex-direction: column">
-                        <div class="d-flex justify-content-between align-items-center" style="height: fit-content; flex: 0; padding: 1.5rem 1.5rem 0 1rem;">
-                            <h4 class="mb-0">Cursos</h4>
-                            <button class="btn-amarillo" id="btn-inscribir-edicion" type="button">Inscribir</button>
-                        </div>
-                        <div id="lista-cursos"
-                            data-labels='["Curso","Edición","Horas","Estado","Acciones"]'
-                            data-attributes='["curso","edicion","horas","estado"]'
-                            data-rows='{{ cursos|json_encode|raw }}'>
-                        </div>
+                    <div id="lista-cursos"
+                        data-labels='["Curso","Edición","Horas","Estado","Acciones"]'
+                        data-attributes='["curso","edicion","horas","estado"]'
+                        data-rows='{{ cursos|json_encode|raw }}'>
                     </div>
                 </div>
             </div>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 1.5rem; min-height: 0; margin-right: 1.5rem;">
             <div style="display: flex; flex-direction: column; gap: 1.5rem; height: 100%;">
                 <div class="cuadrado-reutilizable fill-remaining" style="padding: 0; width: 100%">
                     <h4 class="mb-0" style="padding: 1.5rem 1.5rem 0 1rem;">Cuotas</h4>

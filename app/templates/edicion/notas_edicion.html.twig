@@ -5,45 +5,51 @@
 {% block body %}
 
 <div class="contenedor-blanco" style="display: flex;">
-    <div class="cuadrado-reutilizable auto-height" style="flex: 1; display: flex; flex-direction: column;">
-        <div class="d-flex justify-content-between align-items-center mb-3" style="flex: 0;" id="main-container">
-            <h4> {{ curso.nombre }} {{ edicion.nombre }} |  Notas</h4>
-            <div class="d-flex justify-content-between align-items-right" style="flex: 0; column-gap: 0.5rem">
-                <button class="btn-gris" data-bs-toggle="modal" data-bs-target="#modalNotas">Exportar</button>
-                <button class="btn-verde" id="btn-aniadir">Añadir</button>
-                <button class="btn-amarillo" id="btn-volver">Volver</button>
-            </div>
-        </div>
-        <div id="aniadir-container" style="display: none;">
-            <div class="d-flex justify-content-between align-items-center mb-3" style="flex: 0;">
-                <div>
-                    {{ include('edicion/_form_agregarNotas.html.twig', {
-                        'inscripcionEdicionId': edicion.id|default(null),
-                        'form_id': 'nota-form'
-                    }) }}
-                </div>
-                <div class="col-md-3">
-                    <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Alumno</div>
-                    <select class="form-control" id="alumno-select" required>
-                        <option value="" disabled selected>Seleccione un alumno</option>
-                        {% for inscripcion in inscripciones %}
-                            <option value="{{ inscripcion.id }}">
-                                {{ inscripcion.alumno.nombre }} {{ inscripcion.alumno.apellido }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </div>
+    <div class="cuadrado-reutilizable fill-remaining" style="flex: 1; display: flex; flex-direction: column;">
+        <div style="flex: 0 0 auto; min-height: auto; padding: 1rem">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4> <strong>Notas</strong> | {{ curso.nombre }} {{ edicion.nombre }} </h4>
                 <div class="d-flex justify-content-between align-items-right" style="flex: 0; column-gap: 0.5rem">
-                    <button class="btn-verde" id="btn-guardar" type="submit" form="nota-form">Guardar</button>
-                    <button class="btn-rojo" id="btn-cancelar-aniadir">Cancelar</button>
+                    <button class="btn-gris" data-bs-toggle="modal" data-bs-target="#modalNotas">Exportar</button>
+                    <button class="btn-verde" id="btn-aniadir">Añadir</button>
+                    <button class="btn-amarillo" id="btn-volver">Volver</button>
+                </div>
+            </div>
+            <div id="aniadir-container" style="display: none;">
+                <div class="d-flex justify-content-between align-items-center mb-3" style="flex: 0;">
+                    <div>
+                        {{ include('edicion/_form_agregarNotas.html.twig', {
+                            'inscripcionEdicionId': edicion.id|default(null),
+                            'form_id': 'nota-form'
+                        }) }}
+                    </div>
+                    <div class="col-md-3" style="padding: 0rem 1rem">
+                        <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Alumno</div>
+                        <select class="form-control" id="alumno-select" required>
+                            <option value="" disabled selected>Seleccione un alumno</option>
+                            {% for inscripcion in inscripciones %}
+                                <option value="{{ inscripcion.id }}">
+                                    {{ inscripcion.alumno.nombre }} {{ inscripcion.alumno.apellido }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-right" style="flex: 0; column-gap: 0.5rem">
+                        <button class="btn-verde" id="btn-guardar" type="submit" form="nota-form">Guardar</button>
+                        <button class="btn-rojo" id="btn-cancelar-aniadir">Cancelar</button>
+                    </div>
                 </div>
             </div>
         </div>
-        <div id="lista-notas" style="flex: 1; margin: -1rem"
-            data-labels='["Alumno", "Nota", "Descripcion", "Fecha de carga","Acciones"]'
-            data-attributes='["alumno", "nota", "descripcion", "fecha_carga"]'
-            data-rows='{{ notas|json_encode|raw }}'>
-        </div>
+        {% if notas is empty %}
+            <div class="text-center" style="padding: 2rem; color: #888;">No hay notas registradas.</div>
+        {% else %}
+            <div id="lista-notas" style="flex: 1;"
+                data-labels='["Alumno", "Nota", "Descripcion", "Fecha de carga"]'
+                data-attributes='["alumno", "nota", "descripcion", "fecha_carga"]'
+                data-rows='{{ notas|json_encode|raw }}'>
+            </div>
+        {% endif %}
     </div>
 </div>
 
@@ -51,24 +57,24 @@
     <div class="modal fade" id="modalNotas" tabindex="-1" aria-labelledby="modalNotasLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="modalNotasLabel">Notas</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <!-- Este es el documento que se exporta de notas en formato html, luego se convierte a pdf-->
-            <div class="modal-body" id="contenido-exportar">
-                {{ include('edicion/pdf_notas.html.twig', {
-                    'edicion': edicion,
-                    'notas': notas,
-                    'fecha_emision': date()
-                }) }}
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-gris" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn-verde" onclick="window.open('{{ path('app_edicion_notas_pdf', {'id': edicion.id}) }}', '_blank')">
-                    Descargar PDF
-                </button>
-            </div>
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="modalNotasLabel">Notas</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <!-- Este es el documento que se exporta de notas en formato html, luego se convierte a pdf-->
+                <div class="modal-body" id="contenido-exportar">
+                    {{ include('edicion/pdf_notas.html.twig', {
+                        'edicion': edicion,
+                        'notas': notas,
+                        'fecha_emision': date()
+                    }) }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-gris" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn-verde" onclick="window.open('{{ path('app_edicion_notas_pdf', {'id': edicion.id}) }}', '_blank')">
+                        Descargar PDF
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -145,5 +151,7 @@
             
         });
     </script>
+    {{ encore_entry_script_tags('alumno') }}
+    {{ encore_entry_link_tags('alumno') }}
 
 {% endblock %}

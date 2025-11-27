@@ -316,7 +316,8 @@ final class AlumnoController extends AbstractController
             $carrerasData[] = [
                 'nombre' => $carrera->getNombre(),
                 'nro_ordenanza' => $carrera->getNroOrdenanza(),
-                'nro_implementacion' => $carrera->getNroImplementacion()
+                'nro_implementacion' => $carrera->getNroImplementacion(),
+                'id' => $carrera->getId()
             ];
         }
 
@@ -344,7 +345,9 @@ final class AlumnoController extends AbstractController
                 'curso' => $curso->getNombre(),
                 'edicion' => $edicion->getNombre(),
                 'estado' => $estado,
-                'horas' => $curso->getHoras()
+                'horas' => $curso->getHoras(),
+                'id_edicion' => $edicion->getId(),
+                'id_curso' => $curso->getId()
             ];
         }
 
