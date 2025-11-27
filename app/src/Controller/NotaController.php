@@ -76,14 +76,6 @@ final class NotaController extends AbstractController
     {
         if ($this->isCsrfTokenValid('delete'.$notum->getId(), $request->getPayload()->getString('_token'))) {
             try {
-                // 1. Buscar y desvincular la inscripción que referencia esta nota
-                $inscripcion = $entityManager->getRepository(InscripcionEdicion::class)
-                    ->findOneBy(['nota' => $notum]);
-                
-                if ($inscripcion) {
-                    $inscripcion->setNota(null);
-                    $entityManager->persist($inscripcion);
-                }
                 
                 // 2. Eliminar el archivo físico y la entidad DocumentacionNota
                 $documentacion = $notum->getDocumentacionNota();
@@ -110,9 +102,9 @@ final class NotaController extends AbstractController
                 $this->addFlash('notice', 'Nota y documentación eliminadas correctamente.');
                 
             } catch (\Exception $e) {
-                $this->addFlash('error', 'Error al eliminar la nota.');
+                $this->addFlash('error', `Error al eliminar la nota.`);
                 // En producción se puede loguear el error real internamente
-                // $this->logger->error('Error eliminando nota: ' . $e->getMessage());
+                //$this->logger->error('Error eliminando nota: ' . $e->getMessage());
             }
         } else {
             $this->addFlash('error', 'Token de seguridad inválido.');

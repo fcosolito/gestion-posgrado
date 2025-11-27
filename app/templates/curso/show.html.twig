@@ -11,7 +11,8 @@
     </div>
     <div class="container-fluid">
         <div class="row">
-            <div class="col-5 p-2 rounded bg-light">
+            <div class="col-6 p-2 rounded bg-light">
+            <div class="p-2">
                 <div class="row m-1">
                     <div class="col-4">
                         <h3>Ediciones</h3>
@@ -49,16 +50,19 @@
                         </div>
                     </div>
                 </div>
+                </div>
                 {% else %}
                 <p class="m-1">No hay ediciones registradas</p>
                 {% endfor %}
 
             </div>
             <div class="col-6 ms-auto p-2 rounded bg-light">
+            <div class="p-2">
                 <div id="carreras"
                     data-carreras="{{ carreras|json_encode }}"
                 >
                 </div>
+            </div>
             </div>
         </div>
     </div>

@@ -24,8 +24,8 @@
                             </h1>
                         </div>
                         {% for message in app.flashes('notice') %}
-                        <div class="p-2">
-                            <div class="flash-notice">
+                        <div class="">
+                            <div class="m-2 flash-notice">
                                 <span>{{ message }}</span>
                                 <button class="flash-close" onclick="this.parentElement.remove()">&times;</button>
                             </div>
@@ -33,8 +33,8 @@
                         {% endfor %}
 
                         {% for message in app.flashes('warning') %}
-                        <div class="p-2">
-                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <div class="">
+                            <div class="m-2 alert alert-warning alert-dismissible fade show" role="alert">
                                 {{ message|raw }}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>
@@ -42,8 +42,8 @@
                         {% endfor %}
 
                         {% for message in app.flashes('error') %}
-                        <div class="p-2">
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <div class="">
+                            <div class="m-2 alert alert-danger alert-dismissible fade show" role="alert">
                                 {{ message|raw }}
                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                             </div>

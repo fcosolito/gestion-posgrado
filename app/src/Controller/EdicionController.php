@@ -107,7 +107,6 @@ final class EdicionController extends AbstractController
                     "descuento" => $i->getDescuento() ? $i->getDescuento()->getId() : null,
                     "nroLegajo" => $i->getNroLegajo() ?? null,
                     "fechaInscripcion" => $i->getFechaInscripcion() ? $i->getFechaInscripcion()->format("Y-m-d") : null,
-                    "nota" => $i->getNota() ? $i->getNota()->getValor() : "",
                     "inscripcion" => $i->getId(),
                 ];
             },

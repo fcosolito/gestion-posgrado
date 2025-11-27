@@ -148,7 +148,6 @@ export default function ListaInscripciones ({ edicion, alumnos, descuentos }) {
                                 <th>DNI</th>
                                 <th>Legajo</th>
                                 <th>Descuento</th>
-                                <th>Nota</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
@@ -197,7 +196,6 @@ export default function ListaInscripciones ({ edicion, alumnos, descuentos }) {
                                         alumno.descuento ? descuentos.filter(d => d.id === alumno.descuento)[0].valor : 0
                                     )}
                                     </td>
-                                    <td>{alumno.nota}</td>
                                     <td>
                                         {editingRow === alumno.inscripcion ? (
                                             <div className="row">
@@ -225,7 +223,7 @@ export default function ListaInscripciones ({ edicion, alumnos, descuentos }) {
                                                 </button>
                                                 <ul className="dropdown-menu">
                                                     <li>
-                                                        <a className="dropdown-item btn btn-secondary" href={`/alumno/${alumno.id}`}>
+                                                        <a className="dropdown-item btn btn-secondary" href={`/alumno/${alumno.id}/visualizar`}>
                                                             Ver
                                                         </a>
                                                     </li>

@@ -26,9 +26,6 @@ class InscripcionEdicion
     #[ORM\JoinColumn(nullable: false)]
     private ?Edicion $edicion = null;
 
-    #[ORM\OneToOne(cascade: ['persist'])]
-    private ?Nota $nota = null;
-
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $fechaInscripcion = null;
 
@@ -72,18 +69,6 @@ class InscripcionEdicion
     public function setEdicion(?Edicion $edicion): static
     {
         $this->edicion = $edicion;
-
-        return $this;
-    }
-
-    public function getNota(): ?Nota
-    {
-        return $this->nota;
-    }
-
-    public function setNota(?Nota $nota): static
-    {
-        $this->nota = $nota;
 
         return $this;
     }

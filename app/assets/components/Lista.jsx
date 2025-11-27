@@ -6,14 +6,14 @@ export default function ListaGenerica({ labels, attributes, rows, opcionesAccion
     <div className="lista-generica">
         <div className="lista-header">
         {labels.map(label => (
-          <span key={label} className="lista-label">{label}</span>
+          <span key={label} className="fw-normal lista-label">{label}</span>
         ))}
       </div>
       <div className="lista-body">
         {rows.map((row, idx) => (
           <div className="lista-row" key={idx}>
             {attributes.map(attr => (
-              <span key={attr} className="lista-cell">{row[attr]}</span>
+              <span key={attr} className="fw-light lista-cell">{row[attr]}</span>
             ))}
             {opcionesAcciones.length > 0 && (
               <span className="lista-cell">
