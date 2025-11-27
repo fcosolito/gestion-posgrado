@@ -1,59 +1,80 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Docente index{% endblock %}
+{% block title %}Docentes{% endblock %}
 
 {% block body %}
 <div class="p-3">
-<div class="rounded bg-white vh-100 p-0">
-    <div class="row p-3">
-        <div class="col">
-            <h3>Docentes</h3>
-        </div>
-        <div class="col text-end">
-            <a class="btn btn-primary" href="{{ path('app_docente_new') }}">Nuevo</a>
-        </div>
-    </div>
-    <div class="h-100 overflow-scroll p-0">
-        <table class="table table-striped table-bordered table-hover">
-            <thead class="sticky-top table-secondary">
-                <tr>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>DNI</th>
-                    <th>Correo</th>
-                    <th>Telefono</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for docente in docentes %}
-                    <tr>
-                        <td>{{ docente.nombre }}</td>
-                        <td>{{ docente.apellido }}</td>
-                        <td>{{ docente.dni }}</td>
-                        <td>{{ docente.email }}</td>
-                        <td>{{ docente.telefono }}</td>
-                        <td>
-                            <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Acciones
-                                </button>
-                                <ul class="dropdown-menu" >
-                                    <li><a class="dropdown-item" href="{{ path('app_docente_show', {'id': docente.id}) }}">Ver</a></li>
-                                    <li><a class="dropdown-item" href="{{ path('app_docente_edit', {'id': docente.id}) }}">Editar</a></li>
-                                </ul>
-                            </div>
-                        </td>
+    <div class="cuadrado-reutilizable fill-remaining">
+        <div class="row p-3">
+            <div class="col">
+                <h4>Docentes</h4>
+            </div>
+            <div class="col-auto">
+                <div class="row">
+                    <div class="col">
+                        <button
+                            id="btn-nuevo"
+                            class="btn-verde btn-primario"
+                        >
+                            Nuevo
+                        </button>
                     </div>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="6"><i>No se registraron docentes</i></td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </div>
+            </div>
+        </div>
+            <div class="h-100 overflow-scroll p-0">
+                <table class="table table-bordered">
+                    <thead class="sticky-top table-secondary">
+                        <tr>
+                            <th class="fw-regular">Nombre</th>
+                            <th class="fw-regular">Apellido</th>
+                            <th class="fw-regular">DNI</th>
+                            <th class="fw-regular">Correo</th>
+                            <th class="fw-regular">Teléfono</th>
+                            <th class="fw-regular">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for docente in docentes %}
+                            <tr>
+                                <td class="fw-light">{{ docente.nombre}}</td>
+                                <td class="fw-light">{{ docente.apellido}}</td>
+                                <td class="fw-light">{{ docente.dni}}</td>
+                                <td class="fw-light">{{ docente.email}}</td>
+                                <td class="fw-light">{{ docente.telefono}}</td>
+                                <td style="width: 15%;">
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Acciones
+                                        </button>
+                                        <ul class="dropdown-menu" >
+                                            <li><a class="dropdown-item" href="{{ path('app_docente_show', {'id': docente.id}) }}">Ver</a></li>
+                                            <li><a class="dropdown-item" href="{{ path('app_docente_edit', {'id': docente.id}) }}">Editar</a></li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </div>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="5"><i>No se registraron docentes</i></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
-</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnNuevo = document.getElementById('btn-nuevo');
+
+        btnNuevo.addEventListener('click', () => window.location.href = "{{ path('app_docente_new') }}");
+    })
+</script>
 {% endblock %}

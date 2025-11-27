@@ -1,14 +1,42 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Registrar Docente{% endblock %}
+{% block title %}Docentes{% endblock %}
 
 {% block body %}
+<div class="p-3">
+    <div class="cuadrado-reutilizable p-3">
+        <div class="row">
+            <div class="col">
+                <h4>Nuevo docente</h4>
+            </div>
+            <div class="col-auto">
+                <div class="row">
+                    <div class="col">
+                        <button
+                            id="btn-volver"
+                            class="btn-gris btn-alternativo"
+                        >
+                            Volver
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ include('docente/_form.html.twig', {'button_label': "Registrar"}) }}
 
-<div class="p-2">
-    {{ include('docente/_form.html.twig', {'button_label': "Registrar"}) }}
-
-    <div class="m-3">
-        <a class="btn btn-secondary" href="{{ path('app_docente_index') }}">Volver</a>
+        </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnVolver = document.getElementById('btn-volver');
+
+        btnVolver.addEventListener('click', () => window.location.href = "{{ path('app_docente_index') }}");
+        
+    })
+</script>
 {% endblock %}

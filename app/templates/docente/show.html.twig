@@ -1,46 +1,109 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Docente{% endblock %}
+{% block title %}Docentes{% endblock %}
 
 {% block body %}
 <div class="p-3">
-    <div class="bg-white rounded mt-2">
-        <table class="table">
-            <tbody>
-                <tr>
-                    <th>Nombre</th>
-                    <td>{{ docente.nombre }}</td>
-                </tr>
-                <tr>
-                    <th>Apellido</th>
-                    <td>{{ docente.apellido}}</td>
-                </tr>
-                <tr>
-                    <th>DNI</th>
-                    <td>{{ docente.dni }}</td>
-                </tr>
-                <tr>
-                    <th>Correo</th>
-                    <td>{{ docente.email }}</td>
-                </tr>
-                <tr>
-                    <th>Telefono</th>
-                    <td>{{ docente.telefono }}</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="cuadrado-reutilizable p-3">
+        <div class="row">
+            <div class="col">
+                <h4>Docente</h4>
+            </div>
+            <div class="col-auto">
+                <div class="row">
+                    <div class="col">
+                        <button
+                            id="btn-volver"
+                            class="btn-gris btn-alternativo"
+                        >
+                            Volver
+                        </button>
+                    </div>
+                    <div class="col">
+                        <button
+                            id="btn-editar"
+                            class="btn-amarillo btn-secundario"
+                        >
+                            Editar
+                        </button>
+                    </div>
+                    <div class="col">
+                        <button
+                            id="btn-eliminar"
+                            class="btn-rojo btn-peligro"
+                        >
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-auto">
+                <div class="me-2">
+                    <span class="fw-bold">Nombre</span>
+                    <br>
+                    {{ docente.nombre }}
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="me-2">
+                    <span class="fw-bold">Apellido</span>
+                    <br>
+                    {{ docente.apellido }}
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="me-2">
+                    <span class="fw-bold">DNI</span>
+                    <br>
+                    {{ docente.dni }}
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="me-2">
+                    <span class="fw-bold">Correo</span>
+                    <br>
+                    {{ docente.email }}
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="me-2">
+                    <span class="fw-bold">Telefono</span>
+                    <br>
+                    {{ docente.telefono }}
+                </div>
+            </div>
+        </div>
 
-        <div class="row p-2">
-            <div class="col-auto">
-                <a class="btn btn-secondary" href="{{ path('app_docente_index') }}">Volver</a>
-            </div>
-            <div class="col-auto">
-                <a class="btn btn-secondary" href="{{ path('app_docente_edit', {'id': docente.id}) }}">Editar</a>
-            </div>
-            <div class="col-auto">
-                {{ include('docente/_delete_form.html.twig') }}
-            </div>
+        {# Eliminacion #}
+        {{ include('_modal_eliminacion.html.twig') }}
+        <div hidden>
+        {{ include('docente/_delete_form.html.twig')}}
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const nombre = "{{ docente.nombre }}";
+        const apellido = "{{ docente.apellido }}";
+        const form = document.getElementById("docente-delete-form");
+
+        const btnVolver = document.getElementById('btn-volver');
+        const btnEditar = document.getElementById('btn-editar');
+        const btnEliminar = document.getElementById('btn-eliminar');
+
+        btnVolver.addEventListener('click', () => window.location.href = "{{ path('app_docente_index') }}");
+        btnEditar.addEventListener('click', () => window.location.href = "{{ path('app_docente_edit', {'id': docente.id}) }}");
+        btnEliminar.addEventListener('click', () => mostrarModalEliminar(
+            "Confirmar eliminación",
+            "¿Esta seguro de que desea eliminar el docente?",
+            `${nombre} ${apellido}`,
+            () => form.submit()
+        ));
+    })
+</script>
 {% endblock %}
