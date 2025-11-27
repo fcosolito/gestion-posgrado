@@ -12,9 +12,9 @@ export default function Boton({
 
     // Clases según el variant (solo custom)
     const variantClasses = {
-        principal: 'btn-principal',
-        secundario: 'btn-secundario',
-        peligro: 'btn-peligro'
+        principal: 'btn-amarillo',
+        secundario: 'btn-verde',
+        peligro: 'btn-rojo'
     };
     // Determinar clases finales
     const buttonClasses = [

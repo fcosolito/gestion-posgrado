@@ -9,9 +9,9 @@
             <div class="d-flex justify-content-between align-items-center mb-3" style="flex: 0;">
                 <h4>{{ alumno.nombre }} {{ alumno.apellido }}  |  Notas</h4>
                 <div class="d-flex justify-content-between align-items-right" style="flex: 0; column-gap: 0.5rem">
-                    <button class="btn-alternativo" id="btn-exportar" data-bs-toggle="modal" data-bs-target="#modalNotas">Exportar</button>
-                    <button class="btn-secundario" id="btn-aniadir">Añadir</button>
-                    <button class="btn-principal" id="btn-volver">Volver</button>
+                    <button class="btn-gris" id="btn-exportar" data-bs-toggle="modal" data-bs-target="#modalNotas">Exportar</button>
+                    <button class="btn-verde" id="btn-aniadir">Añadir</button>
+                    <button class="btn-amarillo" id="btn-volver">Volver</button>
                 </div>
             </div>
             <div id="aniadir-container" style="display: none;">
@@ -34,8 +34,8 @@
                         </select>
                     </div>
                     <div class="d-flex justify-content-between align-items-right" style="flex: 0; column-gap: 0.5rem">
-                        <button class="btn-secundario" id="btn-guardar" type="submit" form="nota-form">Guardar</button>
-                        <button class="btn-peligro" id="btn-cancelar-aniadir">Cancelar</button>
+                        <button class="btn-verde" id="btn-guardar" type="submit" form="nota-form">Guardar</button>
+                        <button class="btn-rojo" id="btn-cancelar-aniadir">Cancelar</button>
                     </div>
                 </div>
             </div>
@@ -64,8 +64,8 @@
                 }) }}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-alternativo" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn-secundario" onclick="window.open('{{ path('app_alumno_notas_pdf', {'id': alumno.id}) }}', '_blank')">
+                <button type="button" class="btn-gris" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn-verde" onclick="window.open('{{ path('app_alumno_notas_pdf', {'id': alumno.id}) }}', '_blank')">
                     Descargar PDF
                 </button>
             </div>

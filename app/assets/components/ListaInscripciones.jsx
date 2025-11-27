@@ -8,9 +8,9 @@ export default function ListaInscripciones({ labels, attributes, rows, onAccionC
 
   const getButtonClass = (accion) => {
     if (accion === 'Inscribir') {
-      return 'btn-secundario';
+      return 'btn-verde';
     } else if (accion === 'Borrar') {
-      return 'btn-peligro';
+      return 'btn-rojo';
     }
     return 'btn-primario';
   };

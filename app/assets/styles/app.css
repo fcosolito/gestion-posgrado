@@ -51,7 +51,7 @@ body {
   box-shadow: 0 4px 4px rgba(0,0,0,0.18);
 }
 
-button.btn-principal {
+button.btn-amarillo {
   background: #f5ba04 !important;
   border: 0 !important;
   color: #fff !important;
@@ -62,12 +62,12 @@ button.btn-principal {
   min-height: 40px;
   padding: 0.5rem 1.5rem;
 }
-button.btn-principal:hover {
+button.btn-amarillo:hover {
   background: #f1cc5c !important;
   color: #fff !important;
 }
 
-button.btn-secundario {
+button.btn-verde {
   background: #67db98 !important;
   border: 0 !important;
   color: #fff !important;
@@ -78,12 +78,12 @@ button.btn-secundario {
   min-height: 40px;
   padding: 0.5rem 1.5rem;
 }
-button.btn-secundario:hover {
+button.btn-verde:hover {
   background: #a6e6c1 !important;
   color: #fff !important;
 }
 
-button.btn-alternativo {
+button.btn-gris {
   background: #c6c5c5 !important;
   border: 0 !important;
   color: #fff !important;
@@ -94,12 +94,12 @@ button.btn-alternativo {
   min-height: 40px;
   padding: 0.5rem 1.5rem;
 }
-button.btn-alternativo:hover {
+button.btn-gris:hover {
   background: #dad9d9 !important;
   color: #fff !important;
 }
 
-button.btn-peligro {
+button.btn-rojo {
   background: #f15d65 !important;
   border: 0 !important;
   color: #fff !important;
@@ -110,8 +110,40 @@ button.btn-peligro {
   min-height: 40px;
   padding: 0.5rem 1.5rem;
 }
-button.btn-peligro:hover {
+button.btn-rojo:hover {
   background: #f1a6aa !important;
+  color: #fff !important;
+}
+
+button.btn-azul {
+  background: #5e9beb !important;
+  border: 0 !important;
+  color: #fff !important;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-width: 90px;
+  min-height: 40px;
+  padding: 0.5rem 1.5rem;
+}
+button.btn-azul:hover {
+  background: #7ba7e0 !important;
+  color: #fff !important;
+}
+
+button.btn-alternativo {
+  background: #a1a1a1 !important;
+  border: 0 !important;
+  color: #fff !important;
+  border-radius: 10px;
+  font-weight: 500;
+  transition: all 0.2s;
+  min-width: 90px;
+  min-height: 40px;
+  padding: 0.5rem 1.5rem;
+}
+button.btn-alternativo:hover {
+  background: #cccccc !important;
   color: #fff !important;
 }
 
