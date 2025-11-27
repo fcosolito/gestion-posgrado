@@ -1,42 +1,183 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Pago{% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('/styles/pago/show.css') }}">
+{% endblock %}
+
+{% block title %}Pagos{% endblock %}
 
 {% block body %}
-<div class="p-3">
-    <div class="bg-white rounded mt-2">
-        <table class="table">
-            <tbody>
-                <tr>
-                    <th>Id</th>
-                    <td>{{ pago.id }}</td>
-                </tr>
-                <tr>
-                    <th>MontoPagado</th>
-                    <td>{{ pago.monto}}</td>
-                </tr>
-                <tr>
-                    <th>Fecha de Pago</th>
-                    <td>{{ pago.fechaPago ? pago.fechaPago|date('Y-m-d') : '' }}</td>
-                </tr>
-                <tr>
-                    <th>Comprobante</th>
-                    <td>{{ pago.comprobante ? pago.comprobante : "<i>Adjuntar</i>"}}</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="main-content-show-pago">
+        <div class="info-pago">
+            <div class="header-info-pago">
+                <h2 class="titulo-pago">Información del pago</h2>
+                <div class="header-show-pago-buttons">
+                    <button class="btn-alternativo" id="btn-editar" type="button">Editar</button>
+                    <button class="btn-peligro" id="btn-eliminar" type="button">Eliminar</button>
+                    <button class="btn-principal" id="btn-volver" type="button">Volver</button>
+                </div>
+            </div>
+            <dl class="data-info-pago">
+                <div class="info-item"> 
+                    <dt>Monto Total</dt>
+                    <dd>${{ pago.monto|number_format(2, ',', '.') }}</dd>
+                </div> 
+                <div class="info-item"> 
+                    <dt>Fecha de Pago</dt>
+                    <dd>{{ pago.fechaPago ? pago.fechaPago|date('d/m/Y') : 'No especificada' }}</dd>
+                </div> 
+                <div class="info-item"> 
+                    <dt>Comprobante</dt>
+                    <dd>
+                        {% if pago.comprobante and pago.comprobante.archivo %}
+                            <div class="comprobante-buttons">
+                                <a href="{{ asset('uploads/comprobantes/' ~ pago.comprobante.archivo) }}" 
+                                   target="_blank" 
+                                   class="btn-comprobante primary">
+                                    Ver
+                                </a>
+                                <a href="{{ asset('uploads/comprobantes/' ~ pago.comprobante.archivo) }}" 
+                                   download 
+                                   class="btn-comprobante">
+                                    Descargar
+                                </a>
+                            </div>
+                        {% else %}
+                            <span class="text-muted">No hay comprobante adjunto</span>
+                        {% endif %}
+                    </dd>
+                </div>
+                <div class="info-item">
+                    <dt>Alumno</dt> 
+                    <dd>
+                        {% set alumnoInfo = null %}
+                        {% for pagoCuota in pago.pagoCuotas %}
+                            {% set cuota = pagoCuota.cuota %}
+                            {% if cuota.inscripcionCarrera and cuota.inscripcionCarrera.alumno %}
+                                {% set alumnoInfo = cuota.inscripcionCarrera.alumno %}
+                            {% elseif cuota.inscripcionEdicion and cuota.inscripcionEdicion.alumno %}
+                                {% set alumnoInfo = cuota.inscripcionEdicion.alumno %}
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if alumnoInfo %}
+                            {{ alumnoInfo.apellido }}, {{ alumnoInfo.nombre }}
+                            <small class="text-muted d-block">DNI: {{ alumnoInfo.dni }}</small>
+                        {% else %}
+                            <span class="text-muted">No identificado</span>
+                        {% endif %}
+                    </dd>
+                </div> 
+                <div class="info-item"> 
+                    <dt>Total de Cuotas</dt>
+                    <dd>{{ pago.pagoCuotas|length }}</dd>
+                </div> 
+            </dl>
+        </div>
 
-        <div class="row p-2">
-            <div class="col-auto">
-                <a class="btn btn-secondary" href="{{ path('app_pago_index') }}">Volver</a>
+        {% if pago.pagoCuotas is not empty %}
+        <div class="detalle-cuotas">
+            <div class="header-cuotas">
+                <h2>Cuotas Pagadas</h2>
+                <span class="badge-cuotas">{{ pago.pagoCuotas|length }} cuota(s)</span>
             </div>
-            <div class="col-auto">
-                <a class="btn btn-secondary" href="{{ path('app_pago_edit', {'id': pago.id}) }}">Editar</a>
-            </div>
-            <div class="col-auto">
-                {{ include('pago/_delete_form.html.twig') }}
+            <div class="body-cuotas">
+                <div class="tabla-cuotas">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Concepto</th>
+                                <th>Monto</th>
+                                <th>Tipo</th>
+                                <th>Alumno</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pagoCuota in pago.pagoCuotas %}
+                                {% set cuota = pagoCuota.cuota %}
+                                <tr>
+                                    <td><strong>{{ cuota.numeroCuota }}</strong></td>
+                                    <td>
+                                        {% if cuota.inscripcionCarrera %}
+                                            <strong>Carrera:</strong> {{ cuota.inscripcionCarrera.carrera.nombre }}
+                                        {% elseif cuota.inscripcionEdicion %}
+                                            <strong>Edición:</strong> {{ cuota.inscripcionEdicion.edicion.nombre }}
+                                        {% else %}
+                                            <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>${{ pagoCuota.montoCuota|number_format(2, ',', '.') }}</td>
+                                    <td>
+                                        {% if cuota.inscripcionCarrera %}
+                                            <span class="badge badge-carrera">Carrera</span>
+                                        {% elseif cuota.inscripcionEdicion %}
+                                            <span class="badge badge-edicion">Edición</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if cuota.inscripcionCarrera and cuota.inscripcionCarrera.alumno %}
+                                            {{ cuota.inscripcionCarrera.alumno.apellido }}, {{ cuota.inscripcionCarrera.alumno.nombre }}
+                                        {% elseif cuota.inscripcionEdicion and cuota.inscripcionEdicion.alumno %}
+                                            {{ cuota.inscripcionEdicion.alumno.apellido }}, {{ cuota.inscripcionEdicion.alumno.nombre }}
+                                        {% else %}
+                                            <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-pago">
+                                <td colspan="2"><strong>TOTAL</strong></td>
+                                <td><strong>${{ pago.monto|number_format(2, ',', '.') }}</strong></td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
         </div>
+        {% endif %}
     </div>
-</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btnEditar = document.getElementById('btn-editar');
+            const btnVolver = document.getElementById('btn-volver');
+            const btnEliminar = document.getElementById('btn-eliminar');
+
+            // Botón volver - redirigir a lista de pagos
+            btnVolver.addEventListener('click', () => {
+                window.location.href = '{{ path('app_pago_index') }}';
+            });
+
+            // Cambiar a modo editar
+            btnEditar.addEventListener('click', () => {
+                window.location.href = '{{ path('app_pago_edit', {'id': pago.id}) }}';
+            });
+
+            // Eliminar pago
+            btnEliminar.addEventListener('click', () => {
+                if (confirm('¿Está seguro de que desea eliminar este pago? Esta acción no se puede deshacer.')) {
+                    // Enviar formulario de eliminación
+                    const form = document.createElement('form');
+                    form.method = 'post';
+                    form.action = '{{ path('app_pago_delete', {'id': pago.id}) }}';
+                    
+                    const token = document.createElement('input');
+                    token.type = 'hidden';
+                    token.name = '_token';
+                    token.value = '{{ csrf_token('delete' ~ pago.id) }}';
+                    
+                    form.appendChild(token);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        });
+    </script>
 {% endblock %}

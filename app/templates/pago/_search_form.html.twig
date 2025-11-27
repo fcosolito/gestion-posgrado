@@ -1,0 +1,32 @@
+{{ form_start(searchForm, {'attr': {'class': 'search-form'}}) }}
+    <div class="search-form-inputs">
+        <div>
+            {{ form_label(searchForm.alumno) }}
+            {{ form_widget(searchForm.alumno, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        
+        <div>
+            {{ form_label(searchForm.monto_min) }}
+            {{ form_widget(searchForm.monto_min, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        
+        <div>
+            {{ form_label(searchForm.monto_max) }}
+            {{ form_widget(searchForm.monto_max, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        
+        <div>
+            {{ form_label(searchForm.fecha_desde) }}
+            {{ form_widget(searchForm.fecha_desde, {'attr': {'class': 'form-control'}}) }}
+        </div>
+        
+        <div>
+            {{ form_label(searchForm.fecha_hasta) }}
+            {{ form_widget(searchForm.fecha_hasta, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="search-form-buttons">
+        {{ form_widget(searchForm.buscar, {'attr': {'class': 'btn btn-primary'}}) }}
+        <a href="{{ path('app_pago_index') }}" class="btn btn-outline-secondary">Limpiar</a>
+    </div>
+{{ form_end(searchForm) }}

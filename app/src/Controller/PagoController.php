@@ -8,6 +8,7 @@ use App\Entity\PagoCuota;
 use App\Entity\Alumno;
 use App\Entity\Cuota;
 use App\Form\PagoType;
+use App\Form\PagoSearchType;
 use App\Repository\PagoRepository;
 use App\Repository\CuotaRepository;
 use App\Repository\AlumnoRepository;
@@ -18,19 +19,32 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 #[Route('/pago')]
 final class PagoController extends AbstractController
 {
     #[Route(name: 'app_pago_index', methods: ['GET'])]
-    public function index(PagoRepository $pagoRepository): Response
+    public function index(Request $request, PagoRepository $pagoRepository): Response
     {
+        $searchForm = $this->createForm(PagoSearchType::class);
+        $searchForm->handleRequest($request);
+
+        $pagos = [];
+        
+        if ($searchForm->isSubmitted() && $searchForm->isValid()) {
+            $data = $searchForm->getData();
+            $pagos = $pagoRepository->search($data);
+        } else {
+            $pagos = $pagoRepository->findAllWithRelations();
+        }
+
         return $this->render('pago/index.html.twig', [
-            'pagos' => $pagoRepository->findAllWithRelations(),
+            'pagos' => $pagos,
+            'searchForm' => $searchForm->createView(),
         ]);
     }
- 
-#[Route('/new', name: 'app_pago_new', methods: ['GET', 'POST'])]
+    #[Route('/new', name: 'app_pago_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, AlumnoRepository $alumnoRepository): Response
     {
         $pago = new Pago();
@@ -229,13 +243,29 @@ final class PagoController extends AbstractController
     #[Route('/{id}/edit', name: 'app_pago_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Pago $pago, EntityManagerInterface $entityManager): Response
     {
+        // Guardar el nombre del archivo antiguo antes de procesar el formulario
+        $archivoAntiguo = null;
+        $comprobanteAntiguo = $pago->getComprobante();
+        if ($comprobanteAntiguo) {
+            $archivoAntiguo = $comprobanteAntiguo->getArchivo();
+        }
+
         $form = $this->createForm(PagoType::class, $pago);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Manejar el archivo del comprobante
-            $archivoFile = $form->get('comprobanteFile')->getData();
+            $archivoFile = $form->get('archivoComprobante')->getData();
+            
             if ($archivoFile) {
+                $filesystem = new Filesystem();
+                $uploadDir = $this->getParameter('comprobantes_directory');
+
+                // Eliminar el archivo antiguo si existe
+                if ($archivoAntiguo && $filesystem->exists($uploadDir . '/' . $archivoAntiguo)) {
+                    $filesystem->remove($uploadDir . '/' . $archivoAntiguo);
+                }
+
                 // Si ya existe un comprobante, actualizarlo, sino crear uno nuevo
                 $comprobante = $pago->getComprobante();
                 if (!$comprobante) {
@@ -243,11 +273,27 @@ final class PagoController extends AbstractController
                     $pago->setComprobante($comprobante);
                     $entityManager->persist($comprobante);
                 }
-                $comprobante->setArchivoFile($archivoFile);
+
+                // Generar nombre único para el nuevo archivo
+                $originalFilename = pathinfo($archivoFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$archivoFile->guessExtension();
+                
+                try {
+                    // Mover el archivo al directorio correcto
+                    $archivoFile->move($uploadDir, $newFilename);
+                    
+                    // Establecer el nombre del archivo en el comprobante
+                    $comprobante->setArchivo($newFilename);
+                    
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Error al guardar el archivo: ' . $e->getMessage());
+                }
             }
 
             $entityManager->flush();
 
+            $this->addFlash('success', 'Pago actualizado correctamente.');
             return $this->redirectToRoute('app_pago_index', [], Response::HTTP_SEE_OTHER);
         }
 
