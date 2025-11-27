@@ -9,12 +9,14 @@ export default function Index({ cuotas, carrera, curso, edicion, alumno }) {
     const [cuotaSel, setCuotaSel] = useState();
 
     return (
-        <div className="container-fluid m-0">
-            <div className="bg-white rounded p-2 mt-2">
-                <div className="row mt-2">
-                    <div className="col-1">
-                        <h3>Filtrar</h3>
+        <div className="container-fluid m-0 p-3">
+            <div className="cuadrado-reutilizable p-3">
+                <div className="row">
+                    <div className="col">
+                        <h4>Filtrar</h4>
                     </div>
+                </div>
+                <div className="row">
                     <div className="col">
                         <FormBuscarCuotas 
                             carreraIni={carrera}
@@ -26,7 +28,7 @@ export default function Index({ cuotas, carrera, curso, edicion, alumno }) {
                 </div>
             </div>
             <div className="row mt-2">
-                <div className="col-7 pe-1 vh-100">
+                <div className="col-7 pe-1" style={{ maxHeight: "80vh",}}>
                     <ListaCuotas 
                         cuotas={cuotas}
                         onSelect={setCuotaSel}

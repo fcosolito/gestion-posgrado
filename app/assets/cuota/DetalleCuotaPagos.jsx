@@ -62,15 +62,15 @@ export default function DetalleCuotaPagos({ cuota }){
 
     if (!cuota) {
         return (
-            <div className="container rounded bg-white p-3">
+            <div className="cuadrado-reutilizable bg-white p-3">
                 <div className="row">
                     <div className="col-6">
-                        <h3>Alumno</h3>
+                        <h4>Detalle de la cuota</h4>
                     </div>
                 </div>
                 <hr></hr>
                 <div className="row">
-                    <div className="col">
+                    <div className="col text-center">
                         <div>
                             <i>Seleccione una cuota para ver mas informacion</i>
                         </div>
@@ -81,41 +81,49 @@ export default function DetalleCuotaPagos({ cuota }){
     }
 
     return (
-        <div className="container rounded bg-white p-0 vh-100">
+        <div className="container cuadrado-reutilizable p-0 ">
             <div className="p-3">
             <div className="row">
                 <div className="col">
-                    <h3>Alumno</h3>
+                    <h4>Detalle de la cuota</h4>
+                </div>
+                <div className="col">
+                </div>
+            </div>
+            <hr></hr>
+            <div className="row">
+                <div className="col">
+                    <h5 className="pb-2 fw-bold">Alumno</h5>
                 </div>
                 <div className="col">
                 </div>
             </div>
             {cuota.inscripcionEdicion ? (
                 <>
-                <div className="row">
+                <div className="row mb-1">
                     <div className="col">
-                        <div><strong>Nombre</strong></div>
-                        <div>{cuota.inscripcionEdicion.alumnoNombre}</div>
+                        <div className="fw-normal">Nombre</div>
+                        <div className="fw-light">{cuota.inscripcionEdicion.alumnoNombre}</div>
                     </div>
                     <div className="col">
-                        <div><strong>Apellido</strong></div>
-                        <div>{cuota.inscripcionEdicion.alumnoApellido}</div>
+                        <div className="fw-normal">Apellido</div>
+                        <div className="fw-light">{cuota.inscripcionEdicion.alumnoApellido}</div>
+                    </div>
+                </div>
+                <div className="row mb-1">
+                    <div className="col">
+                        <div className="fw-normal">DNI</div>
+                        <div className="fw-light">{cuota.inscripcionEdicion.alumnoDni}</div>
+                    </div>
+                    <div className="col">
+                        <div className="fw-normal">Legajo</div>
+                        <div className="fw-light">{cuota.inscripcionEdicion.nroLegajo}</div>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col">
-                        <div><strong>DNI</strong></div>
-                        <div>{cuota.inscripcionEdicion.alumnoDni}</div>
-                    </div>
-                    <div className="col">
-                        <div><strong>Legajo</strong></div>
-                        <div>{cuota.inscripcionEdicion.nroLegajo}</div>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col">
-                        <div><strong>Descuento</strong></div>
-                        <div>{cuota.descuento ? cuota.descuento * 100 : 0}%</div>
+                        <div className="fw-normal">Descuento</div>
+                        <div className="fw-light">{cuota.descuento ?? 0}%</div>
                     </div>
                     <div className="col">
                     </div>
@@ -123,84 +131,84 @@ export default function DetalleCuotaPagos({ cuota }){
                 <hr></hr>
                 <div className="row">
                     <div className="col">
-                        <h3>Edicion</h3>
+                        <h5 className="pb-2 fw-bold">Edicion</h5>
+                    </div>
+                    <div className="col">
+                    </div>
+                </div>
+                <div className="row mb-1">
+                    <div className="col">
+                        <div className="fw-normal">Nombre</div>
+                        <div className="fw-light">{cuota.inscripcionEdicion.edicionNombre}</div>
                     </div>
                     <div className="col">
                     </div>
                 </div>
                 <div className="row">
                     <div className="col">
-                        <div><strong>Nombre</strong></div>
-                        <div>{cuota.inscripcionEdicion.edicionNombre}</div>
+                        <div className="fw-normal">Fecha de inicio</div>
+                        <div className="fw-light">{cuota.inscripcionEdicion.edicionFechaInicio}</div>
                     </div>
                     <div className="col">
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col">
-                        <div><strong>Fecha de Inicio</strong></div>
-                        <div>{cuota.inscripcionEdicion.edicionFechaInicio}</div>
-                    </div>
-                    <div className="col">
-                        <div><strong>Fecha de Fin</strong></div>
-                        <div>{cuota.inscripcionEdicion.edicionFechaFin ? cuota.inscripcionEdicion.edicionFechaFin : "-"}</div>
+                        <div className="fw-normal">Fecha de fin</div>
+                        <div className="fw-light">{cuota.inscripcionEdicion.edicionFechaFin ? cuota.inscripcionEdicion.edicionFechaFin : "-"}</div>
                     </div>
                 </div>
                 </>
             ) : (
                 <>
-                <div className="row">
+                <div className="row mb-1">
                     <div className="col">
-                        <div><strong>Nombre</strong></div>
-                        <div>{cuota.inscripcionCarrera.alumnoNombre}</div>
+                        <div className="fw-normal">Nombre</div>
+                        <div className="fw-light">{cuota.inscripcionCarrera.alumnoNombre}</div>
                     </div>
                     <div className="col">
-                        <div><strong>Apellido</strong></div>
-                        <div>{cuota.inscripcionCarrera.alumnoApellido}</div>
+                        <div className="fw-normal">Apellido</div>
+                        <div className="fw-light">{cuota.inscripcionCarrera.alumnoApellido}</div>
+                    </div>
+                </div>
+                <div className="row mb-1">
+                    <div className="col">
+                        <div className="fw-normal">DNI</div>
+                        <div className="fw-light">{cuota.inscripcionCarrera.alumnoDni}</div>
+                    </div>
+                    <div className="col">
+                        <div className="fw-normal">Legajo</div>
+                        <div className="fw-light">{cuota.inscripcionCarrera.nroLegajo}</div>
                     </div>
                 </div>
                 <div className="row">
                     <div className="col">
-                        <div><strong>DNI</strong></div>
-                        <div>{cuota.inscripcionCarrera.alumnoDni}</div>
-                    </div>
-                    <div className="col">
-                        <div><strong>Legajo</strong></div>
-                        <div>{cuota.inscripcionCarrera.nroLegajo}</div>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col">
-                        <div><strong>Descuento</strong></div>
-                        <div>{cuota.descuento ? cuota.descuento * 100 : 0}%</div>
+                        <div className="fw-normal">Descuento</div>
+                        <div className="fw-light">{cuota.descuento ?? 0}%</div>
                     </div>
                     <div className="col">
                     </div>
                 </div>
                 <hr></hr>
-                <div className="row">
+                <div className="row mb-1">
                     <div className="col">
-                        <h3>Carrera</h3>
+                        <h5 className="pb-2 fw-bold">Carrera</h5>
+                    </div>
+                    <div className="col">
+                    </div>
+                </div>
+                <div className="row mb-1">
+                    <div className="col">
+                        <div className="fw-normal">Nombre</div>
+                        <div className="fw-light">{cuota.inscripcionCarrera.carreraNombre}</div>
                     </div>
                     <div className="col">
                     </div>
                 </div>
                 <div className="row">
                     <div className="col">
-                        <div><strong>Nombre</strong></div>
-                        <div>{cuota.inscripcionCarrera.carreraNombre}</div>
+                        <div className="fw-normal">Ordenanza</div>
+                        <div className="fw-light">{cuota.inscripcionCarrera.carreraNroOrdenanza}</div>
                     </div>
                     <div className="col">
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col">
-                        <div><strong>Ordenanza</strong></div>
-                        <div>{cuota.inscripcionCarrera.carreraNroOrdenanza}</div>
-                    </div>
-                    <div className="col">
-                        <div><strong>Implementacion</strong></div>
-                        <div>{cuota.inscripcionCarrera.carreraNroImplementacion}</div>
+                        <div className="fw-normal">Implementación</div>
+                        <div className="fw-light">{cuota.inscripcionCarrera.carreraNroImplementacion}</div>
                     </div>
                 </div>
                 </>
@@ -210,22 +218,17 @@ export default function DetalleCuotaPagos({ cuota }){
             
             <div className="ps-0 pe-0 h-100">
             <div className="row">
-                <div className="col">
-                    <h3 className="ms-3 mb-2">Pagos</h3>
-                </div>
-                <div className="col text-end">
-                    <button className="btn btn-primary mb-2 me-3"
-                        onClick={() => {window.location.href="/pago/new";}}
-                    >
-                        Nuevo
-                    </button>
+                <div className="col-auto">
+                    <h5 className="ms-3 mb-2 fw-bold">Asociar pago a esta cuota</h5>
                 </div>
             </div>
-            <div className="row pb-2 pt-2 ms-1 form-group">
+            <div className="row pb-2 pt-2 ms-1 form-group align-items-end">
                 <div className="col">
+                    <span className="ms-1 fw-normal">Pago</span>
+                    <br className="m-2"></br>
                     <BuscadorDropdown 
                         fetchItems={fetchPagos}
-                        placeholder={"Buscar pago..."}
+                        placeholder={"Descripcion/ID"}
                         setItem={setPagoYMonto}
                         getId={(pago) => pago.id}
                         getLabel={getLabelPago}
@@ -233,33 +236,47 @@ export default function DetalleCuotaPagos({ cuota }){
                     />
                 </div>
                 <div className="col">
+                    <span className="ms-1 fw-normal">Monto asociado</span>
+                    <br className="m-2"></br>
                     <input
                         onChange={(e) => handleChange(e.target.value)}
                         type="number"
                         value={montoCuota ? montoCuota : ""}
                         className="form-control"
-                        placeholder="Monto asociado"
+                        placeholder="Monto cuota"
                     />
                 </div>
                 <div className="col text-end me-3">
                     <button
                         onClick={asociarPago}
-                        className="btn btn-secondary"
+                        className="btn-verde"
                     >
                         Asociar Pago
                     </button>
                 </div>
             </div>
+            <hr className="m-3"></hr>
+            <div className="row">
+                <div className="col-auto">
+                    <h5 className="ms-3 mb-2 fw-bold">Pagos</h5>
+                </div>
+                <div className="col text-end">
+                    <button className="btn-verde mb-2 me-3"
+                        onClick={() => {window.location.href="/pago/new";}}
+                    >
+                        Nuevo
+                    </button>
+                </div>
+            </div>
             <div className="h-100 overflow-scroll">
-                <table className="table table-striped table-bordered table-hover">
+                <table className="table table-bordered">
                     <thead className="sticky-top table-secondary">
                         <tr>
-                            <th>Id</th>
-                            <th>Fecha</th>
-                            <th>Monto</th>
-                            <th>Monto asociado</th>
-                            <th>Comprobante</th>
-                            <th>Acciones</th>
+                            <th className="fw-normal">Id</th>
+                            <th className="fw-normal">Fecha</th>
+                            <th className="fw-normal">Monto</th>
+                            <th className="fw-normal">Monto asociado</th>
+                            <th className="fw-normal">Acción</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -271,7 +288,6 @@ export default function DetalleCuotaPagos({ cuota }){
                                 <td>{pago.fechaPago}</td>
                                 <td>{pago.monto}</td>
                                 <td>{pago.montoAsociado}</td>
-                                <td>{pago.comprobanteArchivo}</td>
                                 <td>
                                     <div className="dropdown">
                                         <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -293,7 +309,7 @@ export default function DetalleCuotaPagos({ cuota }){
                                 </td>
                             </tr>
                         ))}
-                            <tr><td colSpan="6" className="text-center">Monto total asociado a la cuota: ${cuota.montoTotalAsociado}</td></tr>
+                            <tr><td colSpan="5" className="text-center">Monto total asociado a la cuota: ${cuota.montoTotalAsociado}</td></tr>
                     </tbody>
                 </table>
             </div>

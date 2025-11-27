@@ -62,7 +62,7 @@ export default function SelectorDropdown({ items, placeholder, item, setItem, ge
     <div className="position-relative" >
       <input
         type="text"
-        className={`form-control ${isSelected ? "bg-success" : ""}`}
+        className={`form-control ${isSelected ? "seleccion-buscador" : ""}`}
         placeholder={placeholder}
         disabled={!(items.length > 0)}
         value={query}

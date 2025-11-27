@@ -9,16 +9,16 @@ export default function ListaCuotas({ cuotas, onSelect }) {
     }
 
     return (
-            <div className="rounded bg-white h-100 p-3 ps-0 pe-0">
-                <h3 className="ms-3">Cuotas</h3>
-                <div className="h-75 overflow-scroll">
-                    <table className="table table-striped table-bordered table-hover">
+            <div className="cuadrado-reutilizable p-3 ps-0 pe-0">
+                <h4 className="ms-3">Cuotas</h4>
+                <div className="overflow-scroll" style={{maxHeight: "70vh",}}>
+                    <table className="table table-bordered table-hover">
                         <thead className="sticky-top table-secondary">
                             <tr>
-                                <th>Nombre</th>
-                                <th>Apellido</th>
-                                <th>Valor</th>
-                                <th>Estado</th>
+                                <th className="fw-normal">Nombre</th>
+                                <th className="fw-normal">Apellido</th>
+                                <th className="fw-normal">Valor</th>
+                                <th className="fw-normal">Estado</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -31,10 +31,10 @@ export default function ListaCuotas({ cuotas, onSelect }) {
                                             idSeleccion === cuota.id ? "table-primary" : ""
                                         }`}
                                     >
-                                        <td>{cuota.inscripcionEdicion.alumnoNombre}</td>
-                                        <td>{cuota.inscripcionEdicion.alumnoApellido}</td>
-                                        <td>{cuota.valor}</td>
-                                        <td>{cuota.estado}</td>
+                                        <td className="fw-light">{cuota.inscripcionEdicion.alumnoNombre}</td>
+                                        <td className="fw-light">{cuota.inscripcionEdicion.alumnoApellido}</td>
+                                        <td className="fw-light">{cuota.valor}</td>
+                                        <td className="fw-light">{cuota.estado}</td>
                                     </tr>
                                 ) : (
                                     <tr
@@ -44,13 +44,12 @@ export default function ListaCuotas({ cuotas, onSelect }) {
                                             idSeleccion === cuota.id ? "table-primary" : ""
                                         }`}
                                     >
-                                        <td>{cuota.inscripcionCarrera.alumnoNombre}</td>
-                                        <td>{cuota.inscripcionCarrera.alumnoApellido}</td>
-                                        <td>{cuota.valor}</td>
-                                        <td>{cuota.estado}</td>
+                                        <td className="fw-light">{cuota.inscripcionCarrera.alumnoNombre}</td>
+                                        <td className="fw-light">{cuota.inscripcionCarrera.alumnoApellido}</td>
+                                        <td className="fw-light">{cuota.valor}</td>
+                                        <td className="fw-light">{cuota.estado}</td>
                                     </tr>
                                 )
-
                             ))}
                         </tbody>
                     </table>

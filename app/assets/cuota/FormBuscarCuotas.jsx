@@ -12,11 +12,6 @@ export default function FormBuscarCuotas ({carreraIni, cursoIni, edicionIni, alu
     const isFirstRender = useRef(true);
 
     useEffect(() => {
-        //if (isFirstRender.current) {
-            //isFirstRender.current = false;
-            //return
-        //}
-
         if (!curso) {
             setEdiciones([]);
             return
@@ -103,9 +98,11 @@ export default function FormBuscarCuotas ({carreraIni, cursoIni, edicionIni, alu
     }
 
     return (
-        <div className="row">
+        <div className="row align-items-end">
             <div className="col-2">
                 <div className="p-1">
+                    <span className="ms-1 fw-normal">Carrera</span>
+                    <br className="m-2"></br>
                     <BuscadorDropdown 
                         fetchItems={fetchCarreras}
                         placeholder={"Seleccionar carrera..."}
@@ -119,6 +116,8 @@ export default function FormBuscarCuotas ({carreraIni, cursoIni, edicionIni, alu
             </div>
             <div className="col-2">
                 <div className="p-1">
+                    <span className="ms-1 fw-normal">Curso</span>
+                    <br className="m-2"></br>
                     <BuscadorDropdown
                         fetchItems={fetchCursos}
                         placeholder={"Seleccionar curso..."}
@@ -132,6 +131,8 @@ export default function FormBuscarCuotas ({carreraIni, cursoIni, edicionIni, alu
             </div>
             <div className="col-2">
                 <div className="p-1">
+                    <span className="ms-1 fw-normal">Edicion</span>
+                    <br className="m-2"></br>
                     <SelectorDropdown
                         items={ediciones}
                         placeholder={"Seleccionar edicion..."}
@@ -145,6 +146,8 @@ export default function FormBuscarCuotas ({carreraIni, cursoIni, edicionIni, alu
             </div>
             <div className="col-2">
                 <div className="p-1">
+                    <span className="ms-1 fw-normal">Alumno</span>
+                    <br className="m-2"></br>
                     <BuscadorDropdown
                         fetchItems={fetchAlumnos}
                         placeholder={"Seleccionar alumno..."}
@@ -156,20 +159,20 @@ export default function FormBuscarCuotas ({carreraIni, cursoIni, edicionIni, alu
                     />
                 </div>
             </div>
-            <div className="col-2">
+            <div className="col-auto">
                 <div className="p-1">
                     <button 
-                        className="btn btn-primary"
+                        className="btn-azul"
                         onClick={handleSubmit}
                     >
                         Filtrar
                     </button>
                 </div>
             </div>
-            <div className="col-2">
+            <div className="col-auto">
                 <div className="p-1">
                     <button 
-                        className="btn btn-secondary"
+                        className="btn btn-alternativo"
                         onClick={handleLimpiar}
                     >
                         Limpiar
