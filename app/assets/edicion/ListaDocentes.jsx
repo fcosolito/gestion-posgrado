@@ -19,7 +19,6 @@ export default function ListaDocentes ({ docentes, edicion }) {
     }
 
     const handleChange = (field, value) => {
-        console.log(`handleChange(${field}, ${value})`);
         setEditValues((prev) => ({ ...prev, [field]: value }));
     };
 

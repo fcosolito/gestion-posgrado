@@ -19,7 +19,6 @@ const el = document.getElementById("sidebar-root");
 if (el) {
   const path = el.dataset.path;
   const page = `/${path.split("/")[1]}`;
-  console.log(page)
   const root = createRoot(el);
   root.render(<Sidebar initialPage={page} />);
 }
