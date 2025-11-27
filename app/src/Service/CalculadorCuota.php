@@ -12,6 +12,30 @@ class CalculadorCuota
 
     public function calcularEstado(Cuota $cuota): string
     {
+            /*
+            $pagosCuota = [];
+            $montoPagar = 0;
+            $montoPagado = 0;
+            $contadorPagos = 0;
+            foreach ($pagoCuotas as $pago) {
+                if ($pago->getCuota()->getId() === $cuota->getId()) {
+                    $pagosCuota[] = $pago;
+                    $montoPagar = $pago->getMontoCuota();
+                    $montoPagado += $pago->getPago()->getMonto();
+                    $contadorPagos += 1;
+                }
+            }
+            
+            if($contadorPagos === 0){
+                $estadoPago = 'Pendiente';
+            } elseif ($montoPagado >= $montoPagar) {
+                $estadoPago = 'Paga'; 
+            } elseif ($montoPagado === 0) {
+                $estadoPago = 'Pendiente';
+            } else {
+                $estadoPago = 'Faltante';
+            }
+            */
         $pagoCuotas = $this->pagoCuotaR->findBy(["cuota" => $cuota]);
         $montoPagado = 0;
         $contadorPagos = 0;

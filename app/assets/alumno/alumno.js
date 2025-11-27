@@ -132,7 +132,26 @@ document.addEventListener("DOMContentLoaded", () => {
             row.id,
             tipo
           );
-        } 
+        } else {
+          // Mostrar modal de confirmación simple si no hay cuotas
+          window.mostrarModalEliminar(
+            'Confirmar eliminación',
+            `¿Está seguro de que desea eliminar la inscripción a ${row.nombre}? También se eliminarán las <strong>notas</strong> asociadas.`,
+            `No hay cuotas asociadas a esta inscripción.`,
+            () => {
+              // Crear y enviar formulario POST para eliminación
+              const form = document.createElement('form');
+              form.method = 'POST';
+              if (tipo === 'carrera') {
+                form.action = `/alumno/${alumnoId}/desinscribir-carrera/${row.id}`;
+              } else if (tipo === 'edicion') {
+                form.action = `/alumno/${alumnoId}/desinscribir-edicion/${row.id}`;
+              }
+              document.body.appendChild(form);
+              form.submit();
+            }
+          );
+        }
       }
     };
     
@@ -160,9 +179,9 @@ document.addEventListener("DOMContentLoaded", () => {
           const nota = rows[rowIndex];
           const datosNota = `${nota.nota} ${nota.descripcion || 'Sin descripción'} cargada el ${nota.fecha_carga}`;
           
-          mostrarModalConfirmacion(
+          window.mostrarModalEliminar(
             'Confirmar eliminación',
-            '¿Está seguro de que desea eliminar la nota?',
+            '¿Está seguro de que desea eliminar la nota y su documentación asociada?',
             datosNota,
             () => {
               const container = document.getElementById(`delete-form-${nota.id}`);
@@ -183,5 +202,37 @@ document.addEventListener("DOMContentLoaded", () => {
     root.render(<ListaNotas labels={labels} attributes={attributes} rows={rows} opcionesAcciones={opcionesAcciones} />);
   }
 
+  //TODO revisar esto es para la seleccion de descuento a la hora de inscribir a carrera
+  const descuentoSelect = document.getElementById('descuento-select');
+  const descuentoValorHidden = document.getElementById('descuento-valor-hidden');
+  const descripcionDescuentoHidden = document.getElementById('descripcion-descuento-hidden');
+  const infoDescuento = document.getElementById('info-descuento');
+  const valorTexto = document.getElementById('valor-texto');
+  const descripcionTexto = document.getElementById('descripcion-texto');
+  
+  if (descuentoSelect) {
+    descuentoSelect.addEventListener('change', function() {
+        const selectedOption = this.options[this.selectedIndex];
+        
+        if (selectedOption.value) {
+            const valor = selectedOption.getAttribute('data-valor');
+            const descripcion = selectedOption.getAttribute('data-descripcion');
+            
+            // Actualizar campos ocultos
+            descuentoValorHidden.value = valor;
+            descripcionDescuentoHidden.value = descripcion;
+           
+            // Mostrar información
+            valorTexto.textContent = valor;
+            descripcionTexto.textContent = descripcion;
+            infoDescuento.style.display = 'block';
+        } else {
+            // Resetear valores
+            descuentoValorHidden.value = '0';
+            descripcionDescuentoHidden.value = '';
+            infoDescuento.style.display = 'none';
+        }
+    });
+  }
 
 });

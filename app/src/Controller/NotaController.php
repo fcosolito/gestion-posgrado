@@ -75,7 +75,6 @@ final class NotaController extends AbstractController
     public function delete(Request $request, Nota $notum, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$notum->getId(), $request->getPayload()->getString('_token'))) {
-            
             try {
                 // 1. Buscar y desvincular la inscripción que referencia esta nota
                 $inscripcion = $entityManager->getRepository(InscripcionEdicion::class)
@@ -100,6 +99,7 @@ final class NotaController extends AbstractController
                     // Desvincular y eliminar entidad DocumentacionNota
                     $notum->setDocumentacionNota(null);
                     $entityManager->persist($notum);
+                    $entityManager->flush(); // Flush to update FK before deleting
                     $entityManager->remove($documentacion);
                 }
                 
@@ -107,11 +107,11 @@ final class NotaController extends AbstractController
                 $entityManager->remove($notum);
                 $entityManager->flush();
                 
-                $this->addFlash('success', 'Nota y documentación eliminadas correctamente.');
+                $this->addFlash('notice', 'Nota y documentación eliminadas correctamente.');
                 
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Error al eliminar la nota.');
-                // En producción podrías loguear el error real internamente
+                // En producción se puede loguear el error real internamente
                 // $this->logger->error('Error eliminando nota: ' . $e->getMessage());
             }
         } else {
