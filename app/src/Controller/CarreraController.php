@@ -76,6 +76,8 @@ final class CarreraController extends AbstractController
             $entityManager->persist($carrera);
             $entityManager->flush();
 
+            $this->addFlash('notice', 'Carrera creada exitosamente');
+
             return $this->redirectToRoute('app_carrera_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -193,6 +195,8 @@ final class CarreraController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
+            $this->addFlash('notice', 'Carrera guardada exitosamente');
+
             return $this->redirectToRoute('app_carrera_index', [], Response::HTTP_SEE_OTHER);
         }
         
@@ -249,6 +253,8 @@ final class CarreraController extends AbstractController
         $entityManager->persist($pertenece);
         $entityManager->flush();
 
+        $this->addFlash('notice', 'Curso asociado exitosamente');
+
         return $this->redirectToRoute('app_carrera_edit', ['id' => $carrera->getId()]);
     }
 
@@ -284,6 +290,8 @@ final class CarreraController extends AbstractController
 
         $entityManager->persist($pertenece);
         $entityManager->flush();
+
+        $this->addFlash('notice', 'Curso asociado exitosamente');
 
         return $this->redirectToRoute('app_carrera_edit', ['id' => $carrera->getId()]);        
     }
