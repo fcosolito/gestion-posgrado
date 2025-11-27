@@ -19,8 +19,9 @@ const el = document.getElementById("sidebar-root");
 if (el) {
   const path = el.dataset.path;
   const page = `/${path.split("/")[1]}`;
+  const initialPage = (page === '/edicion') ? '/curso' : page;
   const root = createRoot(el);
-  root.render(<Sidebar initialPage={page} />);
+  root.render(<Sidebar initialPage={initialPage} />);
 }
 
 // Variables globales para el modal de confirmación reutilizable
