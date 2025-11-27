@@ -1,41 +1,24 @@
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-4">
-            <div class="bg-white rounded p-2 mt-2">
-                {{ form_start(form) }}
-                <div class="row mt-2 mb-2">
-                    <div class="col-4">
-                        Valor
-                    </div>
-                    <div class="col-2">
-                        {{ form_widget(form.valor) }}
-                    </div>
-                </div>
-                <div class="row mt-2 mb-2">
-                    <div class="col-4">
-                        Descripcion
-                    </div>
-                    <div class="col">
-                        {{ form_widget(form.descripcion) }}
-                    </div>
-                </div>
-                <div class="row mt-2 mb-2">
-                    <div class="col-4">
-                    </div>
-                    <div class="col">
-                        <div class="row">
-                            <div class="col">
-                                <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
-                            </div>
-                            <div class="col">
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {{ form_end(form) }}
-            </div>
+{{ form_start(form) }}
+<div class="row align-items-start">
+    <div class="col-auto">
+        <div class="me-2">
+            <span class="fw-bold mb-2">Descripcion</span>
+            <br class="m-2">
+            {{ form_widget(form.descripcion, {'attr': {'class': 'form-control'}}) }}
         </div>
     </div>
-    
+    <div class="col-auto">
+        <div class="me-2">
+            <span class="fw-bold mb-2">Valor</span>
+            <br class="m-2">
+            {{ form_widget(form.valor, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="col-auto">
+        <div class="me-2">
+            <button class="btn-verde">{{ button_label|default('Save') }}</button>
+        </div>
+    </div>
 </div>
+
+{{ form_end(form) }}

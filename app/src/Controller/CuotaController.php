@@ -129,17 +129,22 @@ final class CuotaController extends AbstractController
         $cuotas_ser = array_map(
             function (Cuota $cuota) use ($pagoCuotaR, $calculadorCuota) {
                 $pagoCuotas = $pagoCuotaR->findBy(["cuota" => $cuota]);
-                $pagos_ser = array_map(
-                    function (PagoCuota $pagoCuota) {
-                        return [
+                $pagos_ser = [];
+                $montoTotal = 0;
+                foreach ($pagoCuotas as $pagoCuota) {
+                    $montoAsociado = $pagoCuota->getMontoCuota();
+                    $montoTotal += $montoAsociado;
+
+                    $pagos_ser[] = [
                             "id" => $pagoCuota->getPago()->getId(),
                             "fechaPago" => $pagoCuota->getPago()->getFechaPago()->format("Y-m-d"),
                             "monto" => $pagoCuota->getPago()->getMonto(),
+                            "montoAsociado" => $montoAsociado,
                             "comprobanteArchivo" => $pagoCuota->getPago()->getComprobante()->getArchivo(),
                             "comprobanteId" => $pagoCuota->getPago()->getComprobante()->getId(),
                         ];
-                    }, $pagoCuotas
-                );
+                }
+
                 $inscCarrera = $cuota->getInscripcionCarrera();
                 $inscEdicion = $cuota->getInscripcionEdicion();
 
@@ -169,6 +174,7 @@ final class CuotaController extends AbstractController
                     ] : null,
                     "numeroCuota" => $cuota->getNumeroCuota(),
                     "pagos" => $pagos_ser,
+                    "montoTotalAsociado" => $montoTotal,
                     "valor" => $calculadorCuota->calcularValor($cuota),
                     "estado" => $calculadorCuota->calcularEstado($cuota),
                     "descuento" => $inscCarrera ? ($inscCarrera->getDescuento() ? $inscCarrera->getDescuento()->getValor() : null) : (

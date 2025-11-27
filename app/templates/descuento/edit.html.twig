@@ -1,21 +1,66 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Editar Descuento{% endblock %}
+{% block title %}Descuentos{% endblock %}
 
 {% block body %}
-<div class="p-2">
-    {{ include('descuento/_form.html.twig', {'button_label': 'Guardar'}) }}
-
-    <div class="row p-2">
-        <div class="col-auto">
-            <a class="btn btn-secondary" href="{{ path('app_descuento_index') }}">Volver</a>
+<div class="p-3">
+    <div class="cuadrado-reutilizable p-3">
+        <div class="row">
+            <div class="col">
+                <h4>Editar descuento</h4>
+            </div>
+            <div class="col-auto">
+                <div class="row">
+                    <div class="col">
+                        <button
+                            id="btn-volver"
+                            class="btn-gris btn-alternativo"
+                        >
+                            Volver
+                        </button>
+                    </div>
+                    <div class="col">
+                        <button
+                            id="btn-eliminar"
+                            class="btn-rojo btn-peligro"
+                        >
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-auto">
-            {{ include('descuento/_delete_form.html.twig') }}
+        <div class="p-2">
+            {{ include('descuento/_form.html.twig', {'button_label': 'Guardar'}) }}
+        </div>
+        {# Eliminacion #}
+        {{ include('_modal_eliminacion.html.twig') }}
+        <div hidden>
+        {{ include('descuento/_delete_form.html.twig')}}
         </div>
     </div>
 </div>
 
 
+{% endblock %}
 
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const id = "{{ descuento.id }}";
+        const descripcion = "{{ descuento.descripcion }}";
+        const form = document.getElementById("descuento-delete-form");
+
+        const btnVolver = document.getElementById('btn-volver');
+        const btnEliminar = document.getElementById('btn-eliminar');
+
+        btnVolver.addEventListener('click', () => window.location.href = "{{ path('app_descuento_index') }}");
+        btnEliminar.addEventListener('click', () => mostrarModalEliminar(
+            "Confirmar eliminación",
+            "¿Esta seguro de que desea eliminar el descuento?",
+            descripcion,
+            () => form.submit()
+        ));
+    })
+</script>
 {% endblock %}

@@ -1,30 +1,89 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Descuento{% endblock %}
+{% block title %}Descuentos{% endblock %}
 
 {% block body %}
-    <h1>Descuento</h1>
+<div class="p-3">
+    <div class="cuadrado-reutilizable p-3">
+        <div class="row">
+            <div class="col">
+                <h4>Descuento</h4>
+            </div>
+            <div class="col-auto">
+                <div class="row">
+                    <div class="col">
+                        <button
+                            id="btn-volver"
+                            class="btn-gris btn-alternativo"
+                        >
+                            Volver
+                        </button>
+                    </div>
+                    <div class="col">
+                        <button
+                            id="btn-editar"
+                            class="btn-amarillo btn-secundario"
+                        >
+                            Editar
+                        </button>
+                    </div>
+                    <div class="col">
+                        <button
+                            id="btn-eliminar"
+                            class="btn-rojo btn-peligro"
+                        >
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-auto">
+                <div class="me-2">
+                    <span class="fw-bold">Descripcion</span>
+                    <br>
+                    {{ descuento.descripcion }}
+                </div>
+            </div>
+            <div class="col-auto">
+                <div class="me-2">
+                    <span class="fw-bold">Valor</span>
+                    <br>
+                    {{ descuento.valor }}
+                </div>
+            </div>
+        </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ descuento.id }}</td>
-            </tr>
-            <tr>
-                <th>Descripcion</th>
-                <td>{{ descuento.descripcion }}</td>
-            </tr>
-            <tr>
-                <th>Valor</th>
-                <td>{{ descuento.valor }}</td>
-            </tr>
-        </tbody>
-    </table>
+        {# Eliminacion #}
+        {{ include('_modal_eliminacion.html.twig') }}
+        <div hidden>
+        {{ include('descuento/_delete_form.html.twig')}}
+        </div>
+    </div>
+</div>
 
-    <a href="{{ path('app_descuento_index') }}">back to list</a>
+{% endblock %}
 
-    <a href="{{ path('app_descuento_edit', {'id': descuento.id}) }}">edit</a>
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const id = "{{ descuento.id }}";
+        const descripcion = "{{ descuento.descripcion }}";
+        const form = document.getElementById("descuento-delete-form");
 
-    {{ include('descuento/_delete_form.html.twig') }}
+        const btnVolver = document.getElementById('btn-volver');
+        const btnEditar = document.getElementById('btn-editar');
+        const btnEliminar = document.getElementById('btn-eliminar');
+
+        btnVolver.addEventListener('click', () => window.location.href = "{{ path('app_descuento_index') }}");
+        btnEditar.addEventListener('click', () => window.location.href = "{{ path('app_descuento_edit', {'id': descuento.id}) }}");
+        btnEliminar.addEventListener('click', () => mostrarModalEliminar(
+            "Confirmar eliminación",
+            "¿Esta seguro de que desea eliminar el descuento?",
+            descripcion,
+            () => form.submit()
+        ));
+    })
+</script>
 {% endblock %}

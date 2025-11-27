@@ -89,10 +89,18 @@ export default function ListaDocentes ({ docentes, edicion }) {
                             </div>
                             <div className="col">
                                 <button 
-                                    className="btn btn-primary"
+                                    className="btn btn-verde"
                                     onClick={handleAsociar}
                                 >
                                     Asociar
+                                </button>
+                            </div>
+                            <div className="col">
+                                <button 
+                                    className="btn btn-verde"
+                                    onClick={() => window.location.href = `/docente/new`}
+                                >
+                                    Nuevo
                                 </button>
                             </div>
                         </div>

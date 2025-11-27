@@ -41,20 +41,6 @@ class InscripcionEdicionRepository extends ServiceEntityRepository
 
         return $cursos;
     }
-
-    public function findByEdicionConNota(Edicion $edicion) {
-        $inscripciones = $this->createQueryBuilder('ie')
-            ->leftJoin('ie.nota', 'n')
-            ->addSelect('n')
-            ->where('ie.edicion = :edicion')
-            ->setParameter('edicion', $edicion->getId())
-            ->getQuery()
-            ->getResult()
-        ;
-
-        return $inscripciones;
-    }
-
     //    /**
     //     * @return InscripcionEdicion[] Returns an array of InscripcionEdicion objects
     //     */

@@ -110,7 +110,7 @@ final class EdicionController extends AbstractController
                     "inscripcion" => $i->getId(),
                 ];
             },
-            $inscripcionRepository->findByEdicionConNota($edicion)
+            $inscripcionRepository->findBy(["edicion" => $edicion])
         );
 
         $edicion_ser = [

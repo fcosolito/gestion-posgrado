@@ -255,8 +255,9 @@ export default function DetalleCuotaPagos({ cuota }){
                     <thead className="sticky-top table-secondary">
                         <tr>
                             <th>Id</th>
-                            <th>Monto</th>
                             <th>Fecha</th>
+                            <th>Monto</th>
+                            <th>Monto asociado</th>
                             <th>Comprobante</th>
                             <th>Acciones</th>
                         </tr>
@@ -267,8 +268,9 @@ export default function DetalleCuotaPagos({ cuota }){
                                 key={pago.id}
                             >
                                 <td>{pago.id}</td>
-                                <td>{pago.monto}</td>
                                 <td>{pago.fechaPago}</td>
+                                <td>{pago.monto}</td>
+                                <td>{pago.montoAsociado}</td>
                                 <td>{pago.comprobanteArchivo}</td>
                                 <td>
                                     <div className="dropdown">
@@ -290,8 +292,8 @@ export default function DetalleCuotaPagos({ cuota }){
                                     </div>
                                 </td>
                             </tr>
-
                         ))}
+                            <tr><td colSpan="6" className="text-center">Monto total asociado a la cuota: ${cuota.montoTotalAsociado}</td></tr>
                     </tbody>
                 </table>
             </div>
