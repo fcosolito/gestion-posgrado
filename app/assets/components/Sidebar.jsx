@@ -1,4 +1,11 @@
+import { useState } from 'react';
+
 export default function Sidebar({ initialPage }) {
+    const [selPage, setSelPage] = useState(initialPage);
+
+    const changePage = (page) => {
+
+    }
 
     const items = [
         {
@@ -50,7 +57,7 @@ export default function Sidebar({ initialPage }) {
 
                             <a 
                                 href={item.path} 
-                                className={"nav-link text-black " + (initialPage === item.path ? "bg-grey" : "")}
+                                className={"nav-link pagina-sidebar" + (initialPage === item.path ? " color-titulo" : " text-black")}
                             >
                                 {item.name}
                             </a>

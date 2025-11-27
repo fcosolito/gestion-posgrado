@@ -17,9 +17,11 @@ import ListaNotas from './components/ListaNotas.jsx';
 
 const el = document.getElementById("sidebar-root");
 if (el) {
-  const initialPage = el.dataset.page || "/alumno"; // Symfony puede inyectar datos acá
+  const path = el.dataset.path;
+  const page = `/${path.split("/")[1]}`;
+  console.log(page)
   const root = createRoot(el);
-  root.render(<Sidebar initialPage={initialPage} />);
+  root.render(<Sidebar initialPage={page} />);
 }
 
 // Variables globales para el modal de confirmación reutilizable

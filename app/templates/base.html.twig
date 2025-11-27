@@ -14,7 +14,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-auto p-0 vh-100">
-                    <div id="sidebar-root" data-page="{{ currentPage|default('/alumno') }}"></div>
+                    <div id="sidebar-root" data-path="{{ app.request.pathInfo }}"></div>
                 </div>
                 <div class="col p-4 vh-100 overflow-scroll" id="main-content">
                     <div class="main-content ">

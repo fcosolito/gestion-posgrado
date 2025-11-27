@@ -33,6 +33,10 @@ body {
 .bg-secundario:hover {
   background-color: #54738d;
 }
+
+.pagina-sidebar:hover {
+  text-decoration: underline;
+}
 /*-------------CSS VALE-------------*/
 
 .boton-base {
