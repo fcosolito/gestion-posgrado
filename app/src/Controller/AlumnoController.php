@@ -10,6 +10,7 @@ use App\Entity\Edicion;
 use App\Entity\Cuota;
 use App\Entity\DocumentacionNota;
 use App\Entity\Descuento;
+use App\Entity\PerteneceA;
 use App\Form\AlumnoType;
 use App\Entity\Nota;
 use App\Form\NotaType;
@@ -371,28 +372,26 @@ final class AlumnoController extends AbstractController
         foreach ($cuotas as $cuota) {
 
             $pagosCuota = [];
+            $montoPagar = 0;
             $montoPagado = 0;
             $contadorPagos = 0;
-            foreach ($pagoCuotas as $pagoCuota) {
-                if ($pagoCuota->getCuota()->getId() === $cuota->getId()) {
-                    $pagosCuota[] = $pagoCuota;
-                    // Sumar el monto de cada PagoCuota (que es la parte del pago asignada a esta cuota)
-                    $montoPagado += $pagoCuota->getMontoCuota();
+            foreach ($pagoCuotas as $pago) {
+                if ($pago->getCuota()->getId() === $cuota->getId()) {
+                    $pagosCuota[] = $pago;
+                    $montoPagar = $pago->getMontoCuota();
+                    $montoPagado += $pago->getPago()->getMonto();
                     $contadorPagos += 1;
                 }
             }
             
-            // Determinar el estado de pago
-            // Nota: Como no tenemos el monto exacto que se debe pagar por la cuota,
-            // asumimos que si hay pagos registrados, la cuota está pagada
             if($contadorPagos === 0){
                 $estadoPago = 'Pendiente';
-            } elseif ($montoPagado > 0) {
-                // Si hay pagos con monto mayor a 0, consideramos la cuota como pagada
-                // En el futuro, esto debería compararse con el monto real de la cuota
+            } elseif ($montoPagado >= $montoPagar) {
                 $estadoPago = 'Paga'; 
-            } else {
+            } elseif ($montoPagado === 0) {
                 $estadoPago = 'Pendiente';
+            } else {
+                $estadoPago = 'Faltante';
             }
 
 
@@ -591,9 +590,13 @@ final class AlumnoController extends AbstractController
             return 0;
         });
 
+        // Obtener descuentos para seleccionar a la hora de inscribir
+        $descuentos = $entityManager->getRepository(Descuento::class)->findAll();
+
         return $this->render('alumno/inscribirCarrera.html.twig', [
             'alumno' => $alumno,
             'carrerasData' => $carrerasData,
+            'descuentos' => $descuentos,
         ]);
     }
 
@@ -840,13 +843,14 @@ final class AlumnoController extends AbstractController
             return 0;
         });
 
+        // Obtener descuentos para seleccionar a la hora de inscribir
+        $descuentos = $entityManager->getRepository(Descuento::class)->findAll();
+
         return $this->render('alumno/inscribirEdicion.html.twig', [
             'alumno' => $alumno,
             'edicionesData' => $edicionesData,
+            'descuentos' => $descuentos,
         ]);
-
-        
-
 
     }
 
@@ -871,6 +875,21 @@ final class AlumnoController extends AbstractController
         if ($inscripcionExistente) {
             $this->addFlash('warning', 'El alumno ya está inscripto en esta edición');
         } else {
+            // Obtener el curso de la edición
+            $curso = $edicion->getCurso();
+            
+            // Verificar si el alumno está inscripto en alguna carrera a la que pertenece el curso
+            $carreraInscripta = $entityManager->createQueryBuilder()
+                ->select('ic')
+                ->from(InscripcionCarrera::class, 'ic')
+                ->join('ic.carrera', 'c')
+                ->join(PerteneceA::class, 'pa', 'WITH', 'pa.carrera = c AND pa.curso = :curso')
+                ->where('ic.alumno = :alumno')
+                ->setParameter('alumno', $alumno)
+                ->setParameter('curso', $curso)
+                ->getQuery()
+                ->getOneOrNullResult();
+            
             // Crear la nueva inscripción
             $inscripcion = new InscripcionEdicion();
             $inscripcion->setAlumno($alumno);
@@ -896,10 +915,14 @@ final class AlumnoController extends AbstractController
             $entityManager->persist($inscripcion);
             $entityManager->flush();
 
-            // Creamos las cuotas correspondientes a la edición
-            $this->crearCuotasParaEdicion($inscripcion, $entityManager);
-
-            $this->addFlash('notice', 'Alumno inscripto exitosamente en ' . $edicion->getNombre());
+            // Crear cuotas solo si no está inscripto en la carrera correspondiente
+            if ($carreraInscripta) {
+                $this->addFlash('notice', 'Alumno inscripto exitosamente en ' . $edicion->getNombre() . '. No se crearon cuotas ya que está inscripto en la carrera correspondiente.');
+            } else {
+                // Creamos las cuotas correspondientes a la edición
+                $this->crearCuotasParaEdicion($inscripcion, $entityManager);
+                $this->addFlash('notice', 'Alumno inscripto exitosamente en ' . $edicion->getNombre() . '. Se creó una cuota correspondiente.');
+            }
         }
 
         return $this->redirectToRoute('app_alumno_inscribir_edicion_view', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
@@ -952,6 +975,34 @@ final class AlumnoController extends AbstractController
         if (!$inscripcion) {
             $this->addFlash('warning', 'El alumno no está inscripto en esta edicion');
         } else {
+            // Eliminar las notas asociadas a la inscripción
+            $notas = $entityManager->getRepository(\App\Entity\Nota::class)
+                ->findBy(['inscripcionEdicion' => $inscripcion]);
+            
+            foreach ($notas as $nota) {
+                // Eliminar documentación asociada a la nota
+                $documentacion = $nota->getDocumentacionNota();
+                if ($documentacion) {
+                    $uploadDir = $this->getParameter('documentos_notas_directory');
+                    $archivoPath = $uploadDir . '/' . $documentacion->getArchivo();
+                    
+                    // Eliminar archivo físico si existe
+                    if (file_exists($archivoPath)) {
+                        unlink($archivoPath);
+                    }
+                    
+                    // Desvincular la documentación de la nota
+                    $nota->setDocumentacionNota(null);
+                    $entityManager->persist($nota);
+                    $entityManager->flush(); // Flush to update FK before deleting
+                    
+                    // Eliminar entidad DocumentacionNota
+                    $entityManager->remove($documentacion);
+                }
+                
+                $entityManager->remove($nota);
+            }
+            
             // Eliminamos las cuotas asociadas a la inscripción 
             $this->eliminarCuotasDeInscripcion($inscripcion, $entityManager, 'edicion');
 

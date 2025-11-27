@@ -26,7 +26,7 @@ class InscripcionEdicion
     #[ORM\JoinColumn(nullable: false)]
     private ?Edicion $edicion = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(cascade: ['persist'])]
     private ?Nota $nota = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]

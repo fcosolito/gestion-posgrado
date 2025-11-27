@@ -24,11 +24,11 @@ class Nota
     private ?\DateTime $fechaCarga = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?InscripcionEdicion $inscripcionEdicion = null;
 
 
-    #[ORM\OneToOne(targetEntity: DocumentacionNota::class, cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(targetEntity: DocumentacionNota::class, cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?DocumentacionNota $documentacionNota = null;
 

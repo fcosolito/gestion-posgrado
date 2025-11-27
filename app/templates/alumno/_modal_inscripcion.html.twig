@@ -24,28 +24,35 @@
                 </div>
                 
                 <div class="mb-3">
-                    <label for="descuento-input" class="form-label" style="color: #000000; font-weight: 500;">Descuento (%)</label>
-                    <input type="number" 
-                           class="form-control" 
-                           id="descuento-input" 
-                           name="descuento" 
-                           min="0" 
-                           max="100" 
-                           maxlength="3"
-                           value="0"
-                           placeholder="Ej: 10"
-                           required>
+                    <label for="descuento-select" class="form-label" style="color: #000000; font-weight: 500;">Descuento</label>
+                    <select class="form-select" 
+                            id="descuento-select" 
+                            name="descuento_id">
+                        <option value="">Sin descuento</option>
+                        {% for descuento in descuentos %}
+                            <option value="{{ descuento.id }}" 
+                                    data-valor="{{ descuento.valor }}"
+                                    data-descripcion="{{ descuento.descripcion }}">
+                                {{ descuento.descripcion }} - {{ descuento.valor }}%
+                            </option>
+                        {% endfor %}
+                    </select>
                 </div>
-                
-                <div class="mb-3">
-                    <label for="descripcion-descuento-input" class="form-label" style="color: #000000; font-weight: 500;">Descripción del Descuento</label>
-                    <input type="text" 
-                           class="form-control" 
-                           id="descripcion-descuento-input" 
-                           name="descripcion_descuento"
-                           maxlength="255"
-                           placeholder="">
+
+                <!-- Campos ocultos para el descuento -->
+                <input type="hidden" id="descuento-valor-hidden" name="valorDescuento" value="0">
+                <input type="hidden" id="descripcion-descuento-hidden" name="descripcionDescuento" value="">
+
+                <!-- Mostrar información del descuento seleccionado -->
+                <div class="alert alert-info mt-2" id="info-descuento" style="display: none;">
+                    <small>
+                        <strong>Descuento aplicado:</strong>
+                        <span id="valor-texto"></span>% - 
+                        <span id="descripcion-texto"></span>
+                    </small>
                 </div>
+
+                <a href="/descuento" class="text-decoration-none text-primary" style="font-size: 0.9em; margin-bottom: 15px; display: block;">Crear descuento</a>
                 
                 <div class="mb-3">
                     <label for="fecha-inscripcion-input" class="form-label" style="color: #000000; font-weight: 500;">Fecha de Inscripción</label>

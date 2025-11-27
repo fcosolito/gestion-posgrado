@@ -13,7 +13,7 @@ import './styles/app.css';
 import { createRoot } from "react-dom/client";
 import Sidebar from "./components/Sidebar.jsx";
 import Lista from "./components/Lista.jsx";
-import { Modal } from 'bootstrap';
+import Modal from 'bootstrap/js/dist/modal';
 
 const el = document.getElementById("sidebar-root");
 if (el) {
@@ -38,12 +38,12 @@ window.mostrarModalEliminar = function(titulo, mensaje, detalle, onConfirm) {
   
   const mensajeElements = document.querySelectorAll('#deleteModal .modal-body p');
   if (mensajeElements.length >= 1) {
-    mensajeElements[0].textContent = mensaje;
+    mensajeElements[0].innerHTML = mensaje;
   }
   
   const detalleElement = document.getElementById('detalleElementoModal');
   if (detalleElement) {
-    detalleElement.textContent = detalle;
+    detalleElement.innerHTML = detalle;
   }
   
   currentDeleteAction = onConfirm;
@@ -64,11 +64,6 @@ window.mostrarModalConfirmar = function(nombre, alumno_id, inscripcion_id, tipo)
   document.getElementById('alumno-id-hidden').value = alumno_id;
   tipoInscripcionActual = tipo;
   
-  // Resetear campos del formulario
-  document.getElementById('nro-legajo-input').value = '';
-  document.getElementById('descuento-input').value = 0;
-  document.getElementById('descripcion-descuento-input').value = '';
-  
   // Establecer fecha actual por defecto
   const fechaActual = new Date().toISOString().split('T')[0];
   document.getElementById('fecha-inscripcion-input').value = fechaActual; 
@@ -81,6 +76,7 @@ window.mostrarModalConfirmar = function(nombre, alumno_id, inscripcion_id, tipo)
 
 // Función global para mostrar modal con cuotas (funciona para carreras y ediciones)
 window.mostrarModalEliminarConCuotas = function(nombre, cuotas, alumnoId, inscripcionId, tipo) {
+
     // Actualizar título
     const nombreElement = document.getElementById('modalCuotasCarreraNombre');
     if (nombreElement) {
@@ -120,6 +116,16 @@ window.mostrarModalEliminarConCuotas = function(nombre, cuotas, alumnoId, inscri
                 advertencia.classList.remove('d-none');
             } else {
                 advertencia.classList.add('d-none');
+            }
+        }
+        
+        // Actualizar el texto de eliminación según el tipo
+        const textoEliminacion = document.getElementById('textoEliminacion');
+        if (textoEliminacion) {
+            if (tipo === 'carrera') {
+                textoEliminacion.innerHTML = '<i class="bi bi-info-circle me-1"></i>Al eliminar la inscripción, se eliminarán todas las <strong>cuotas</strong> asociadas y sus registros de <strong>pago</strong>.';
+            } else if (tipo === 'edicion') {
+                textoEliminacion.innerHTML = '<i class="bi bi-info-circle me-1"></i>Al eliminar la inscripción, se eliminarán todas las <strong>cuotas</strong> asociadas, sus registros de <strong>pago</strong> y las <strong>notas</strong> asociadas.';
             }
         }
     }
@@ -214,13 +220,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const valorDescuentoInput = document.createElement('input');
       valorDescuentoInput.type = 'hidden';
       valorDescuentoInput.name = 'valorDescuento';
-      valorDescuentoInput.value = document.getElementById('descuento-input').value;
+      valorDescuentoInput.value = document.getElementById('descuento-valor-hidden').value;
       formPost.appendChild(valorDescuentoInput);
 
       const descripcionDescuentoInput = document.createElement('input');
       descripcionDescuentoInput.type = 'hidden';
       descripcionDescuentoInput.name = 'descripcionDescuento';
-      descripcionDescuentoInput.value = document.getElementById('descripcion-descuento-input').value || '';
+      descripcionDescuentoInput.value = document.getElementById('descripcion-descuento-hidden').value || '';
       formPost.appendChild(descripcionDescuentoInput);
 
       const fechaInput = document.createElement('input');
@@ -243,7 +249,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Renderizar lista de notas (funciona tanto para alumno como para edición)
   const listaNotas = document.getElementById("lista-notas");
-  if (listaNotas) {
+  if (listaNotas && !listaNotas.hasChildNodes()) {  // Solo renderizar si no tiene hijos (evitar doble renderizado)
     const labels = JSON.parse(listaNotas.dataset.labels || '[]');
     const attributes = JSON.parse(listaNotas.dataset.attributes || '[]');
     const rows = JSON.parse(listaNotas.dataset.rows || '[]');
