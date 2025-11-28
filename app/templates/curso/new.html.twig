@@ -1,9 +1,42 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Registrar Curso{% endblock %}
+{% block title %}Cursos{% endblock %}
 
 {% block body %}
+<div class="p-3">
+    <div class="cuadrado-reutilizable p-3">
+        <div class="row">
+            <div class="col">
+                <h4>Nuevo curso</h4>
+            </div>
+            <div class="col-auto">
+                <div class="row">
+                    <div class="col">
+                        <button
+                            id="btn-volver"
+                            class="btn-gris btn-alternativo"
+                        >
+                            Volver
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{ include('curso/_form.html.twig', {'button_label': "Registrar"}) }}
 
-    {{ include('curso/_form.html.twig', {'button_label': "Registrar"}) }}
+        </div>
+    </div>
+</div>
 
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const btnVolver = document.getElementById('btn-volver');
+
+        btnVolver.addEventListener('click', () => window.location.href = "{{ path('app_curso_index') }}");
+        
+    })
+</script>
 {% endblock %}

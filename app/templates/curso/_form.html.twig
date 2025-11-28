@@ -1,46 +1,37 @@
-<div class="container ">
-    <div class="row">
-        <div class="col-6 m-0 rounded bg-white">
-
-            {{ form_start(form) }}
-            <div class="row mb-2 mt-2">
-                <div class="col-5">
-                Nombre
-                </div>
-                <div class="col">
-                {{ form_widget(form.nombre) }}
-                </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-5">
-                Numero de ordenanza
-                </div>
-                <div class="col">
-                {{ form_widget(form.nroOrdenanza) }}
-                </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-5">
-                Numero de implementacion
-                </div>
-                <div class="col">
-                {{ form_widget(form.nroImplementacion) }}
-                </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-5">
-                Horas
-                </div>
-                <div class="col">
-                {{ form_widget(form.horas) }}
-                </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col-3 offset-7">
-                    <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
-                </div>
-            </div>
-            {{ form_end(form) }}
+{{ form_start(form) }}
+<div class="row align-items-end">
+    <div class="col-auto">
+        <div class="me-2">
+            <span class="fw-bold mb-2">Nombre</span>
+            <br class="m-2">
+            {{ form_widget(form.nombre, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="col-auto">
+        <div class="me-2">
+            <span class="fw-bold mb-2">Número de ordenanza</span>
+            <br class="m-2">
+            {{ form_widget(form.nroOrdenanza, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="col-auto">
+        <div class="me-2">
+            <span class="fw-bold mb-2">Número de implementación</span>
+            <br class="m-2">
+            {{ form_widget(form.nroImplementacion, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="col-auto">
+        <div class="me-2">
+            <span class="fw-bold mb-2">Horas</span>
+            <br class="m-2">
+            {{ form_widget(form.horas, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="col-auto">
+        <div class="me-2">
+            <button class="btn-verde">{{ button_label|default('Save') }}</button>
         </div>
     </div>
 </div>
+{{ form_end(form) }}

@@ -3,78 +3,102 @@
 {% block title %}Cursos{% endblock %}
 
 {% block body %}
-    <div class="p-3 rounded bg-white">
+<div class="p-3">
+    <div class="p-3 mb-2 cuadrado-reutilizable">
         <div class="row align-items-center">
             <div class="col text-start">
-                <h2>Buscar</h2>
+                <h4>Buscar</h4>
             </div>
-            <div class="col text-end">
-                <a href="{{ path('app_curso_new') }}" class="btn btn-secondary">Nuevo</a>
-            </div>
+            
         </div>
         <div class="container ms-0">
         {{ form_start(form) }}
         <div class="row g-2">
             <div class="col">
                 {{ form_label(form.nombre) }}
-                {{ form_widget(form.nombre) }}
+                {{ form_widget(form.nombre, {'attr': {'class': "form-control"}}) }}
             </div>
             <div class="col">
                 {{ form_label(form.horas) }}
-                {{ form_widget(form.horas) }}
+                {{ form_widget(form.horas, {'attr': {'class': "form-control"}}) }}
             </div>
             <div class="col">
                 {{ form_label(form.ordenanza) }}
-                {{ form_widget(form.ordenanza) }}
+                {{ form_widget(form.ordenanza, {'attr': {'class': "form-control"}}) }}
             </div>
             <div class="col">
                 {{ form_label(form.implementacion) }}
-                {{ form_widget(form.implementacion) }}
+                {{ form_widget(form.implementacion, {'attr': {'class': "form-control"}}) }}
             </div>
             <div class="col align-items-end d-flex">
-                {{ form_widget(form.buscar, {'attr': {'class': "btn btn-primary"}}) }}
+                {{ form_widget(form.buscar, {'attr': {'class': "btn-azul"}}) }}
             </div>
         </div>
         {{ form_end(form) }}
         </div>
     </div>
-    <div class="p-3 rounded bg-white">
-    <h2>Cursos</h2>
-    <table class="table table-striped table-hover table-bordered">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Horas</th>
-                <th>Ordenanza</th>
-                <th>Implementacion</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for curso in cursos %}
-            <tr>
-                <td>{{ curso.nombre }}</td>
-                <td>{{ curso.horas }}</td>
-                <td>{{ curso.nroOrdenanza }}</td>
-                <td>{{ curso.nroImplementacion }}</td>
-                <td>
-                    <div class="dropdown">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Acciones
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{{ path('app_curso_show', {'id': curso.id}) }}">Ver</a></li>
-                        </ul>
-                    </div>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">No se registraron cursos.</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="cuadrado-reutilizable fill-remaining">
+        <div class="row m-2">
+            <div class="col">
+                <h4>Cursos</h4>
+            </div>
+            <div class="col text-end">
+                <button
+                    id="btn-nuevo"
+                    class="btn-verde"
+                >
+                    Nuevo
+                </button>
+            </div>
+        </div>
+        <table class="table table-bordered">
+            <thead class="table-secondary sticky-top">
+                <tr>
+                    <th class="fw-normal">Nombre</th>
+                    <th class="fw-normal">Horas</th>
+                    <th class="fw-normal">Ordenanza</th>
+                    <th class="fw-normal">Implementacion</th>
+                    <th class="fw-normal">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for curso in cursos %}
+                <tr>
+                    <td class="fw-light">{{ curso.nombre }}</td>
+                    <td class="fw-light">{{ curso.horas }}</td>
+                    <td class="fw-light">{{ curso.nroOrdenanza }}</td>
+                    <td class="fw-light">{{ curso.nroImplementacion }}</td>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Acciones
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ path('app_curso_show', {'id': curso.id}) }}">Ver</a></li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6">No se registraron cursos.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
+</div>
 
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const btnNuevo = document.getElementById('btn-nuevo');
+
+        btnNuevo.addEventListener('click', () => window.location.href = "{{ path('app_curso_new') }}");
+        
+    })
+</script>
 {% endblock %}
