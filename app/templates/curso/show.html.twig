@@ -1,72 +1,101 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Curso{% endblock %}
+{% block title %}Cursos{% endblock %}
 
 {% block body %}
 
-    <div id="curso"
-        data-curso="{{ curso|json_encode }}"
-        data-delete-form="{{ include('curso/_delete_form.html.twig')|e('html_attr') }}"
-    >
-    </div>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-6 p-2 rounded bg-light">
-            <div class="p-2">
-                <div class="row m-1">
-                    <div class="col-4">
-                        <h3>Ediciones</h3>
-                    </div>
-                    <div class="col-2 ms-auto m-1">
-                        <a class="btn btn-primary" href="{{ path('app_edicion_new', {'cursoId': curso.id }) }}">
-                            Nueva
-                        </a>
-                    </div>
-                </div>
-                <div class="row m-1">
-                    <div class="col bg-grey fw-bold">Nombre</div>
-                    <div class="col bg-grey fw-bold">Precio</div>
-                    <div class="col bg-grey fw-bold">Acciones</div>
-                </div>
-                {% for edicion in ediciones %}
-                <div class="row m-1">
-                    <div class="col">{{ edicion.nombre }}</div>
-                    <div class="col">{{ edicion.precio }}</div>
-                    <div class="col">
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Acciones
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a 
-                                        class="dropdown-item btn btn-secondary" 
-                                        href="{{ path('app_edicion_show', {'id': edicion.id }) }}"
-                                    >
-                                        Ver
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                </div>
-                {% else %}
-                <p class="m-1">No hay ediciones registradas</p>
-                {% endfor %}
-
-            </div>
-            <div class="col-6 ms-auto p-2 rounded bg-light">
-            <div class="p-2">
-                <div id="carreras"
-                    data-carreras="{{ carreras|json_encode }}"
-                >
-                </div>
-            </div>
+<div class="container-fluid p-3">
+    <div class="row mb-3">
+        <div class="col">
+            <div id="curso"
+                data-curso="{{ curso|json_encode }}"
+                data-delete-form="{{ include('curso/_delete_form.html.twig')|e('html_attr') }}"
+            >
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col">
+            <div class="cuadrado-reutilizable fill-remaining">
+                <div class="row p-3 mb-1">
+                    <div class="col">
+                        <h4>Ediciones</h4>
+                    </div>
+                    <div class="col text-end">
+                        <button 
+                            id="btn-nueva"
+                            class="btn-azul"
+                        >
+                            Nueva
+                        </button>
+                    </div>
+                </div>
+                <div class="overflow-scroll" style="max-height: 50vh;">
+                    <table class="table table-bordered">
+                        <thead class="sticky-top table-secondary">
+                            <tr>
+                                <th class="fw-normal">Nombre</th>
+                                <th class="fw-normal">Precio</th>
+                                <th class="fw-normal">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for edicion in ediciones %}
+                            <tr>
+                                <td class="fw-light">{{ edicion.nombre }}</td>
+                                <td class="fw-light">{{ edicion.precio }}</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Acciones
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a 
+                                                    class="dropdown-item btn btn-secondary" 
+                                                    href="{{ path('app_edicion_show', {'id': edicion.id }) }}"
+                                                >
+                                                    Ver
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <td><i colspan="3">No hay ediciones registradas</i></td>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-    {{ encore_entry_script_tags('curso_show') }}
-    {{ encore_entry_link_tags('curso_show') }}
+        <div class="col">
+            <div id="carreras"
+                data-carreras="{{ carreras|json_encode }}"
+            >
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Eliminacion #}
+{{ include('_modal_eliminacion.html.twig') }}
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById("curso-delete-form");
+
+        const btnNueva = document.getElementById('btn-nueva');
+
+        btnNueva.addEventListener('click', () => window.location.href = "{{ path('app_edicion_new', {'cursoId': curso.id }) }}");
+    })
+</script>
+
+{{ encore_entry_script_tags('curso_show') }}
+{{ encore_entry_link_tags('curso_show') }}
+
 {% endblock %}

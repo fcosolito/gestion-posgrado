@@ -5,45 +5,51 @@
 {% block body %}
 
     <div class="contenedor-blanco" style="display: flex;">
-        <div class="cuadrado-reutilizable auto-height" style="flex: 1; display: flex; flex-direction: column;">
-            <div class="d-flex justify-content-between align-items-center mb-3" style="flex: 0;">
-                <h4>{{ alumno.nombre }} {{ alumno.apellido }}  |  Notas</h4>
-                <div class="d-flex justify-content-between align-items-right" style="flex: 0; column-gap: 0.5rem">
-                    <button class="btn-gris" id="btn-exportar" data-bs-toggle="modal" data-bs-target="#modalNotas">Exportar</button>
-                    <button class="btn-verde" id="btn-aniadir">Añadir</button>
-                    <button class="btn-amarillo" id="btn-volver">Volver</button>
-                </div>
-            </div>
-            <div id="aniadir-container" style="display: none;">
-                <div class="d-flex justify-content-between align-items-center mb-3" style="flex: 0;">
-                    <div>
-                        {{ include('alumno/_form_agregarNotaAlumno.html.twig', {
-                            'inscripcionEdicionId': null,
-                            'form_id': 'nota-form'
-                        }) }}
-                    </div>
-                    <div class="col-md-3">
-                        <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Edicion</div>
-                        <select class="form-control" id="edicion-select" required>
-                            <option value="" disabled selected>Seleccione una edicion</option>
-                            {% for inscripcion in inscripciones %}
-                                <option value="{{ inscripcion.id }}">
-                                    {{ inscripcion.edicion.nombre }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
+        <div class="cuadrado-reutilizable fill-remaining" style="flex: 1; display: flex; flex-direction: column;">
+            <div style="flex: 0 0 auto; min-height: auto; padding: 1rem">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4> <strong>Notas</strong> | {{ alumno.nombre }} {{ alumno.apellido }} </h4>
                     <div class="d-flex justify-content-between align-items-right" style="flex: 0; column-gap: 0.5rem">
-                        <button class="btn-verde" id="btn-guardar" type="submit" form="nota-form">Guardar</button>
-                        <button class="btn-rojo" id="btn-cancelar-aniadir">Cancelar</button>
+                        <button class="btn-gris" id="btn-exportar" data-bs-toggle="modal" data-bs-target="#modalNotas">Exportar</button>
+                        <button class="btn-verde" id="btn-aniadir">Añadir</button>
+                        <button class="btn-amarillo" id="btn-volver">Volver</button>
+                    </div>
+                </div>
+                <div id="aniadir-container" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            {{ include('alumno/_form_agregarNotaAlumno.html.twig', {
+                                'inscripcionEdicionId': null,
+                                'form_id': 'nota-form'
+                            }) }}
+                        </div>
+                        <div class="col-md-3">
+                            <div style="color: #000000; font-weight: 500; margin-bottom: 0.5rem;">Edicion</div>
+                            <select class="form-control" id="edicion-select" required>
+                                <option value="" disabled selected>Seleccione una edicion</option>
+                                {% for inscripcion in inscripciones %}
+                                    <option value="{{ inscripcion.id }}">
+                                        {{ inscripcion.edicion.nombre }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-right" style="flex: 0; column-gap: 0.5rem">
+                            <button class="btn-verde" id="btn-guardar" type="submit" form="nota-form">Guardar</button>
+                            <button class="btn-rojo" id="btn-cancelar-aniadir">Cancelar</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div id="lista-notas" style="flex: 1; margin: -1rem"
-                data-labels='["Curso","Edicion", "Nota", "Descripcion", "Documentación","Fecha de carga"]'
-                data-attributes='["curso","edicion", "nota", "descripcion", "documentacion","fecha_carga"]'
-                data-rows='{{ notas|json_encode|raw }}'>
-            </div>
+            {% if notas is empty %}
+                <div class="text-center" style="padding: 2rem; color: #888;">No hay notas registradas.</div>
+            {% else %}
+                <div id="lista-notas" style="flex: 1;"
+                    data-labels='["Curso","Edicion", "Nota", "Descripcion", "Documentación","Fecha de carga"]'
+                    data-attributes='["curso","edicion", "nota", "descripcion", "documentacion","fecha_carga"]'
+                    data-rows='{{ notas|json_encode|raw }}'>
+                </div>
+            {% endif %}
         </div>
     </div>
 

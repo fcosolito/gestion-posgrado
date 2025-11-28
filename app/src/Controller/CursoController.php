@@ -143,24 +143,6 @@ final class CursoController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_curso_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Curso $curso, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(CursoType::class, $curso);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_curso_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('curso/edit.html.twig', [
-            'curso' => $curso,
-            'form' => $form,
-        ]);
-    }
-
     #[Route('/{id}', name: 'api_curso_update', methods: ['PUT', 'PATCH'])]
     public function update(Curso $curso, Request $request, EntityManagerInterface $em): JsonResponse
     {

@@ -4,7 +4,7 @@ export default function ListaNotas({ labels, attributes, rows, opcionesAcciones 
 
   // Función para renderizar el contenido de la celda
   const renderCellContent = (attribute, value) => {
-    // Si el valor contiene HTML, renderízalo sin escapar
+    // Si el valor contiene HTML se renderiza sin escapar
     if (typeof value === 'string' && 
         (value.includes('<a') || value.includes('<span') || value.includes('<div') || value.includes('📎'))) {
       return <span dangerouslySetInnerHTML={{ __html: value }} />;

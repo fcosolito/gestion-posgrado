@@ -38,7 +38,6 @@ export default function ListaInscripciones ({ edicion, alumnos, descuentos }) {
     };
 
     const handleInscribir = async () => {
-        console.log(inscripcion);
         try {
             const res = await fetch(`/edicion/${edicion.id}/insc-alumno/${inscripcion.alumno}`, {
             method: "PUT",

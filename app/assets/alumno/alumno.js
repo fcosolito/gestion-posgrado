@@ -4,8 +4,6 @@ import ListaCuotas from "../components/ListaCuotas.jsx";
 import ListaInscripciones from "../components/ListaInscripciones.jsx";
 import { createRoot } from "react-dom/client";
 import '../styles/app.css';
-import 'bootstrap/dist/js/bootstrap.min.js';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import ListaNotas from "../components/ListaNotas.jsx";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -61,11 +59,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Definir las opciones de acciones para la lista de carreras
     const opcionesAcciones = [
       {
-        label: 'a implementar',
+        label: 'Ver',
         onClick: (rowIndex) => {
           const carreraId = rows[rowIndex].id;
-          console.log('Ver carrera:', carreraId);
-          // logica
+          window.location.href = `/carrera/${carreraId}`;
         }
       },
     ];
@@ -83,11 +80,17 @@ document.addEventListener("DOMContentLoaded", () => {
     // Definir las opciones de acciones para la lista de cursos
     const opcionesAcciones = [
       {
-        label: 'a implementar',
+        label: 'Ver Curso',
         onClick: (rowIndex) => {
-          const cursoId = rows[rowIndex].id;
-          console.log('Ver curso:', cursoId);
-          // logica
+          const cursoId = rows[rowIndex].id_curso;
+          window.location.href = `/curso/${cursoId}`;
+        }
+      },
+      {
+        label: 'Ver Edición',
+        onClick: (rowIndex) => {
+          const edicionId = rows[rowIndex].id_edicion;
+          window.location.href = `/edicion/${edicionId}`;
         }
       },
     ];

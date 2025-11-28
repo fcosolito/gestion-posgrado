@@ -14,7 +14,6 @@ export default function SelectorDropdown({ items, placeholder, item, setItem, ge
     if (item) {
       setQuery(getLabel(item));
       setIsSelected(true);
-      console.log(item)
     }
   }, []);
 

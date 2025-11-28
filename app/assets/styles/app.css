@@ -187,6 +187,18 @@ a[class*="btn-"] {
     overflow: hidden;
 }
 
+.contenedor-blanco-grid {
+    background-color: #efefef;
+    padding: 1.5rem;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    height: calc(100vh - 8.5rem);
+    display: grid;
+    grid-template-columns: 70% 30%;
+    gap: 1.5rem;
+    overflow: hidden;
+}
+
 .cuadrado-reutilizable {
     background-color: white;
     border-radius: 10px;
@@ -245,8 +257,7 @@ a[class*="btn-"] {
   flex-direction: row;
   background: #efefef;
   font-weight: bold;
-  margin-top: 1.5rem;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem;
   border-bottom: 2px solid #ccc;
   flex-shrink: 0;
 }

@@ -1,4 +1,4 @@
-<form method="post" action="{{ path('app_curso_delete', {'id': curso.id}) }}" onsubmit="return confirm('¿Esta seguro que quiere eliminar este curso?');">
+<form id="curso-delete-form" method="post" action="{{ path('app_curso_delete', {'id': curso.id}) }}" onsubmit="return confirm('¿Esta seguro que quiere eliminar este curso?');">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ curso.id) }}">
     <button class="btn btn-danger">Eliminar</button>
 </form>
