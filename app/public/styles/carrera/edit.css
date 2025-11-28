@@ -10,6 +10,7 @@
     width: 30%;
     height: 100%;
 }
+
 .editor-carrera h2{
     padding: 20px 0px 8px 25px;
     border-bottom: 1px solid #e5e7eb;
@@ -66,16 +67,6 @@
     display: flex;
     justify-content: space-between;
     padding:0px 25px;
-}
-.agregar-button{
-    border:none;
-    border-radius:8px;
-    color:white;
-    background-color: #f5ba04;
-    transition: background-color ease 0.3s;
-}
-.agregar-button:hover{
-    background-color: #d39e01;
 }
 table{
     width: 100%;

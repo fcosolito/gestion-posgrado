@@ -55,7 +55,8 @@ body {
   box-shadow: 0 4px 4px rgba(0,0,0,0.18);
 }
 
-button.btn-amarillo {
+button.btn-amarillo,
+a.btn-amarillo {
   background: #f5ba04 !important;
   border: 0 !important;
   color: #fff !important;
@@ -66,12 +67,14 @@ button.btn-amarillo {
   min-height: 40px;
   padding: 0.5rem 1.5rem;
 }
-button.btn-amarillo:hover {
+button.btn-amarillo:hover,
+a.btn-amarillo:hover{
   background: #f1cc5c !important;
   color: #fff !important;
 }
 
-button.btn-verde {
+button.btn-verde,
+a.btn-verde  {
   background: #67db98 !important;
   border: 0 !important;
   color: #fff !important;
@@ -82,12 +85,14 @@ button.btn-verde {
   min-height: 40px;
   padding: 0.5rem 1.5rem;
 }
-button.btn-verde:hover {
+button.btn-verde:hover,
+a.btn-verde:hover {
   background: #a6e6c1 !important;
   color: #fff !important;
 }
 
-button.btn-gris {
+button.btn-gris,
+a.btn-gris {
   background: #c6c5c5 !important;
   border: 0 !important;
   color: #fff !important;
@@ -98,12 +103,14 @@ button.btn-gris {
   min-height: 40px;
   padding: 0.5rem 1.5rem;
 }
-button.btn-gris:hover {
+button.btn-gris:hover,
+a.btn-gris:hover {
   background: #dad9d9 !important;
   color: #fff !important;
 }
 
-button.btn-rojo {
+button.btn-rojo,
+a.btn-rojo {
   background: #f15d65 !important;
   border: 0 !important;
   color: #fff !important;
@@ -114,12 +121,14 @@ button.btn-rojo {
   min-height: 40px;
   padding: 0.5rem 1.5rem;
 }
-button.btn-rojo:hover {
+button.btn-rojo:hover,
+a.btn-rojo:hover {
   background: #f1a6aa !important;
   color: #fff !important;
 }
 
-button.btn-azul {
+button.btn-azul,
+a.btn-azul {
   background: #5e9beb !important;
   border: 0 !important;
   color: #fff !important;
@@ -130,12 +139,14 @@ button.btn-azul {
   min-height: 40px;
   padding: 0.5rem 1.5rem;
 }
-button.btn-azul:hover {
+button.btn-azul:hover,
+a.btn-azul:hover {
   background: #7ba7e0 !important;
   color: #fff !important;
 }
 
-button.btn-alternativo {
+button.btn-alternativo, 
+a.btn-alternativo{
   background: #a1a1a1 !important;
   border: 0 !important;
   color: #fff !important;
@@ -146,11 +157,15 @@ button.btn-alternativo {
   min-height: 40px;
   padding: 0.5rem 1.5rem;
 }
-button.btn-alternativo:hover {
+button.btn-alternativo:hover,
+a.btn-alternativo:hover {
   background: #cccccc !important;
   color: #fff !important;
 }
-
+/* para que no tengan el subrayado los a que tienen la clase btn*/
+a[class*="btn-"] {
+    text-decoration: none !important;
+}
 .cabecera-azul {
     background-color: #276da6;
     padding: 1.5rem;

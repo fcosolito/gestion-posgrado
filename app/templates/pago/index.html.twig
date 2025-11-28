@@ -2,10 +2,14 @@
 
 {% block title %}Pagos{% endblock %}
 
+
+
 {% block stylesheets %}
+    {{ parent() }}
     <link rel="stylesheet" href="{{ asset('styles/carrera/index.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/pago/index.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/pago/search_form.css') }}">
+    {{ encore_entry_link_tags('app') }}
 {% endblock %}
 
 {% block body %}
@@ -19,7 +23,7 @@
     <div class="main-content-carreras">
         <header class="main-content-carreras-header">
             <h2>Pagos</h2>
-            <a href="{{ path('app_pago_new') }}">+ Nuevo</a>
+            <a class="btn-verde" href="{{ path('app_pago_new') }}">Nuevo</a>
         </header>
         <div class="main-content-carreras-body">
             <table class="table-carreras">
@@ -66,7 +70,7 @@
                                         {% if ext in ['jpg','jpeg','png','gif','webp'] %}
                                             <img src="{{ asset(filePath) }}" alt="comprobante" class="comprobante-thumb">
                                         {% else %}
-                                            <span class="btn btn-sm btn-outline-primary">Ver comprobante</span>
+                                            <span>Ver comprobante</span>
                                         {% endif %}
                                     </a>
                                 {% else %}
@@ -109,3 +113,4 @@
         </div>
     </div>
 {% endblock %}
+

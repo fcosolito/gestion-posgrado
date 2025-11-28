@@ -21,8 +21,8 @@
             {{ form_widget(searchForm.nroOrdenanza, {'attr': {'class': 'form-control'}}) }}
         </div>
     </div>
-    <div class="btn-group w-100 search-form-buttons" role="group">
-        {{ form_widget(searchForm.buscar, {'attr': {'class': 'btn btn-primary'}}) }}
-        <a href="{{ path('app_carrera_index') }}" class="btn btn-outline-secondary">Limpiar</a>
+    <div class="search-form-buttons" role="group">
+        {{ form_widget(searchForm.buscar, {'attr': {'class': 'btn btn-azul'}}) }}
+        <a href="{{ path('app_carrera_index') }}" class="btn btn-alternativo">Limpiar</a>
     </div>
 {{ form_end(searchForm) }}

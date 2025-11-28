@@ -1,3 +1,7 @@
+.search-form{
+    display: flex;
+    align-items: center;
+}
 .search-form-inputs{
     display: flex;
     margin-bottom: 3vh;
@@ -6,6 +10,6 @@
     margin-left: 5VW;
 }
 .search-form-buttons{
-    margin-left:5vw;
+    margin-left:3vw;
     max-width:30%;
 }

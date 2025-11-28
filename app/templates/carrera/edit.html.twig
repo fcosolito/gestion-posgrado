@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="{{ asset('/styles/carrera/edit.css')}}">
 {% endblock %}
 
-{% block title %}Editor de Carrera{% endblock %}
+{% block title %}Carreras{% endblock %}
 
 {% block body %}
     <div class="main-content-edit-carrera">
@@ -12,7 +12,7 @@
             <div class="cursos-obligatorios">
                 <div class="header">
                     <h2>Cursos Obligatorios</h2>
-                    <button class="agregar-button" id="agregar-button-obligatorios">+ Agregar</button>
+                    <button class="agregar-button btn-verde" id="agregar-button-obligatorios">Agregar</button>
                 </div>
                 <div class="body-cursos-obligatorios">
                     <div class="tabla-cursos">
@@ -59,7 +59,7 @@
             <div class="cursos-electivos">
                 <div class="header">
                     <h2>Cursos Electivos</h2>
-                    <button class="agregar-button" id="agregar-button-electivos">+ Agregar</button>
+                    <button class="agregar-button btn-verde" id="agregar-button-electivos">Agregar</button>
                 </div>
                 <div class="body-cursos-electivos">
                     <div class="tabla-cursos">
@@ -117,10 +117,14 @@
             contenedor.classList.toggle('expandido');
             if(contenedor.classList.contains('expandido')){
                 lista.classList.add('visible');
+                button.classList.remove('btn-verde');
+                button.classList.add('btn-alternativo');
                 button.textContent = 'Cancelar';
             } else {
                 lista.classList.remove('visible');
-                button.textContent = '+ Agregar';
+                button.classList.remove('btn-alternativo');
+                button.classList.add('btn-verde');
+                button.textContent = 'Agregar';
             }
         });
 
@@ -131,10 +135,14 @@
             contenedor.classList.toggle('expandido');
             if(contenedor.classList.contains('expandido')){
                 lista.classList.add('visible');
+                button.classList.remove('btn-verde');
+                button.classList.add('btn-alternativo');
                 button.textContent = 'Cancelar';
             } else {
                 lista.classList.remove('visible');
-                button.textContent = '+ Agregar';
+                button.classList.remove('btn-alternativo');
+                button.classList.add('btn-verde');
+                button.textContent = 'Agregar';
             }
         });
     </script>

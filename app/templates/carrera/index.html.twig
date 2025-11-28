@@ -4,6 +4,7 @@
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/carrera/index.css') }}">
+    {{ encore_entry_link_tags('app') }}
 {% endblock %}
 
 {% block body %}
@@ -17,7 +18,7 @@
     <div class="main-content-carreras">
         <header class="main-content-carreras-header">
             <h2>Carreras</h2>
-            <a href="{{ path('app_carrera_new') }}">+ Nueva</a>
+            <a class="btn-verde" href="{{ path('app_carrera_new') }}">Nueva</a>
         </header>
         <div class="main-content-carreras-body">
             <table class="table-carreras">

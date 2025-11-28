@@ -26,6 +26,7 @@ Encore
     .addEntry('carrera_show', './assets/carrera/show.js')
     .addEntry('alumno', './assets/alumno/alumno.js')
     .addEntry('cuota_index', './assets/cuota/index.js')
+    .addEntry('pago', './assets/styles/pago/pago.css')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     .splitEntryChunks()

@@ -5,6 +5,7 @@
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/carrera/index.css') }}">
     <link rel="stylesheet" href="{{ asset('styles/pago/form.css') }}">
+    {{ encore_entry_link_tags('app') }}
 {% endblock %}
 
 {% block body %}
@@ -49,7 +50,7 @@
                                 <strong>Comprobante:</strong> 
                                 <a href="{{ asset('uploads/comprobantes/' ~ pago.comprobante.archivo) }}" 
                                    target="_blank" 
-                                   class="btn btn-sm btn-outline-primary ms-2">
+                                   >
                                     Ver comprobante
                                 </a><br>
                             {% else %}

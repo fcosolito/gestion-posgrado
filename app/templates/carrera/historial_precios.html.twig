@@ -2,15 +2,16 @@
 
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('/styles/carrera/historial_precios.css') }}">
+    {{ encore_entry_link_tags('app') }}
 {% endblock %}
 
-{% block title %}Historial de Precios - {{ carrera.nombre }}{% endblock %}
+{% block title %}Carreras{% endblock %}
 
 {% block body %}
     <div class="container">
         <div class="header-historial">
             <h1>Historial de Precios - {{ carrera.nombre }}</h1>
-            <button class="btn-volver" onclick="window.history.back()">Volver</button>
+            <button class="btn-gris" onclick="window.history.back()">Volver</button>
         </div>
 
         {% if precios|length > 0 %}

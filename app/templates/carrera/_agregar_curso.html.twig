@@ -14,7 +14,7 @@
                         <input type="hidden" name="carrera_id" value="{{ carrera.id }}">
                         <input type="hidden" name="curso_id" value="{{ curso.id }}">
                         <input type="hidden" name="tipo_asignacion" value="{{ tipoAsignacion }}">
-                        <button type="submit" class="button-asignar-curso">Asignar</button>
+                        <button type="submit" class="btn-verde">Asignar</button>
                     </form>
                 </div>
             {% endfor %}
@@ -32,7 +32,7 @@
             <input type="text" name="nroOrdenanza" placeholder="Nro. Ordenanza" required>
             <input type="text" name="nroImplementacion" placeholder="Nro. Implementación" required>
             <input type="number" name="cantidadHoras" placeholder="Cantidad de horas" required>
-            <button type="submit">Crear y asignar</button>
+            <button class="btn-verde" type="submit">Crear y asignar</button>
         </form>
     </div>
 </div>

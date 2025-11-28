@@ -56,7 +56,7 @@ class PagoSearchType extends AbstractType
             ])
             ->add('buscar', SubmitType::class, [
                 'label' => 'Buscar',
-                'attr' => ['class' => 'btn btn-primary']
+                'attr' => ['class' => 'btn btn-gris']
             ])
         ;
     }
