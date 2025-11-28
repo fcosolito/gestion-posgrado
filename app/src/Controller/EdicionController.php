@@ -228,12 +228,23 @@ final class EdicionController extends AbstractController
             $inscripcion = $nota->getInscripcionEdicion();
             $alumno = $inscripcion->getAlumno();
             
+             // Generar enlace para el archivo si existe
+            $documentacionHtml = 'Sin documentación';
+            if ($nota->getDocumentacionNota()) {
+                $archivo = $nota->getDocumentacionNota()->getArchivo();
+                $documentacionHtml = sprintf(
+                    '<a href="/uploads/documentos_notas/%s" target="_blank" class="btn-documento">Ver archivo</a>',
+                    $archivo
+                );
+            }
+
             $notasData[] = [
                 'id' => $nota->getId(),
                 'alumno' => $alumno->getNombre() . ' ' . $alumno->getApellido(),
                 'nota' => $nota->getValor(),
                 'descripcion' => $nota->getDescripcion(),
                 'fecha_carga' => $nota->getFechaCarga() ? $nota->getFechaCarga()->format('d/m/Y') : 'N/A',
+                'documentacion' => $documentacionHtml,
             ];
         }
 

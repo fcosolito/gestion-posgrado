@@ -45,8 +45,8 @@
             <div class="text-center" style="padding: 2rem; color: #888;">No hay notas registradas.</div>
         {% else %}
             <div id="lista-notas" style="flex: 1;"
-                data-labels='["Alumno", "Nota", "Descripcion", "Fecha de carga"]'
-                data-attributes='["alumno", "nota", "descripcion", "fecha_carga"]'
+                data-labels='["Alumno", "Nota", "Descripcion", "Documentación", "Fecha de carga"]'
+                data-attributes='["alumno", "nota", "descripcion", "documentacion", "fecha_carga"]'
                 data-rows='{{ notas|json_encode|raw }}'>
             </div>
         {% endif %}
