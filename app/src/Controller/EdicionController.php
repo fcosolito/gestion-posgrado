@@ -53,6 +53,7 @@ final class EdicionController extends AbstractController
 
         return $this->render('edicion/new.html.twig', [
             'edicion' => $edicion,
+            'curso' => $cursoId,
             'form' => $form,
         ]);
     }

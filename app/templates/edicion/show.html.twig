@@ -3,67 +3,97 @@
 {% block title %}Edicion{% endblock %}
 
 {% block body %}
-
-    
-    <div class="container-fluid pb-1">
+    <div class="container-fluid p-3">
 
         {# Curso show #}
-        <div class="row m-2">
-            <div class="col rounded bg-white p-2">
-                <div class="row">
-                    <div class="col-4">
-                        <span class="m-1 fs-5 fw-bold">{{ curso.nombre }}</span>
+        <div class="row mb-2">
+            <div class="col">
+                <div class="p-3 cuadrado-reutilizable">
+                    <div class="row mb-2">
+                        <div class="col">
+                            <h4>Curso</h4>
+                        </div>
+                        <div class="col text-end">
+                            <button
+                                id="btn-ver"
+                                class="btn-gris"
+                            >
+                                Ver curso
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div class="row m-1">
-                    <div class="col-2 fw-bold">Ordenanza</div>
-                    <div class="col-2 fw-bold">Implementacion</div>
-                    <div class="col-2 fw-bold">Horas</div>
-                </div>
-                <div class="row m-1">
-                    <div class="col-2">{{ curso.nroOrdenanza }}</div>
-                    <div class="col-2">{{ curso.nroImplementacion }}</div>
-                    <div class="col-2">{{ curso.horas }}</div>
+                    <div class="row">
+                        <div class="col">
+                            <span class="fw-normal">Nombre</span>
+                            <br/>
+                            <span class="fw-light">{{ curso.nombre }}</span>
+                        </div>
+                        <div class="col">
+                            <span class="fw-normal">Ordenanza</span>
+                            <br/>
+                            <span class="fw-light">{{ curso.nroOrdenanza }}</span>
+                        </div>
+                        <div class="col">
+                            <span class="fw-normal">Implementación</span>
+                            <br/>
+                            <span class="fw-light">{{ curso.nroImplementacion }}</span>
+                        </div>
+                        <div class="col">
+                            <span class="fw-normal">Horas</span>
+                            <br/>
+                            <span class="fw-light">{{ curso.horas }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     
-        <div class="row m-2">
+        <div class="row mb-2">
 
             {# Edicion show #}
-            <div class="col-5 pe-1 ps-0">
-                <div class="rounded bg-white p-2">
-                    <div id="edicion"
-                        data-edicion="{{ edicion|json_encode }}"
-                        data-delete-form="{{ include('edicion/_delete_form.html.twig')|e('html_attr') }}"
-                    >
-                    </div>
+            <div class="col-5">
+                <div id="edicion"
+                    data-edicion="{{ edicion|json_encode }}"
+                    data-delete-form="{{ include('edicion/_delete_form.html.twig')|e('html_attr') }}"
+                >
                 </div>
             </div>
 
             {# Listado de docentes #}
-            <div class="col-7 pe-0">
+            <div class="col-7">
                 <div id="listado-docentes" 
-                    class="rounded bg-white p-0"
                     data-docentes="{{docentes|json_encode}}"
                     data-edicion="{{edicion|json_encode}}"
                 >
                 </div>
-                
             </div>
         </div>
 
         {# Listado de alumnos #}
-        <div class="p-2">
-            <div id="listado-alumnos"
-                data-edicion="{{edicion|json_encode}}"
-                data-alumnos="{{ alumnos|json_encode }}"
-                data-descuentos="{{ descuentos|json_encode }}"
-            >
+        <div class="row">
+            <div class="col">
+                <div id="listado-alumnos"
+                    data-edicion="{{edicion|json_encode}}"
+                    data-alumnos="{{ alumnos|json_encode }}"
+                    data-descuentos="{{ descuentos|json_encode }}"
+                >
+                </div>
             </div>
         </div>
     </div>
 
     {{ encore_entry_script_tags('edicion_show') }}
     {{ encore_entry_link_tags('edicion_show') }}
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const btnVer = document.getElementById('btn-ver');
+
+        btnVer.addEventListener('click', () => window.location.href = "{{ path('app_curso_show', {'id': curso.id}) }}");
+        
+    })
+</script>
 {% endblock %}

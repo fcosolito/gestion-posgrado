@@ -67,13 +67,13 @@ export default function ListaInscripciones ({ edicion, alumnos, descuentos }) {
     }
 
     return (
-        <div className="rounded bg-white vh-100 p-3">
-                <div className="row p-2 d-flex justify-content-between align-items-start">
+        <div className="cuadrado-reutilizable fill-remaining vh-75">
+                <div className="row p-3 d-flex justify-content-between align-items-start">
                     <div className="col d-flex align-items-center justify-content-start">
-                        <span className="m-1 fs-5 fw-bold">Alumnos</span>
+                        <h4>Alumnos | Inscribir alumno</h4>
                     </div>
                     <div className="col d-flex align-items-center justify-content-end">
-                            <div className="vr me-3"></div>
+                        <div className="vr me-3"></div>
                         <div className="row form-group align-items-end">
                             <div className="col">
                                 <div className="form-label ps-1">Alumno</div>
@@ -139,7 +139,7 @@ export default function ListaInscripciones ({ edicion, alumnos, descuentos }) {
                     </div>
                 </div>
                 <div className="h-100 overflow-scroll">
-                    <table className="table table-striped table-bordered table-hover">
+                    <table className="table table-bordered ">
                         <thead className="sticky-top table-secondary">
                             <tr>
                                 <th>Nombre</th>

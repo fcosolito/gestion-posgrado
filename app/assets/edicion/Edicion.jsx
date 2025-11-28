@@ -31,52 +31,53 @@ export default function Curso({edicion, deleteFormHtml}) {
     };
 
     return (
-        <>
-            <div className="row d-flex justify-content-start">
+        <div className="container cuadrado-reutilizable">
+            <div className="row d-flex justify-content-start mb-3">
                 <div className="col">
+                    <h4>Edicion</h4>
+                </div>
+                <div className="col-auto">
                     {isEditing ? (
+                    <div className="row d-flex justify-content-end">
+                        <div className="col-auto">
+                            <button className="btn-verde" onClick={() => handleSave()}>Guardar</button>
+                        </div>
+                        <div className="col-auto">
+                            <button className="btn-rojo" onClick={() => handleCancel()}>Cancelar</button>
+                        </div>
+                    </div>
+                    ) : (
+                    <div className="row d-flex justify-content-end">
+                        <div className="col-auto">
+                            <button className="btn-alternativo" onClick={() => window.location.href = `/edicion/${edicion.id}/notas`}>Notas</button>
+                        </div>
+                        <div className="col-auto">
+                            <button className="btn-amarillo" onClick={() => handleEdit(edicion)}>Editar</button>
+                        </div>
+                        <div className="col-auto"
+                            dangerouslySetInnerHTML={{ __html: deleteFormHtml }}
+                        >
+                        </div>
+                    </div>
+                    )}
+                </div>
+            </div>
+            
+            {isEditing ? (
+                <div className="row">
+                    <div className="col">
+                        <span className="fw-normal">Nombre</span>
+                        <br></br>
                         <input
                             type="text"
                             value={editValues["nombre"]}
                             onChange={(e) => handleChange("nombre", e.target.value)}
                             className="border"
                         />
-                    ) : (
-                        <span className="m-1 fs-5 fw-bold">{edicion.nombre}</span>
-                    )}
-                </div>
-            </div>
-            {isEditing ? (
-            <div className="row d-flex justify-content-end">
-                <div className="col-auto">
-                    <button className="btn-verde" onClick={() => handleSave()}>Guardar</button>
-                </div>
-                <div className="col-auto">
-                    <button className="btn-rojo" onClick={() => handleCancel()}>Cancelar</button>
-                </div>
-            </div>
-            ) : (
-            <div className="row d-flex justify-content-end">
-                <div className="col-auto">
-                    <button className="btn-alternativo" onClick={() => window.location.href = `/edicion/${edicion.id}/notas`}>Notas</button>
-                </div>
-                <div className="col-auto">
-                    <button className="btn-amarillo" onClick={() => handleEdit(edicion)}>Editar</button>
-                </div>
-                <div className="col-auto"
-                    dangerouslySetInnerHTML={{ __html: deleteFormHtml }}
-                >
-                </div>
-            </div>
-            )}
-            <div className="row m-1">
-                <div className="col-4 fw-bold">Inicio</div>
-                <div className="col-4 fw-bold">Fin</div>
-                <div className="col-4 fw-bold">Precio</div>
-            </div>
-            {isEditing ? (
-                <div className="row m-1">
-                    <div className="col-4">
+                    </div>
+                    <div className="col">
+                        <span className="fw-normal">Inicio</span>
+                        <br></br>
                         <input 
                             type="date"
                             value={editValues["fechaInicio"]}
@@ -84,7 +85,9 @@ export default function Curso({edicion, deleteFormHtml}) {
                             className="border"
                         />
                     </div>
-                    <div className="col-4">
+                    <div className="col">
+                        <span className="fw-normal">Fin</span>
+                        <br></br>
                         <input 
                             type="date"
                             value={editValues["fechaFin"]}
@@ -92,7 +95,9 @@ export default function Curso({edicion, deleteFormHtml}) {
                             className="border"
                         />
                     </div>
-                    <div className="col-4">
+                    <div className="col">
+                        <span className="fw-normal">Precio</span>
+                        <br></br>
                         <input 
                             type="number"
                             value={editValues["precio"]}
@@ -102,13 +107,30 @@ export default function Curso({edicion, deleteFormHtml}) {
                     </div>
                 </div>
             ) : (
-                <div className="row m-1">
-                    <div className="col-4">{edicion.fechaInicio}</div>
-                    <div className="col-4">{edicion.fechaFin}</div>
-                    <div className="col-4">{edicion.precio}</div>
+                <div className="row">
+                    <div className="col">
+                        <span className="fw-normal">Nombre</span>
+                        <br></br>
+                        <span className="fw-light">{edicion.nombre}</span>
+                    </div>
+                    <div className="col">
+                        <span className="fw-normal">Inicio</span>
+                        <br></br>
+                        <span className="fw-light">{edicion.fechaInicio}</span>
+                    </div>
+                    <div className="col">
+                        <span className="fw-normal">Fin</span>
+                        <br></br>
+                        <span className="fw-light">{edicion.fechaFin}</span>
+                    </div>
+                    <div className="col">
+                        <span className="fw-normal">Precio</span>
+                        <br></br>
+                        <span className="fw-light">{edicion.precio}</span>
+                    </div>
                 </div>
             )}
-        </>
+        </div>
 
     );
 }

@@ -69,14 +69,16 @@ export default function ListaDocentes ({ docentes, edicion }) {
     }
 
     return (
-        <div className="rounded bg-white h-100 p-3">
-                <div className="row p-2 d-flex justify-content-between">
-                    <div className="col d-flex align-items-center justify-content-start">
-                        <span className="m-1 fs-5 fw-bold">Docentes</span>
+        <div className="cuadrado-reutilizable h-100 fill-remaining">
+                <div className="row p-3 d-flex justify-content-between">
+                    <div className="col-3 d-flex align-items-center justify-content-start">
+                        <h4>Docentes | Asociar docente</h4>
                     </div>
                     <div className="col d-flex align-items-center justify-content-end">
-                        <div className="row">
-                            <div className="col">
+                        <div className="row align-items-end">
+                            <div className="col-auto">
+                                <span className="fw-normal ms-1">Docente</span>
+                                <br></br>
                                 <BuscadorDropdown 
                                     fetchItems={buscarDocentes} 
                                     placeholder={"Buscar docente..."}
@@ -95,6 +97,8 @@ export default function ListaDocentes ({ docentes, edicion }) {
                                 </button>
                             </div>
                             <div className="col">
+                            </div>
+                            <div className="col">
                                 <button 
                                     className="btn btn-verde"
                                     onClick={() => window.location.href = `/docente/new`}
@@ -106,7 +110,7 @@ export default function ListaDocentes ({ docentes, edicion }) {
                     </div>
                 </div>
                 <div className="h-25 overflow-scroll">
-                    <table className="table table-striped table-bordered table-hover">
+                    <table className="table table-bordered ">
                         <thead className="sticky-top table-secondary">
                             <tr>
                                 <th>Nombre</th>
