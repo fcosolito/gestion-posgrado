@@ -129,7 +129,7 @@ export default function ListaInscripciones ({ edicion, alumnos, descuentos }) {
                             <div className="col">
                                 <div className="flex-grow"></div>
                                 <button 
-                                    className="btn btn-primary"
+                                    className="btn-verde"
                                     onClick={handleInscribir}
                                 >
                                     Inscribir

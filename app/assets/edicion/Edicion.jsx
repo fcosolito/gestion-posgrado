@@ -49,16 +49,19 @@ export default function Curso({edicion, deleteFormHtml}) {
             {isEditing ? (
             <div className="row d-flex justify-content-end">
                 <div className="col-auto">
-                    <button className="btn btn-primary" onClick={() => handleSave()}>Guardar</button>
+                    <button className="btn-verde" onClick={() => handleSave()}>Guardar</button>
                 </div>
                 <div className="col-auto">
-                    <button className="btn btn-danger" onClick={() => handleCancel()}>Cancelar</button>
+                    <button className="btn-rojo" onClick={() => handleCancel()}>Cancelar</button>
                 </div>
             </div>
             ) : (
             <div className="row d-flex justify-content-end">
                 <div className="col-auto">
-                    <button className="btn btn-secondary" onClick={() => handleEdit(edicion)}>Editar</button>
+                    <button className="btn-alternativo" onClick={() => window.location.href = `/edicion/${edicion.id}/notas`}>Notas</button>
+                </div>
+                <div className="col-auto">
+                    <button className="btn-amarillo" onClick={() => handleEdit(edicion)}>Editar</button>
                 </div>
                 <div className="col-auto"
                     dangerouslySetInnerHTML={{ __html: deleteFormHtml }}
