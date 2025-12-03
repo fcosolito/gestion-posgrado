@@ -21,6 +21,7 @@ use App\Repository\EdicionRepository;
 use App\Repository\InscripcionCarreraRepository;
 use App\Repository\InscripcionEdicionRepository;
 use App\Service\CalculadorCuota;
+use App\Service\AlumnoService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -218,6 +219,7 @@ final class AlumnoController extends AbstractController
 
         return $this->redirectToRoute('app_alumno_index', [], Response::HTTP_SEE_OTHER);
     }
+    
     #[Route('/{id}/inscribir-alumno-curso', name:'app_alumno_inscribir_curso', methods : ['POST'])]
     public function inscribirAlumnoACurso(
         Request $request,
@@ -278,7 +280,7 @@ final class AlumnoController extends AbstractController
     }
 
     #[Route('/{id}/visualizar', name: 'app_alumno_visualizar', methods: ['GET', 'POST'])]
-    public function visualizar(Request $request, int $id, AlumnoRepository $alumnoRepository, EntityManagerInterface $entityManager, CalculadorCuota $calculadorCuota): Response
+    public function visualizar(Request $request, int $id, AlumnoRepository $alumnoRepository, EntityManagerInterface $entityManager, CalculadorCuota $calculadorCuota, AlumnoService $alumnoService): Response
     {
         // Buscar manualmente el alumno
         $alumno = $alumnoRepository->find($id);
@@ -289,6 +291,7 @@ final class AlumnoController extends AbstractController
         }
         
         // Obtener las inscripciones a carreras del alumno
+        // MOVER A REPOSITORY
         $inscripcionesCarrera = $entityManager->createQueryBuilder()
             ->select('ic', 'c')
             ->from(\App\Entity\InscripcionCarrera::class, 'ic')
@@ -299,6 +302,7 @@ final class AlumnoController extends AbstractController
             ->getResult();
 
         // Obtener las inscripciones a ediciones del alumno
+        // MOVER A REPOSITORY
         $inscripcionesEdicion = $entityManager->createQueryBuilder()
             ->select('ie', 'e', 'c')
             ->from(\App\Entity\InscripcionEdicion::class, 'ie')
@@ -310,48 +314,13 @@ final class AlumnoController extends AbstractController
             ->getResult();
 
         // Preparar datos de carreras para el template
-        $carrerasData = [];
-        foreach ($inscripcionesCarrera as $inscripcion) {
-            $carrera = $inscripcion->getCarrera();
-            $carrerasData[] = [
-                'nombre' => $carrera->getNombre(),
-                'nro_ordenanza' => $carrera->getNroOrdenanza(),
-                'nro_implementacion' => $carrera->getNroImplementacion(),
-                'id' => $carrera->getId()
-            ];
-        }
+        $carrerasData = $alumnoService->prepararCarrerasData($inscripcionesCarrera);
 
         // Preparar datos de ediciones (cursos) para el template
-        $cursosData = [];
-        $fechaActual = new \DateTime();
-        
-        foreach ($inscripcionesEdicion as $inscripcion) {
-            $edicion = $inscripcion->getEdicion();
-            $curso = $edicion->getCurso();
-            
-            // Determinar el estado basado en las fechas
-            $fechaInicio = $edicion->getFechaInicio();
-            $fechaFin = $edicion->getFechaFin();
-            
-            if ($fechaActual < $fechaInicio) {
-                $estado = 'Próximo';
-            } elseif ($fechaFin && $fechaActual > $fechaFin) {
-                $estado = 'Finalizado';
-            } else {
-                $estado = 'En curso';
-            }
-            
-            $cursosData[] = [
-                'curso' => $curso->getNombre(),
-                'edicion' => $edicion->getNombre(),
-                'estado' => $estado,
-                'horas' => $curso->getHoras(),
-                'id_edicion' => $edicion->getId(),
-                'id_curso' => $curso->getId()
-            ];
-        }
+        $cursosData = $alumnoService->prepararCursosData($inscripcionesEdicion);
 
         // Obtener todas las cuotas asociadas a las inscripciones del alumno
+        // MOVER A REPOSITORY
         $cuotasPagos = $entityManager->createQueryBuilder()
             ->select('cu', 'ic', 'ie', 'pc', 'p')
             ->from(\App\Entity\Cuota::class, 'cu')
@@ -376,24 +345,7 @@ final class AlumnoController extends AbstractController
         }
 
         // Preparar datos de cuotas para el template
-        $cuotasData = [];
-        foreach ($cuotas as $cuota) {
-            // Factorice lo anterior en este metodo, comprobar si funciona igual
-            $estadoPago = $calculadorCuota->calcularEstado($cuota);
-
-
-            if ($cuota->getInscripcionCarrera() === null) {
-                $carreraCurso = $cuota->getInscripcionEdicion()->getEdicion()->getNombre();
-            } else {
-                $carreraCurso = $cuota->getInscripcionCarrera()->getCarrera()->getNombre();
-            }
-
-
-            $cuotasData[] = [
-                'carreraCurso' => $carreraCurso,
-                'estado' => $estadoPago
-            ];
-        }
+        $cuotasData = $alumnoService->prepararCuotasData($cuotas, $calculadorCuota);
         
         $formEditar = $this->createForm(AlumnoType::class, $alumno);
         $formEditar->handleRequest($request);
@@ -416,11 +368,12 @@ final class AlumnoController extends AbstractController
     }
 
     #[Route('/{id}/inscribir-carrera', name: 'app_alumno_inscribir_carrera_view', methods: ['GET', 'POST'])]
-    public function inscribirCarreraView(Request $request, Alumno $alumno, EntityManagerInterface $entityManager): Response
+    public function inscribirCarreraView(Request $request, Alumno $alumno, EntityManagerInterface $entityManager, AlumnoService $alumnoService): Response
     {
         // Traer todas las carreras de la base de datos
         $carreras = $entityManager->getRepository(Carrera::class)->findAll();
 
+        // MOVER A REPOSITORY
         // Se obtienen las inscripciones del alumno
         $inscripcionesCarrera = $entityManager->createQueryBuilder()
             ->select('ic', 'c', 'd')
@@ -432,6 +385,7 @@ final class AlumnoController extends AbstractController
             ->getQuery()
             ->getResult();
         
+        // MOVER A REPOSITORY
         // Obtener todas las cuotas del alumno (tengan o no pagos)
         $cuotas = $entityManager->createQueryBuilder()
             ->select('cu', 'ic', 'c')
@@ -442,7 +396,8 @@ final class AlumnoController extends AbstractController
             ->setParameter('alumno', $alumno)
             ->getQuery()
             ->getResult();
-
+        
+        // MOVER A REPOSITORY
         // Obtener todos los pagos de cuotas del alumno
         $pagosCuotas = $entityManager->createQueryBuilder()
             ->select('pc', 'p', 'cu')
@@ -462,121 +417,9 @@ final class AlumnoController extends AbstractController
             $pagosPorCuota[$cuotaId][] = $pagoCuota;
         }
 
-        // Crear mapas de inscripciones y cuotas por carrera
-        $inscripcionesPorCarrera = [];
-        $carrerasInscriptas = [];
-
-        foreach ($inscripcionesCarrera as $inscripcion) {
-            $carreraId = $inscripcion->getCarrera()->getId();
-            $carrerasInscriptas[] = $carreraId;
-            $inscripcionesPorCarrera[$carreraId] = $inscripcion;
-        }
-
-        // Agrupar cuotas por carrera y calcular estados
-        $cuotasPorCarrera = [];
+        // preparar carrerasData para vista de inscripcion a carrera
+        $carrerasData = $alumnoService->prepararCarrerasInscripcion($inscripcionesCarrera, $cuotas, $carreras);
         
-        foreach ($cuotas as $cuota) {
-            $inscripcion = $cuota->getInscripcionCarrera();
-            
-            if ($inscripcion) {
-                $carreraId = $inscripcion->getCarrera()->getId();
-                $cuotaId = $cuota->getId();
-                
-                if (!isset($cuotasPorCarrera[$carreraId])) {
-                    $cuotasPorCarrera[$carreraId] = [];
-                }
-                
-                // Calcular montos de la cuota
-                $montoPagado = 0;
-                $montoCuota = 0;
-                $contadorPagos = 0;
-                
-                if (isset($pagosPorCuota[$cuotaId])) {
-                    foreach ($pagosPorCuota[$cuotaId] as $pagoCuota) {
-                        $montoCuota = $pagoCuota->getMontoCuota();
-                        $montoPagado += $pagoCuota->getPago()->getMonto();
-                        $contadorPagos++;
-                    }
-                }
-                
-                // Determinar estado
-                if ($contadorPagos === 0) {
-                    $estado = 'Pendiente';
-                } elseif ($montoPagado >= $montoCuota) {
-                    $estado = 'Paga';
-                } else {
-                    $estado = 'Parcial';
-                }
-                
-                $cuotasPorCarrera[$carreraId][] = [
-                    'numero' => $cuota->getNumeroCuota(),
-                    'monto' => $montoCuota,
-                    'pagado' => $montoPagado,
-                    'estado' => $estado
-                ];
-            }
-        }
-
-        // Preparar datos para todas las carreras
-        $carrerasData = [];
-        foreach ($carreras as $carrera) {
-            $carreraId = $carrera->getId();
-
-            // Verificar si el alumno está inscripto en esta carrera
-            if (in_array($carreraId, $carrerasInscriptas)) {
-                $estado = 'Inscripto';
-                $accion = 'Borrar';
-                
-                // Obtener datos de la inscripción
-                $inscripcion = $inscripcionesPorCarrera[$carreraId];
-                $descuento = $inscripcion->getDescuento();
-                
-                // Extraer valores del descuento si existe
-                $valorDescuento = $descuento ? $descuento->getValor() : 0;
-                $descripcionDescuento = $descuento ? $descuento->getDescripcion() : '';
-                
-                // Extraer valores de la inscripción
-                $legajo = $inscripcion->getNroLegajo() ?? 'Sin legajo';
-                $fechaInscripcion = $inscripcion->getFechaInscripcion() ? $inscripcion->getFechaInscripcion()->format('Y-m-d') : null;
-                
-                // Obtener cuotas de esta carrera
-                $cuotasInfo = $cuotasPorCarrera[$carreraId] ?? [];
-            } else {
-                $estado = 'No inscripto';
-                $accion = 'Inscribir';
-                $valorDescuento = 0;
-                $descripcionDescuento = '';
-                $legajo = null;
-                $fechaInscripcion = null;
-                $cuotasInfo = [];
-            }
-
-            $carrerasData[] = [
-                'id' => $carreraId,
-                'nombre' => $carrera->getNombre(),
-                'ordenanza' => $carrera->getNroOrdenanza(),
-                'implementacion' => $carrera->getNroImplementacion(),
-                'legajo' => $legajo,
-                'descuento' => $valorDescuento,
-                'descripcion' => $descripcionDescuento,
-                'fechaInscripcion' => $fechaInscripcion,
-                'estado' => $estado,
-                'accion' => $accion,
-                'cuotas' => $cuotasInfo
-            ];
-        }
-
-        // Ordenar carreras por estado (inscriptas primero)
-        usort($carrerasData, function($a, $b) {
-            if ($a['estado'] === 'Inscripto' && $b['estado'] !== 'Inscripto') {
-                return -1;
-            }
-            if ($a['estado'] !== 'Inscripto' && $b['estado'] === 'Inscripto') {
-                return 1;
-            }
-            return 0;
-        });
-
         // Obtener descuentos para seleccionar a la hora de inscribir
         $descuentos = $entityManager->getRepository(Descuento::class)->findAll();
 
@@ -592,7 +435,8 @@ final class AlumnoController extends AbstractController
             Request $request,
             Alumno $alumno,
             Carrera $carrera,
-            EntityManagerInterface $entityManager
+            EntityManagerInterface $entityManager,
+            AlumnoService $alumnoService
         ): Response
     {
         // Obtener datos del POST
@@ -634,7 +478,7 @@ final class AlumnoController extends AbstractController
             $entityManager->flush();
 
             // Creamos las cuotas correspondientes a la carrera
-            $this->crearCuotasParaCarrera($inscripcion, $entityManager);
+            $alumnoService->crearCuotasParaCarrera($inscripcion, $entityManager);
 
             $this->addFlash('notice', 'Alumno inscripto exitosamente en ' . $carrera->getNombre());
         }
@@ -642,36 +486,13 @@ final class AlumnoController extends AbstractController
         return $this->redirectToRoute('app_alumno_inscribir_carrera_view', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
     }
 
-    private function crearCuotasParaCarrera(
-        InscripcionCarrera $inscripcion, 
-        EntityManagerInterface $entityManager
-    ): void
-    {
-        $carrera = $inscripcion->getCarrera();
-        $cantidadCuotas = $carrera->getCantidadCuotas();
-
-        // Si la carrera no tiene cantidad de cuotas definida, no crear cuotas
-        if (!$cantidadCuotas || $cantidadCuotas <= 0) {
-            return;
-        }
-
-        // Crear cada cuota
-        for ($i = 1; $i <= $cantidadCuotas; $i++) {
-            $cuota = new Cuota();
-            $cuota->setInscripcionCarrera($inscripcion);
-            $cuota->setNumeroCuota($i);
-            $entityManager->persist($cuota);
-        }
-
-        $entityManager->flush();
-    }
-
     #[Route('/{id}/inscribir-edicion', name: 'app_alumno_inscribir_edicion_view', methods: ['GET', 'POST'])]
-    public function inscribirEdicionView(Request $request, Alumno $alumno, EntityManagerInterface $entityManager): Response
+    public function inscribirEdicionView(Request $request, Alumno $alumno, EntityManagerInterface $entityManager, AlumnoService $alumnoService): Response
     {
         // Traer todas las edicion de la base de datos
         $ediciones = $entityManager->getRepository(Edicion::class)->findAll();
 
+        // MOVER A REPOSITORY
         // Se obtienen las inscripciondes del alumno
         $inscripcionesEdicion = $entityManager->createQueryBuilder()
             ->select('ie', 'e', 'd', 'c')
@@ -684,6 +505,7 @@ final class AlumnoController extends AbstractController
             ->getQuery()
             ->getResult();
 
+        // MOVER A REPOSITORY
         // Obtener todas las cuotas del alumno
         $cuotas = $entityManager->createQueryBuilder()
             ->select('cu', 'ie', 'e')
@@ -695,6 +517,7 @@ final class AlumnoController extends AbstractController
             ->getQuery()
             ->getResult();
 
+        // MOVER A REPOSITORY
         // Obtener todos los pagos de cuotas del alumno
         $pagosCuotas = $entityManager->createQueryBuilder()
             ->select('pc', 'p', 'cu')
@@ -714,121 +537,7 @@ final class AlumnoController extends AbstractController
             $pagosPorCuota[$cuotaId][] = $pagoCuota;
         }
 
-        // Crear mapa de inscripciones y cuotas por edicion
-        $inscripcionesPorEdicion = [];
-        $edicionesInscriptas = [];
-
-        foreach ($inscripcionesEdicion as $inscripcion) {
-            $edicionId = $inscripcion->getEdicion()->getId();
-            $edicionesInscriptas[] = $edicionId;
-            $inscripcionesPorEdicion[$edicionId] = $inscripcion;
-        }
-
-        // Agrupar cuotas por edicion y calcular estados
-        $cuotasPorEdicion = [];
-        
-        foreach ($cuotas as $cuota) {
-            $inscripcion = $cuota->getInscripcionEdicion();
-            
-            if ($inscripcion) {
-                $edicionId = $inscripcion->getEdicion()->getId();
-                $cuotaId = $cuota->getId();
-                
-                if (!isset($cuotasPorEdicion[$edicionId])) {
-                    $cuotasPorEdicion[$edicionId] = [];
-                }
-                
-                // Calcular montos de la cuota (misma lógica que visualizar)
-                $montoPagado = 0;
-                $montoCuota = 0;
-                $contadorPagos = 0;
-                
-                if (isset($pagosPorCuota[$cuotaId])) {
-                    foreach ($pagosPorCuota[$cuotaId] as $pagoCuota) {
-                        $montoCuota = $pagoCuota->getMontoCuota();
-                        $montoPagado += $pagoCuota->getPago()->getMonto();
-                        $contadorPagos++;
-                    }
-                }
-                
-                // Determinar estado
-                if ($contadorPagos === 0) {
-                    $estado = 'Pendiente';
-                } elseif ($montoPagado >= $montoCuota) {
-                    $estado = 'Paga';
-                } else {
-                    $estado = 'Parcial';
-                }
-                
-                $cuotasPorEdicion[$edicionId][] = [
-                    'numero' => $cuota->getNumeroCuota(),
-                    'monto' => $montoCuota,
-                    'pagado' => $montoPagado,
-                    'estado' => $estado
-                ];
-            }
-        }
-
-        // Preparar datos para todas las ediciones
-        $edicionesData = [];
-        foreach ($ediciones as $edicion) {
-            $edicionId = $edicion->getId();
-
-            // Verificar si el alumno está inscripto en esta edicion
-            if (in_array($edicionId, $edicionesInscriptas)) {
-                $estado = 'Inscripto';
-                $accion = 'Borrar';
-                
-                // Obtener datos de la inscripción
-                $inscripcion = $inscripcionesPorEdicion[$edicionId];
-                $descuento = $inscripcion->getDescuento();
-                
-                // Extraer valores del descuento si existe
-                $valorDescuento = $descuento ? $descuento->getValor() : 0;
-                $descripcionDescuento = $descuento ? $descuento->getDescripcion() : '';
-                
-                // Extraer valores de la inscripción
-                $legajo = $inscripcion->getNroLegajo() ?? 'Sin legajo';
-                $fechaInscripcion = $inscripcion->getFechaInscripcion() ? $inscripcion->getFechaInscripcion()->format('Y-m-d') : null;
-                
-                // Obtener cuotas de esta edicion
-                $cuotasInfo = $cuotasPorEdicion[$edicionId] ?? [];
-            } else {
-                $estado = 'No inscripto';
-                $accion = 'Inscribir';
-                $valorDescuento = 0;
-                $descripcionDescuento = '';
-                $legajo = null;
-                $fechaInscripcion = null;
-                $cuotasInfo = [];
-            }
-
-            $edicionesData[] = [
-                'id' => $edicionId,
-                'nombre' => $edicion->getNombre(),
-                'curso' => $edicion->getCurso()->getNombre(),
-                'ordenanza' => $edicion->getCurso()->getNroOrdenanza(),
-                'implementacion' => $edicion->getCurso()->getNroImplementacion(),
-                'legajo' => $legajo,
-                'descuento' => $valorDescuento,
-                'descripcion' => $descripcionDescuento,
-                'fechaInscripcion' => $fechaInscripcion,
-                'estado' => $estado,
-                'accion' => $accion,
-                'cuotas' => $cuotasInfo
-            ];
-        }
-
-        // Ordenar ediciones por estado (inscriptas primero)
-        usort($edicionesData, function($a, $b) {
-            if ($a['estado'] === 'Inscripto' && $b['estado'] !== 'Inscripto') {
-                return -1;
-            }
-            if ($a['estado'] !== 'Inscripto' && $b['estado'] === 'Inscripto') {
-                return 1;
-            }
-            return 0;
-        });
+        $edicionesData = $alumnoService->prepararEdicionesInscripcion($inscripcionesEdicion, $cuotas, $ediciones);
 
         // Obtener descuentos para seleccionar a la hora de inscribir
         $descuentos = $entityManager->getRepository(Descuento::class)->findAll();
@@ -845,7 +554,8 @@ final class AlumnoController extends AbstractController
             Request $request,
             Alumno $alumno,
             Edicion $edicion,
-            EntityManagerInterface $entityManager
+            EntityManagerInterface $entityManager,
+            AlumnoService $alumnoService
         ): Response
     { 
         // Obtener datos del POST
@@ -906,7 +616,7 @@ final class AlumnoController extends AbstractController
                 $this->addFlash('notice', 'Alumno inscripto exitosamente en ' . $edicion->getNombre() . '. No se crearon cuotas ya que está inscripto en la carrera correspondiente.');
             } else {
                 // Creamos las cuotas correspondientes a la edición
-                $this->crearCuotasParaEdicion($inscripcion, $entityManager);
+                $alumnoService->crearCuotasParaEdicion($inscripcion, $entityManager);
                 $this->addFlash('notice', 'Alumno inscripto exitosamente en ' . $edicion->getNombre() . '. Se creó una cuota correspondiente.');
             }
         }
@@ -914,22 +624,8 @@ final class AlumnoController extends AbstractController
         return $this->redirectToRoute('app_alumno_inscribir_edicion_view', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
     }
 
-    private function crearCuotasParaEdicion(
-        InscripcionEdicion $inscripcion, 
-        EntityManagerInterface $entityManager
-    ): void
-    {
-        // esta funcion crea una sola cuota, en este momento los cursos o ediciones no tienen un atributo de numero de cuotas
-        $cuota = new Cuota();
-        $cuota->setInscripcionEdicion($inscripcion);
-        $cuota->setNumeroCuota(1);
-       
-        $entityManager->persist($cuota);
-        $entityManager->flush();
-    }
-
     #[Route('/{id}/desinscribir-carrera/{carrera}', name: 'app_alumno_desinscribir_carrera', methods: ['POST'])]
-    public function desinscribirCarrera(Alumno $alumno, \App\Entity\Carrera $carrera, EntityManagerInterface $entityManager): Response
+    public function desinscribirCarrera(Alumno $alumno, \App\Entity\Carrera $carrera, EntityManagerInterface $entityManager, AlumnoService $alumnoService): Response
     {
         // Buscar la inscripción
         $inscripcion = $entityManager->getRepository(\App\Entity\InscripcionCarrera::class)
@@ -939,7 +635,7 @@ final class AlumnoController extends AbstractController
             $this->addFlash('warning', 'El alumno no está inscripto en esta carrera');
         } else {
             // Eliminamos las cuotas asociadas a la inscripción 
-            $this->eliminarCuotasDeInscripcion($inscripcion, $entityManager, 'carrera');
+            $alumnoService->eliminarCuotasDeInscripcion($inscripcion, $entityManager, 'carrera');
 
             // Eliminar la inscripción
             $entityManager->remove($inscripcion);
@@ -952,7 +648,7 @@ final class AlumnoController extends AbstractController
     }
 
     #[Route('/{id}/desinscribir-edicion/{edicion}', name: 'app_alumno_desinscribir_edicion', methods: ['POST'])]
-    public function desinscribirEdicion(Alumno $alumno, \App\Entity\Edicion $edicion, EntityManagerInterface $entityManager): Response
+    public function desinscribirEdicion(Alumno $alumno, \App\Entity\Edicion $edicion, EntityManagerInterface $entityManager, AlumnoService $alumnoService): Response
     {
         // Buscar la inscripción
         $inscripcion = $entityManager->getRepository(\App\Entity\InscripcionEdicion::class)
@@ -1002,54 +698,11 @@ final class AlumnoController extends AbstractController
         return $this->redirectToRoute('app_alumno_inscribir_edicion_view', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
     }
 
-    private function eliminarCuotasDeInscripcion(
-            $inscripcion, 
-            EntityManagerInterface $entityManager,
-            string $tipo = 'carrera'
-        ): void
-    {
-        // Se buscan todas las cuotas asociadas a esta inscripción según el tipo
-        if ($tipo === 'carrera') {
-            $cuotas = $entityManager->getRepository(Cuota::class)
-                ->findBy(['inscripcionCarrera' => $inscripcion]);
-        } else if ($tipo === 'edicion') {
-            $cuotas = $entityManager->getRepository(Cuota::class)
-                ->findBy(['inscripcionEdicion' => $inscripcion]);
-        } else{
-            throw new \InvalidArgumentException("Tipo de inscripción inválido: $tipo. Debe ser 'carrera' o 'edicion'.");
-        }
-
-        // Eliminar cada cuota y sus pagos asociados
-        foreach ($cuotas as $cuota) {
-            // Primero obtener los pagos de cuota asociados
-            $pagosCuotas = $entityManager->getRepository(\App\Entity\PagoCuota::class)
-                ->findBy(['cuota' => $cuota]);
-            
-            foreach ($pagosCuotas as $pagoCuota) {
-                // Obtener el pago antes de eliminar la relación
-                $pago = $pagoCuota->getPago();
-                
-                // Eliminar la relación PagoCuota
-                $entityManager->remove($pagoCuota);
-                
-                // Eliminar el Pago
-                if ($pago) {
-                    $entityManager->remove($pago);
-                }
-            }
-            
-            // Luego eliminar la cuota
-            $entityManager->remove($cuota);
-        }
-        
-        // No hacemos flush aquí, se hará junto con la eliminación de la inscripción
-    }
-
     #[Route('/{id}/notas', name: 'app_alumno_notas', methods: ['GET', 'POST'])]
-    public function notas(Request $request, Alumno $alumno, EntityManagerInterface $entityManager): Response
+    public function notas(Request $request, Alumno $alumno, EntityManagerInterface $entityManager, AlumnoService $alumnoService): Response
     {
-        $notum = new Nota();
-        $form = $this->createForm(NotaType::class, $notum);
+        $nota = new Nota();
+        $form = $this->createForm(NotaType::class, $nota);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -1073,20 +726,21 @@ final class AlumnoController extends AbstractController
                     $documentacionNota->setArchivo($newFilename);
                     $entityManager->persist($documentacionNota);
                     
-                    $notum->setDocumentacionNota($documentacionNota);
+                    $nota->setDocumentacionNota($documentacionNota);
                     
                 } catch (\Exception $e) {
                     $this->addFlash('error', 'Error al subir el archivo: '.$e->getMessage());
                 }
             }
 
-            $entityManager->persist($notum);
+            $entityManager->persist($nota);
             $entityManager->flush();
 
             $this->addFlash('success', 'Nota guardada correctamente.');
             return $this->redirectToRoute('app_alumno_notas', ['id' => $alumno->getId()], Response::HTTP_SEE_OTHER);
         }
 
+        // MOVER A REPOSITORY
         // Obtener notas del alumno
         $notas = $entityManager->createQueryBuilder()
             ->select('n', 'ie', 'e', 'c', 'dn')
@@ -1100,6 +754,7 @@ final class AlumnoController extends AbstractController
             ->getQuery()
             ->getResult();
 
+        // MOVER A REPOSITORY
         // Obtener todas las inscripciones del alumno (para el dropdown)
         $inscripciones = $entityManager->createQueryBuilder()
             ->select('ie', 'e', 'c')
@@ -1112,33 +767,7 @@ final class AlumnoController extends AbstractController
             ->getResult();
 
         // Preparar datos para el template
-        $notasData = [];
-
-        foreach ($notas as $nota) {
-            $inscripcion = $nota->getInscripcionEdicion();
-            $edicion = $inscripcion->getEdicion();
-            $curso = $edicion->getCurso();
-            
-            // Generar enlace para el archivo si existe
-            $documentacionHtml = 'Sin documentación';
-            if ($nota->getDocumentacionNota()) {
-                $archivo = $nota->getDocumentacionNota()->getArchivo();
-                $documentacionHtml = sprintf(
-                    '<a href="/uploads/documentos_notas/%s" target="_blank" class="btn-documento">Ver archivo</a>',
-                    $archivo
-                );
-            }
-            
-            $notasData[] = [
-                'id' => $nota->getId(),
-                'curso' => $curso->getNombre(),
-                'edicion' => $edicion->getNombre(),
-                'nota' => $nota->getValor(),
-                'descripcion' => $nota->getDescripcion(),
-                'documentacion' => $documentacionHtml,
-                'fecha_carga' => $nota->getFechaCarga() ? $nota->getFechaCarga()->format('d/m/Y') : 'N/A',
-            ];
-        }
+        $notasData = $alumnoService->prepararNotasData($notas);
 
         return $this->render('alumno/notas_alumno.html.twig', [
             'alumno' => $alumno,
