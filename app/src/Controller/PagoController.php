@@ -12,6 +12,7 @@ use App\Form\PagoSearchType;
 use App\Repository\PagoRepository;
 use App\Repository\CuotaRepository;
 use App\Repository\AlumnoRepository;
+use App\Service\PagoService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
@@ -44,8 +45,9 @@ final class PagoController extends AbstractController
             'searchForm' => $searchForm->createView(),
         ]);
     }
+
     #[Route('/new', name: 'app_pago_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, AlumnoRepository $alumnoRepository): Response
+    public function new(Request $request, PagoService $pagoS, EntityManagerInterface $entityManager, AlumnoRepository $alumnoRepository): Response
     {
         $pago = new Pago();
         $form = $this->createForm(PagoType::class, $pago);
@@ -53,96 +55,56 @@ final class PagoController extends AbstractController
 
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
-                try {
-                    // 1. Obtener datos del formulario
-                    $monto = $pago->getMonto();
-                    $fechaPago = $pago->getFechaPago();
-
-                    // 2. Obtener cuotas seleccionadas del campo del formulario
-                    $cuotasSeleccionadasJson = $form->get('cuotasSeleccionadas')->getData();
-                    
-                    // Si está vacío, intentar del request directo
-                    if (empty($cuotasSeleccionadasJson)) {
-                        // Usar all() para obtener arrays, ya que get() solo funciona con valores escalares
-                        $allRequestData = $request->request->all();
-                        $pagoData = $allRequestData['pago'] ?? [];
-                        if (isset($pagoData['cuotasSeleccionadas']) && $pagoData['cuotasSeleccionadas'] !== '') {
-                            $cuotasSeleccionadasJson = $pagoData['cuotasSeleccionadas'];
-                        } else {
-                            $cuotasSeleccionadasJson = '[]';
-                        }
+                // 2. Obtener cuotas seleccionadas del campo del formulario
+                $cuotasSeleccionadasJson = $form->get('cuotasSeleccionadas')->getData();
+                
+                // Si está vacío, intentar del request directo
+                if (empty($cuotasSeleccionadasJson)) {
+                    // Usar all() para obtener arrays, ya que get() solo funciona con valores escalares
+                    $allRequestData = $request->request->all();
+                    $pagoData = $allRequestData['pago'] ?? [];
+                    if (isset($pagoData['cuotasSeleccionadas']) && $pagoData['cuotasSeleccionadas'] !== '') {
+                        $cuotasSeleccionadasJson = $pagoData['cuotasSeleccionadas'];
+                    } else {
+                        $cuotasSeleccionadasJson = '[]';
                     }
-                    
-                    $cuotasSeleccionadasIds = json_decode($cuotasSeleccionadasJson, true) ?? [];
-                    
-                    if (empty($cuotasSeleccionadasIds)) {
-                        $this->addFlash('error', 'Debe seleccionar al menos una cuota para pagar.');
-                        return $this->render('pago/new.html.twig', [
-                            'pago' => $pago,
-                            'form' => $form,
-                            'alumnos' => $alumnoRepository->findAll(),
-                        ]);
-                    }
-
-                    // 3. Buscar las cuotas en la base de datos
-                    $cuotasSeleccionadas = [];
-                    foreach ($cuotasSeleccionadasIds as $cuotaId) {
-                        $cuota = $entityManager->getRepository(Cuota::class)->find($cuotaId);
-                        if ($cuota) {
-                            $cuotasSeleccionadas[] = $cuota;
-                        }
-                    }
-
-                    if (empty($cuotasSeleccionadas)) {
-                        $this->addFlash('error', 'No se encontraron las cuotas seleccionadas en la base de datos.');
-                        return $this->render('pago/new.html.twig', [
-                            'pago' => $pago,
-                            'form' => $form,
-                            'alumnos' => $alumnoRepository->findAll(),
-                        ]);
-                    }
-
-                    // 4. Procesar comprobante
-                    $archivoComprobante = $form->get('archivoComprobante')->getData();
-                    if ($archivoComprobante) {
-                        $comprobante = new Comprobante();
-                        
-                        $originalFilename = pathinfo($archivoComprobante->getClientOriginalName(), PATHINFO_FILENAME);
-                        $newFilename = $originalFilename.'-'.uniqid().'.'.$archivoComprobante->guessExtension();
-                        
-                        $archivoComprobante->move(
-                            $this->getParameter('comprobantes_directory'),
-                            $newFilename
-                        );
-                        
-                        $comprobante->setArchivo($newFilename);
-                        $pago->setComprobante($comprobante);
-                    }
-
-                    // 5. Calcular montos
-                    $numeroCuotas = count($cuotasSeleccionadas);
-                    $montoPorCuota = $pago->getMonto() / $numeroCuotas;
-
-                    // 6. Crear relaciones PagoCuota
-                    foreach ($cuotasSeleccionadas as $cuota) {
-                        $pagoCuota = new PagoCuota();
-                        $pagoCuota->setCuota($cuota);
-                        $pagoCuota->setPago($pago);
-                        $pagoCuota->setMontoCuota($montoPorCuota);
-                        $entityManager->persist($pagoCuota);
-                    }
-
-                    // 7. Persistir todo
-                    $entityManager->persist($pago);
-                    $entityManager->flush();
-
-                    $this->addFlash('success', 'Pago registrado correctamente para ' . count($cuotasSeleccionadas) . ' cuotas.');
-                    
-                    return $this->redirectToRoute('app_pago_index', [], Response::HTTP_SEE_OTHER);
-
-                } catch (\Exception $e) {
-                    $this->addFlash('error', 'Error al registrar el pago: ' . $e->getMessage());
                 }
+                
+                $cuotasSeleccionadasIds = json_decode($cuotasSeleccionadasJson, true) ?? [];
+                
+                if (empty($cuotasSeleccionadasIds)) {
+                    $this->addFlash('error', 'Debe seleccionar al menos una cuota para pagar.');
+                    return $this->render('pago/new.html.twig', [
+                        'pago' => $pago,
+                        'form' => $form,
+                        'alumnos' => $alumnoRepository->findAll(),
+                    ]);
+                }
+
+                // 3. Buscar las cuotas en la base de datos
+                $cuotasSeleccionadas = [];
+                foreach ($cuotasSeleccionadasIds as $cuotaId) {
+                    $cuota = $entityManager->getRepository(Cuota::class)->find($cuotaId);
+                    if ($cuota) {
+                        $cuotasSeleccionadas[] = $cuota;
+                    }
+                }
+
+                // 4. Procesar comprobante
+                $archivoComprobante = $form->get('archivoComprobante')->getData();
+                if ($archivoComprobante) {
+                    $resultado = $pagoS->newComprobante(new Comprobante(), $archivoComprobante, $this->getParameter('comprobantes_directory'));
+                    $resultado["estado"] === "exito" ? 
+                        $pago->setComprobante($resultado["comprobante"]) :
+                        $this->addFlash('error', 'Error al registrar el comprobante: ' . $resultado["exception"]);
+                }
+                $resultado = $pagoS->new($pago, $cuotasSeleccionadas);
+
+                $resultado["estado"] === "exito" ? 
+                    $this->addFlash('success', 'Pago registrado correctamente para ' . count($cuotasSeleccionadas) . ' cuotas.') :
+                    $this->addFlash('error', 'Error al registrar el pago: ' . $resultado["exception"]);
+                
+                return $this->redirectToRoute('app_pago_index', [], Response::HTTP_SEE_OTHER);
             } else {
                 $errors = $form->getErrors(true, true);
                 foreach ($errors as $error) {
@@ -241,7 +203,7 @@ final class PagoController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_pago_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Pago $pago, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Pago $pago, PagoService $pagoS, EntityManagerInterface $entityManager): Response
     {
         // Guardar el nombre del archivo antiguo antes de procesar el formulario
         $archivoAntiguo = null;
@@ -255,39 +217,14 @@ final class PagoController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             // Manejar el archivo del comprobante
-            $archivoFile = $form->get('archivoComprobante')->getData();
+            $archivoComprobante = $form->get('archivoComprobante')->getData();
+            $comprobante = $pago->getComprobante() ?? new Comprobante();
             
-            if ($archivoFile) {
-                $filesystem = new Filesystem();
-                $uploadDir = $this->getParameter('comprobantes_directory');
+            if ($archivoComprobante) {
+                $resultado = $pagoS->updateComprobante($comprobante, $archivoComprobante, $archivoAntiguo, $this->getParameter('comprobantes_directory'));
 
-                // Eliminar el archivo antiguo si existe
-                if ($archivoAntiguo && $filesystem->exists($uploadDir . '/' . $archivoAntiguo)) {
-                    $filesystem->remove($uploadDir . '/' . $archivoAntiguo);
-                }
-
-                // Si ya existe un comprobante, actualizarlo, sino crear uno nuevo
-                $comprobante = $pago->getComprobante();
-                if (!$comprobante) {
-                    $comprobante = new Comprobante();
-                    $pago->setComprobante($comprobante);
-                    $entityManager->persist($comprobante);
-                }
-
-                // Generar nombre único para el nuevo archivo
-                $originalFilename = pathinfo($archivoFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
-                $newFilename = $safeFilename.'-'.uniqid().'.'.$archivoFile->guessExtension();
-                
-                try {
-                    // Mover el archivo al directorio correcto
-                    $archivoFile->move($uploadDir, $newFilename);
-                    
-                    // Establecer el nombre del archivo en el comprobante
-                    $comprobante->setArchivo($newFilename);
-                    
-                } catch (FileException $e) {
-                    $this->addFlash('error', 'Error al guardar el archivo: ' . $e->getMessage());
+                if (!($resultado["estado"] === "exito")) {
+                    $this->addFlash('error', 'Error al actualizar comprobante.');
                 }
             }
 
@@ -304,27 +241,15 @@ final class PagoController extends AbstractController
     }
 
     #[Route('/{id}/asoc-cuota/{idCuota}', name: 'app_pago_asociar_cuota', methods: ['PUT'])]
-    public function asociarCuota(Request $request, Pago $pago, Cuota $idCuota, EntityManagerInterface $entityManager): Response
+    public function asociarCuota(Request $request, Pago $pago, Cuota $idCuota, PagoService $pagoS): Response
     {
-        $pagoCuotaRepository = $entityManager->getRepository(PagoCuota::class);
-        $pagoCuota = $pagoCuotaRepository->findOneBy(["pago" => $pago, "cuota" => $idCuota]) ?? new PagoCuota();
-
-        $pagoCuota->setCuota($idCuota);
-        $pagoCuota->setPago($pago);
-
-        // En el body de la request puede pasarse "montoCuota: N"
-        // Se toma el monto del pago si no se pasa.
         $data = $request->toArray();
-        $montoCuota = $data['montoCuota'];
+        $montoCuota = $data['montoCuota'] ?? 0;
 
-        if ($montoCuota) {
-            $pagoCuota->setMontoCuota($montoCuota <= $pago->getMonto() ? $montoCuota : $pago->getMonto());
-        } else {
-            $pagoCuota->setMontoCuota($pago->getMonto());
-        }
-
-        $entityManager->persist($pagoCuota);
-        $entityManager->flush();
+        $resultado = $pagoS->asociarCuota($pago, $idCuota, $montoCuota);
+        $resultado["estado"] === "exito" ?
+            $this->addFlash('notice', 'Se asocio el pago a la cuota exitosamente.') :
+            $this->addFlash('error', 'Error al asociar el pago: ' . $resultado["exception"]);
 
         return $this->json([
             "pagoCuota" => [
@@ -335,13 +260,13 @@ final class PagoController extends AbstractController
     }
 
     #[Route('/{id}/desasoc-cuota/{idCuota}', name: 'app_pago_desasociar_cuota', methods: ['PUT'])]
-    public function desasociarCuota(Request $request, Pago $pago, Cuota $idCuota, EntityManagerInterface $entityManager): Response
+    public function desasociarCuota(Request $request, Pago $pago, Cuota $idCuota, PagoService $pagoS): Response
     {
-        $pagoCuotaRepository = $entityManager->getRepository(PagoCuota::class);
-        $pagoCuota = $pagoCuotaRepository->findOneBy(["pago" => $pago, "cuota" => $idCuota]) ?? new PagoCuota();
+        $resultado = $pagoS->desasociarCuota($pago, $idCuota);
 
-        $entityManager->remove($pagoCuota);
-        $entityManager->flush();
+        $resultado["estado"] === "exito" ?
+            $this->addFlash('notice', 'Se desasocio el pago de la cuota exitosamente.') :
+            $this->addFlash('error', 'Error al desasociar el pago: ' . $resultado["exception"]);
 
         return $this->json([
             "success" => true,
@@ -350,42 +275,15 @@ final class PagoController extends AbstractController
 
     
     #[Route('/{id}', name: 'app_pago_delete', methods: ['POST'])]
-    public function delete(Request $request, Pago $pago, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Pago $pago, PagoService $pagoS): Response
     {
         if ($this->isCsrfTokenValid('delete'.$pago->getId(), $request->getPayload()->getString('_token'))) {
             
-            try {
-                $filesystem = new Filesystem();
-                
-                // 1. Eliminar el archivo físico del comprobante si existe
-                $comprobante = $pago->getComprobante();
-                if ($comprobante) {
-                    $uploadDir = $this->getParameter('comprobantes_directory');
-                    $archivoPath = $uploadDir . '/' . $comprobante->getArchivo();
-                    
-                    // Eliminar archivo físico de forma segura
-                    if ($filesystem->exists($archivoPath)) {
-                        $filesystem->remove($archivoPath);
-                    }
-                    
-                    // Eliminar la entidad Comprobante
-                    $entityManager->remove($comprobante);
-                }
-                
-                // 2. Eliminar las relaciones PagoCuota
-                foreach ($pago->getPagoCuotas() as $pagoCuota) {
-                    $entityManager->remove($pagoCuota);
-                }
-                
-                // 3. Eliminar el pago
-                $entityManager->remove($pago);
-                $entityManager->flush();
-                
-                $this->addFlash('success', 'Pago y documentos asociados eliminados correctamente.');
-                
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Error al eliminar el pago: ' . $e->getMessage());
-            }
+            $resultado = $pagoS->delete($pago, $this->getParameter('comprobantes_directory'));
+            
+            $resultado["estado"] === "exito" ?
+                $this->addFlash('notice', 'Pago eliminado exitosamente.') :
+                $this->addFlash('error', 'Error al eliminar el pago: ' . $resultado["exception"]);
         }
 
         return $this->redirectToRoute('app_pago_index', [], Response::HTTP_SEE_OTHER);

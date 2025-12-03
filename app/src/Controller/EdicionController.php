@@ -19,6 +19,7 @@ use App\Repository\DocenteRepository;
 use App\Repository\EdicionRepository;
 use App\Repository\InscripcionEdicionRepository;
 use App\Service\CalculadorCuota;
+use App\Service\EdicionService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -33,7 +34,7 @@ use Dompdf\Dompdf;
 final class EdicionController extends AbstractController
 {
     #[Route('/{cursoId}/new', name: 'app_edicion_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, Curso $cursoId): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, EdicionService $edicionS, Curso $cursoId): Response
     {
         $edicion = new Edicion();
         $form = $this->createForm(EdicionType::class, $edicion);
@@ -42,11 +43,11 @@ final class EdicionController extends AbstractController
         // cursoId en este punto es la entidad, debe tener ese nombre para
         // que symfony asocie el argumento del metodo al parametro de la ruta
         if ($form->isSubmitted() && $form->isValid() && $cursoId) {
-            $edicion->setCurso($cursoId);
-            $entityManager->persist($edicion);
-            $entityManager->flush();
+            $resultado = $edicionS->new($edicion, $cursoId);
 
-            $this->addFlash('notice', "Edicion guardada exitosamente");
+            $resultado["estado"] === "exito" ? 
+                $this->addFlash('notice', "Edicion guardada exitosamente") :
+                $this->addFlash('notice', "Error al guardar edicion: ".$resultado["exception"]);
 
             return $this->redirectToRoute('app_curso_show', ["id" => $cursoId->getId()], Response::HTTP_SEE_OTHER);
         }
@@ -144,7 +145,7 @@ final class EdicionController extends AbstractController
 
 
     #[Route('/{id}', name: 'api_edicion_update', methods: ['PUT'])]
-    public function update(Request $request, Edicion $edicion, EntityManagerInterface $entityManager): Response
+    public function update(Request $request, Edicion $edicion, EdicionService $edicionS): Response
     {
         $data = json_decode($request->getContent(), true);
 
@@ -152,14 +153,12 @@ final class EdicionController extends AbstractController
             return $this->json(['error' => 'JSON inválido'], 400);
         }
 
-        if (isset($data['nombre'])) $edicion->setNombre($data['nombre']);
-        if (isset($data['fechaInicio'])) $edicion->setFechaInicio(new DateTime($data['fechaInicio']));
-        if (isset($data['fechaFin']))   $edicion->setFechaFin(new DateTime($data['fechaFin']));
-        if (isset($data['precio']))   $edicion->setPrecio($data['precio']);
+        $resultado = $edicionS->update($edicion, $data);
 
-        $entityManager->flush();
+        $resultado["estado"] === "exito" ? 
+            $this->addFlash('notice', "Edicion guardada exitosamente") :
+            $this->addFlash('notice', "Error al guardar la edicion");
 
-        $this->addFlash('notice', "Edicion guardada exitosamente");
 
         return $this->json([
             'success' => true,
@@ -174,14 +173,15 @@ final class EdicionController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_edicion_delete', methods: ['POST'])]
-    public function delete(Request $request, Edicion $edicion, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Edicion $edicion, EdicionService $edicionS): Response
     {
         if ($this->isCsrfTokenValid('delete'.$edicion->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($edicion);
-            $entityManager->flush();
+            $resultado = $edicionS->delete($edicion);
         }
 
-        $this->addFlash('notice', "Edicion eliminada exitosamente");
+        $resultado["estado"] === "exito" ? 
+            $this->addFlash('notice', "Edicion eliminada exitosamente") :
+            $this->addFlash('notice', "Error al eliminar edicion :".$resultado["exception"]);
 
         return $this->redirectToRoute('app_curso_show', ["id" => $edicion->getCurso()->getId()], Response::HTTP_SEE_OTHER);
     }
@@ -311,17 +311,11 @@ final class EdicionController extends AbstractController
     }
 
     #[Route('/{id}/asoc-docente/{idDocente}', name: 'api_edicion_asociar_docente', methods: ['PUT'])]
-    public function asociarDocente(Request $request, Edicion $edicion, Docente $idDocente, EntityManagerInterface $entityManager): Response
+    public function asociarDocente(Request $request, Edicion $edicion, Docente $idDocente, EdicionService $edicionS): Response
     {
         // Validacion:
         // Comprobar que la edicion y el docente existen
         // lo hace symfony al usar variables de path
-
-        $dictaRepository = $entityManager->getRepository(Dicta::class);
-        $dicta = $dictaRepository->findOneBy(["docente" => $idDocente, "edicion" => $edicion]) ?? new Dicta();
-
-        $dicta->setDocente($idDocente);
-        $dicta->setEdicion($edicion);
 
         // En el body de la request puede pasarse "esFirmante: true"
         // para modificar la condicion o setearla por primera vez.
@@ -329,13 +323,12 @@ final class EdicionController extends AbstractController
         $data = $request->toArray();
         $esFirmante = $data['esFirmante'];
 
-        $dicta->setEsFirmante($esFirmante ? true : false);
+        $resultado = $edicionS->asociarDocente($edicion, $idDocente, $esFirmante ? true : false);
 
-        $entityManager->persist($dicta);
-        $entityManager->flush();
+        $resultado["estado"] === "exito" ? $this->addFlash('notice', "Asociacion guardada exitosamente") :
+            $this->addFlash('notice', "Error al asociar docente a edicion");
 
-        $this->addFlash('notice', "Asociacion guardada exitosamente");
-
+        $dicta = $resultado["dicta"];
         return $this->json([
             "dicta" => [
                 "docente" => $dicta->getDocente()->getNombre(),
@@ -365,72 +358,37 @@ final class EdicionController extends AbstractController
     }
 
     #[Route('/{id}/insc-alumno/{idAlumno}', name: 'api_edicion_inscribir_alumno', methods: ['PUT'])]
-    public function inscribirEdicionApi(
+    public function inscribirAlumno(
             Request $request,
             Alumno $idAlumno,
             Edicion $edicion,
-            EntityManagerInterface $entityManager,
+            EdicionService $edicionS
         ): Response
     {
-        $descuentoR = $entityManager->getRepository(Descuento::class);
-        $inscripcionR = $entityManager->getRepository(InscripcionEdicion::class);
-
-        $inscripcion = $inscripcionR->findOneBy(["edicion" => $edicion, "alumno" => $idAlumno]) ?? new InscripcionEdicion();
         $data = $request->toArray();
+        $resultado = $edicionS->inscribirAlumno($idAlumno, $edicion, $data);
 
-        // Obtener datos de la request
-        $descuento = $data['descuento'] ? $descuentoR->find($data['descuento']) : null;
-        $fechaInscripcion = $data['fechaInscripcion'] ? DateTime::createFromFormat("Y-m-d", $data['fechaInscripcion']) : new DateTime();
-        $nroLegajo = $data['nroLegajo'] ? (int) $data['nroLegajo'] : null;
-        
-        $inscripcion->setAlumno($idAlumno);
-        $inscripcion->setEdicion($edicion);
-        $inscripcion->setDescuento($descuento);
-        $inscripcion->setFechaInscripcion($fechaInscripcion);
-            
-        if ($nroLegajo) {
-            if ($inscripcionR->findOneBy(["edicion" => $edicion, "nroLegajo" => $nroLegajo])) {
-                return $this->json(["success" => false, "error" => "El legajo ya existe en la edicion."], 500);
-            } else {
-                $inscripcion->setNroLegajo($nroLegajo);
-            }
-        }
-            
-        // Crear una cuota asociada al alumno
-        $cuotaInscripcion = new Cuota();
-        $cuotaInscripcion->setInscripcionEdicion($inscripcion);
-        $cuotaInscripcion->setNumeroCuota(1);
+        $resultado["estado"] === "exito" ? 
+            $this->addFlash('notice', "Inscripcion guardada exitosamente") :
+            $this->addFlash('notice', "Error al inscribir alumno");
 
-        $entityManager->persist($cuotaInscripcion);
-        $entityManager->persist($inscripcion);
-        $entityManager->flush();
 
-        $this->addFlash('notice', "Inscripcion guardada exitosamente");
-
-        return $this->json(["success" => true, "inscripcion" => $inscripcion->getId()]);
+        return $this->json(["success" => true]);
 
     }
 
     #[Route('/{id}/desinsc-alumno/{idAlumno}', name: 'api_edicion_desinscribir_alumno', methods: ['PUT'])]
     public function desinscribirEdicionApi(
-            Request $request,
             Alumno $idAlumno,
             Edicion $edicion,
-            EntityManagerInterface $entityManager,
+            EdicionService $edicionS
         ): Response
     {
-        $inscripcionR = $entityManager->getRepository(InscripcionEdicion::class);
-        $cuotaR = $entityManager->getRepository(Cuota::class);
+        $resultado =  $edicionS->desinscribirAlumno($idAlumno, $edicion);
 
-        $inscripcion = $inscripcionR->findOneBy(["edicion" => $edicion, "alumno" => $idAlumno]) ?? new InscripcionEdicion();
-        $cuota = $inscripcion && $cuotaR->findOneBy(["inscripcionEdicion" => $inscripcion]) ?
-            $cuotaR->findOneBy(["inscripcionEdicion" => $inscripcion]) : new Cuota();
-
-        $entityManager->remove($inscripcion);
-        $entityManager->remove($cuota);
-        $entityManager->flush();
-
-        $this->addFlash('notice', "Inscripcion eliminada exitosamente");
+        $resultado["estado"] === "exito" ? 
+            $this->addFlash('notice', "Inscripcion eliminada exitosamente") :
+            $this->addFlash('notice', "Error al eliminar inscripción");
 
         return $this->json(["success" => true]);
     }
@@ -440,36 +398,18 @@ final class EdicionController extends AbstractController
             Request $request,
             InscripcionEdicion $inscripcion,
             Edicion $edicion,
-            EntityManagerInterface $entityManager,
+            EdicionService $edicionS
         ): Response
     {
-        $descuentoR = $entityManager->getRepository(Descuento::class);
-        $inscripcionR = $entityManager->getRepository(InscripcionEdicion::class);
-
         $data = $request->toArray();
 
-        // Obtener datos de la request
-        $descuento = $data['descuento'] ? $descuentoR->find($data['descuento']) : null;
-        $fechaInscripcion = isset($data['fechaInscripcion']) ? DateTime::createFromFormat("Y-m-d", $data['fechaInscripcion']) : new DateTime();
-        $nroLegajo = $data['nroLegajo'] ? (int) $data['nroLegajo'] : null;
-        
-        $inscripcion->setDescuento($descuento);
-        $inscripcion->setFechaInscripcion($fechaInscripcion);
+        $resultado = $edicionS->editarInscripcion($inscripcion, $edicion, $data);
             
-        if ($nroLegajo) {
-            if ($inscripcionR->findOneBy(["edicion" => $edicion, "nroLegajo" => $nroLegajo])) {
-                return $this->json(["success" => false, "error" => "El legajo ya existe en la edicion."], 500);
-            } else {
-                $inscripcion->setNroLegajo($nroLegajo);
-            }
-        }
-            
-        $entityManager->persist($inscripcion);
-        $entityManager->flush();
+        $resultado["estado"] === "exito" ?
+            $this->addFlash('notice', "Inscripción guardada exitosamente") :
+            $this->addFlash('notice', "Error al guardar inscripción");
 
-        $this->addFlash('notice', "Inscripcion guardada exitosamente");
-
-        return $this->json(["success" => true, "inscripcion" => $inscripcion->getId()]);
+        return $this->json(["success" => true]);
 
     }
 }
