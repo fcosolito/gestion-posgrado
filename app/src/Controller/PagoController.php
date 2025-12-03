@@ -221,7 +221,7 @@ final class PagoController extends AbstractController
             $comprobante = $pago->getComprobante() ?? new Comprobante();
             
             if ($archivoComprobante) {
-                $resultado = $pagoS->updateComprobante($comprobante, $archivoComprobante, $archivoAntiguo, $this->getParameter('comprobantes_directory'));
+                $resultado = $pagoS->updateComprobante($comprobante, $archivoComprobante, $archivoAntiguo, $this->getParameter('comprobantes_directory'), new Filesystem());
 
                 if (!($resultado["estado"] === "exito")) {
                     $this->addFlash('error', 'Error al actualizar comprobante.');

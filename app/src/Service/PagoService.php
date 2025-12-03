@@ -37,15 +37,13 @@ class PagoService
         }
     }
     
-    public function updateComprobante(Comprobante $comprobante, $archivo, $archivoAntiguo, $comprobanteDir): array
+    public function updateComprobante(Comprobante $comprobante, $archivo, $archivoAntiguo, $comprobanteDir, Filesystem $filesystem): array
     {
         // Igual a newComprobante pero elimina el comprobante viejo
         try {
             $comprobante = $comprobante ?? new Comprobante();
             
             if ($archivoAntiguo) {
-                $filesystem = new Filesystem();
-
                 // Eliminar el archivo antiguo si existe
                 if ($archivoAntiguo && $filesystem->exists($comprobanteDir . '/' . $archivoAntiguo)) {
                     $filesystem->remove($comprobanteDir . '/' . $archivoAntiguo);
