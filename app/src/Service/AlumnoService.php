@@ -97,7 +97,18 @@ class AlumnoService
         return $cursosData;
     }
 
-    public function prepararCarrerasInscripcion(array $inscripcionesCarrera, array $cuotas, array $carreras): array{
+    public function prepararCarrerasInscripcion(array $inscripcionesCarrera, array $cuotas, array $carreras, array $pagosCuotas): array{
+        
+        // Crear mapa de pagos por cuota
+        $pagosPorCuota = [];
+        foreach ($pagosCuotas as $pagoCuota) {
+            $cuotaId = $pagoCuota->getCuota()->getId();
+            if (!isset($pagosPorCuota[$cuotaId])) {
+                $pagosPorCuota[$cuotaId] = [];
+            }
+            $pagosPorCuota[$cuotaId][] = $pagoCuota;
+        }
+
         // Crear mapas de inscripciones y cuotas por carrera
         $inscripcionesPorCarrera = [];
         $carrerasInscriptas = [];
@@ -237,7 +248,18 @@ class AlumnoService
         $entityManager->flush();
     }
 
-    public function prepararEdicionesInscripcion(array $inscripcionesEdicion, array $cuotas, array $ediciones): array{
+    public function prepararEdicionesInscripcion(array $inscripcionesEdicion, array $cuotas, array $ediciones, array $pagosCuotas): array{
+        
+        // Crear mapa de pagos por cuota
+        $pagosPorCuota = [];
+        foreach ($pagosCuotas as $pagoCuota) {
+            $cuotaId = $pagoCuota->getCuota()->getId();
+            if (!isset($pagosPorCuota[$cuotaId])) {
+                $pagosPorCuota[$cuotaId] = [];
+            }
+            $pagosPorCuota[$cuotaId][] = $pagoCuota;
+        }
+        
         // Crear mapa de inscripciones y cuotas por edicion
         $inscripcionesPorEdicion = [];
         $edicionesInscriptas = [];

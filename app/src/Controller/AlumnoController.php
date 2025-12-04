@@ -407,18 +407,8 @@ final class AlumnoController extends AbstractController
             ->getQuery()
             ->getResult();
 
-        // Crear mapa de pagos por cuota
-        $pagosPorCuota = [];
-        foreach ($pagosCuotas as $pagoCuota) {
-            $cuotaId = $pagoCuota->getCuota()->getId();
-            if (!isset($pagosPorCuota[$cuotaId])) {
-                $pagosPorCuota[$cuotaId] = [];
-            }
-            $pagosPorCuota[$cuotaId][] = $pagoCuota;
-        }
-
         // preparar carrerasData para vista de inscripcion a carrera
-        $carrerasData = $alumnoService->prepararCarrerasInscripcion($inscripcionesCarrera, $cuotas, $carreras);
+        $carrerasData = $alumnoService->prepararCarrerasInscripcion($inscripcionesCarrera, $cuotas, $carreras, $pagosCuotas);
         
         // Obtener descuentos para seleccionar a la hora de inscribir
         $descuentos = $entityManager->getRepository(Descuento::class)->findAll();
@@ -527,17 +517,7 @@ final class AlumnoController extends AbstractController
             ->getQuery()
             ->getResult();
 
-        // Crear mapa de pagos por cuota
-        $pagosPorCuota = [];
-        foreach ($pagosCuotas as $pagoCuota) {
-            $cuotaId = $pagoCuota->getCuota()->getId();
-            if (!isset($pagosPorCuota[$cuotaId])) {
-                $pagosPorCuota[$cuotaId] = [];
-            }
-            $pagosPorCuota[$cuotaId][] = $pagoCuota;
-        }
-
-        $edicionesData = $alumnoService->prepararEdicionesInscripcion($inscripcionesEdicion, $cuotas, $ediciones);
+        $edicionesData = $alumnoService->prepararEdicionesInscripcion($inscripcionesEdicion, $cuotas, $ediciones, $pagosCuotas);
 
         // Obtener descuentos para seleccionar a la hora de inscribir
         $descuentos = $entityManager->getRepository(Descuento::class)->findAll();
@@ -686,7 +666,7 @@ final class AlumnoController extends AbstractController
             }
             
             // Eliminamos las cuotas asociadas a la inscripción 
-            $this->eliminarCuotasDeInscripcion($inscripcion, $entityManager, 'edicion');
+            $alumnoService->eliminarCuotasDeInscripcion($inscripcion, $entityManager, 'edicion');
 
             // Eliminar la inscripción
             $entityManager->remove($inscripcion);
