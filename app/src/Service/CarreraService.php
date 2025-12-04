@@ -2,15 +2,19 @@
 
 namespace App\Service;
 
+use App\Entity\Alumno;
 use App\Entity\Carrera;
+use App\Entity\Cuota;
 use App\Entity\Curso;
 use App\Entity\PerteneceA;
 use App\Entity\Descuento;
+use App\Entity\InscripcionCarrera;
 use App\Repository\CarreraRepository;
 use App\Repository\InscripcionCarreraRepository;
 use App\Repository\PerteneceARepository;
 use App\Repository\PrecioCarreraRepository;
 use App\Repository\DescuentoRepository;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CarreraService

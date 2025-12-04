@@ -205,7 +205,7 @@ final class CuotaService
             ] : null,
             "descuento" => $inscCarrera
                 ? ($inscCarrera->getDescuento()?->getValor())
-                : ($inscEdicion->getDescuento()?->getValor()),
+                : ($inscEdicion ? ($inscEdicion->getDescuento()?->getValor()) : null),
         ];
     }
 

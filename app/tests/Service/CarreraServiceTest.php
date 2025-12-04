@@ -24,11 +24,11 @@ use PHPUnit\Framework\MockObject\MockObject;
 class CarreraServiceTest extends TestCase
 {
     private CarreraService $carreraService;
-    private MockObject $carreraRepository;
-    private MockObject $inscripcionCarreraRepository;
-    private MockObject $perteneceARepository;
-    private MockObject $precioCarreraRepository;
-    private MockObject $descuentoRepository;
+    private CarreraRepository $carreraRepository;
+    private InscripcionCarreraRepository $inscripcionCarreraRepository;
+    private PerteneceARepository $perteneceARepository;
+    private PrecioCarreraRepository $precioCarreraRepository;
+    private DescuentoRepository $descuentoRepository;
     private MockObject $entityManager;
 
     protected function setUp(): void
