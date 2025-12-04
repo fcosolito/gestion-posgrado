@@ -17,6 +17,7 @@ use App\Repository\PrecioCarreraRepository;
 use App\Repository\CursoRepository;
 use App\Repository\DescuentoRepository;
 use App\Repository\PerteneceARepository;
+use App\Service\CarreraService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,39 +29,43 @@ use Symfony\Component\Routing\Attribute\Route;
 final class CarreraController extends AbstractController
 {
     #[Route(name: 'app_carrera_index', methods: ['GET'])]
-    public function index(Request $request,CarreraRepository $carreraRepository, InscripcionCarreraRepository $inscripcionCarreraRepository): Response
+    public function index(Request $request, CarreraService $carreraService): Response
     {
-        // Creamos formulario para buscar carrera por nombre, nroImpl y/o nroOrd.
         $searchForm = $this->createForm(CarreraSearchType::class);
         $searchForm->handleRequest($request);
-        
+
         $criteria = [];
 
-        if($searchForm->isSubmitted() && $searchForm->isValid()){
-            $data = $searchForm->getData(); // Esto devuelve un objeto Carrera
-            
-            // Acceder a las propiedades del objeto Carrera
-            if(!empty($data->getNombre())){
+        if ($searchForm->isSubmitted() && $searchForm->isValid()) {
+            $data = $searchForm->getData();
+
+            if (!empty($data->getNombre())) {
                 $criteria['nombre'] = $data->getNombre();
             }
-            if(!empty($data->getNroImplementacion())){
+            if (!empty($data->getNroImplementacion())) {
                 $criteria['nroImplementacion'] = $data->getNroImplementacion();
             }
-            if(!empty($data->getNroOrdenanza())){
+            if (!empty($data->getNroOrdenanza())) {
                 $criteria['nroOrdenanza'] = $data->getNroOrdenanza();
             }
         }
-        
-        $carreras = $carreraRepository->search($criteria);
-        $inscriptosPorCarrera = [];
-        foreach($carreras as $carrera){
-            $inscriptos = $inscripcionCarreraRepository->findByCarrera($carrera->getId());
-            $inscriptosPorCarrera[$carrera->getId()] = count($inscriptos); 
+
+        try {
+            $result = $carreraService->getIndexData($criteria);
+
+        } catch (\Throwable $e) {
+            $this->addFlash('error', $e->getMessage());
+
+            return $this->render('carrera/index.html.twig', [
+                'carreras' => [],
+                'inscriptosPorCarrera' => [],
+                'searchForm' => $searchForm,
+            ]);
         }
 
         return $this->render('carrera/index.html.twig', [
-            'carreras' => $carreras,
-            'inscriptosPorCarrera'=>$inscriptosPorCarrera,
+            'carreras' => $result['carreras'],
+            'inscriptosPorCarrera' => $result['inscriptosPorCarrera'],
             'searchForm' => $searchForm,
         ]);
     }
@@ -110,74 +115,16 @@ final class CarreraController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_carrera_show', methods: ['GET'])]
-    public function show(
-        Carrera $carrera, 
-        InscripcionCarreraRepository $inscripcionCarreraRepository,
-        PerteneceARepository $perteneceARepository,
-        PrecioCarreraRepository $precioCarreraRepository,
-        DescuentoRepository $descuentoRepository,
-        EntityManagerInterface $entityManager
-    ): Response
-    {   
-        // Obtenemos todos los cursos de la carrera
-        $cursosRelacionados = $perteneceARepository->findBy(['carrera' => $carrera]);
-        $cursosObligatorios = [];
-        $cursosElectivos = [];
-        
-        foreach ($cursosRelacionados as $relacion) {
-            if ($relacion->isEsElectivo()) {
-                $cursosElectivos[] = $relacion->getCurso();
-            } else {
-                $cursosObligatorios[] = $relacion->getCurso();
-            }
+    public function show(Carrera $carrera, CarreraService $carreraService): Response
+    {
+        $result = $carreraService->buildShowData($carrera);
+
+        if (!$result['success']) {
+            $this->addFlash('error', $result['error']);
+            return $this->redirectToRoute('app_carrera_index');
         }
-        
-        // Obtenemos los alumnos inscriptos a la carrera
-        $inscripciones = $inscripcionCarreraRepository->findByCarrera($carrera->getId());
-        $alumnos = array_map(function($inscripcion) {
-            $alumno = $inscripcion->getAlumno();
-            return [
-                "id" => $alumno->getId(),
-                "nombre" => $alumno->getNombre(),
-                "apellido" => $alumno->getApellido(),
-                "dni" => $alumno->getDni(),
-                "email" => $alumno->getEmail(),
-                "inscripcion" => $inscripcion->getId(),
-                "nroLegajo" => $inscripcion->getNroLegajo(),
-                "fechaInscripcion" => $inscripcion->getFechaInscripcion() ? $inscripcion->getFechaInscripcion()->format("Y-m-d") : null,
-                "descuento" => $inscripcion->getDescuento() ? $inscripcion->getDescuento()->getId() : null,
-            ];
-        }, $inscripciones);
 
-        // Todos los descuentos, para poder modificar las inscripciones
-        $descuentos = array_map(
-            function (Descuento $d) {
-                return [
-                    "id" => $d->getId(),
-                    "valor" => $d->getValor(),
-                    "descripcion" => $d->getDescripcion(),
-                ];
-            }, $descuentoRepository->findAll()
-        );
-
-        // Carrera serializada, para el componente de react
-        $carrera_ser = [
-            "id" => $carrera->getId(),
-        ];
-
-        //buscamos el precio vigente de la carrera
-        $precioVigente = $precioCarreraRepository->findPrecioVigentePorCarrera($carrera->getId());
-        
-        return $this->render('carrera/show.html.twig', [
-            'carrera' => $carrera,
-            'carrera_ser' => $carrera_ser,
-            'inscriptosCarrera' => count($inscripciones),
-            'cursosObligatorios' => $cursosObligatorios,
-            'cursosElectivos' => $cursosElectivos,
-            'alumnos' => $alumnos,
-            'descuentos' => $descuentos,
-            'precioVigente'=> $precioVigente,
-        ]);
+        return $this->render('carrera/show.html.twig', $result['data']);
     }
 
     #[Route('/{id}/edit', name: 'app_carrera_edit', methods: ['GET', 'POST'])]
@@ -232,68 +179,41 @@ final class CarreraController extends AbstractController
     // Método para asignar cursos ya existentes a una carrera
     #[Route('/{id}/asignar-curso', name: 'app_carrera_asignar_curso', methods: ['POST'])]
     public function asignarCurso(
-            Request $request, 
-            Carrera $carrera, 
-            EntityManagerInterface $entityManager
-        ) : Response
-
-    {
+        Request $request,
+        Carrera $carrera,
+        CarreraService $carreraService
+    ): Response {
         $cursoId = $request->request->get('curso_id');
-        $tipo = $request->request->get('tipo_asignacion');
+        $tipo = $request->request->get('tipo_asignacion'); // 'obligatorio' o 'electivo'
 
-        //Recuperamos el curso de la db
-        $curso = $entityManager->getRepository(Curso::class)->find($cursoId);
+        try {
+            $carreraService->asignarCursoExistente($carrera, $cursoId, $tipo);
 
-        // Creamos la relación en la db
-        $pertenece = new PerteneceA();
-        $pertenece->setCarrera($carrera);
-        $pertenece->setCurso($curso);
-        $pertenece->setEsElectivo($tipo === 'electivo');
-
-        $entityManager->persist($pertenece);
-        $entityManager->flush();
-
-        $this->addFlash('notice', 'Curso asociado exitosamente');
+            $this->addFlash('success', 'Curso asociado exitosamente.');
+        } catch (\Throwable $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
 
         return $this->redirectToRoute('app_carrera_edit', ['id' => $carrera->getId()]);
     }
 
-    // Método para asignar un curso creado nuevo a una carrera
+    // Método para asignar un curso creado nuevo a una carrera (se crea el curso en la ventana en donde se edita la carrera)
     #[Route('/{id}/crear-asignar-curso', name: 'app_carrera_crear_asignar_curso', methods: ['POST'])]
     public function crearAsignarCurso(
-            Request $request, 
-            Carrera $carrera, 
-            EntityManagerInterface $entityManager
-        ) : Response
-    {
-        // Datos del formulario
-        $nombre = $request->request->get('nombre');
-        $nroOrdenanza = $request->request->get('nroOrdenanza');
-        $nroImplementacion = $request->request->get('nroImplementacion');
-        $cantidadHoras = $request->request->get('cantidadHoras');
-        $tipo = $request->request->get('tipo_asignacion'); // 'obligatorio' o 'electivo'
+        Request $request,
+        Carrera $carrera,
+        CarreraService $carreraService
+    ): Response {
+        $data = $request->request->all();
 
-        // Creamos el curso nuevo
-        $curso = new Curso();
-        $curso->setNombre($nombre);
-        $curso->setNroOrdenanza($nroOrdenanza);
-        $curso->setNroImplementacion($nroImplementacion);
-        $curso->setHoras($cantidadHoras);
+        try {
+            $carreraService->crearYAsignarCurso($carrera, $data);
+            $this->addFlash('success', 'Curso creado y asociado exitosamente.');
+        } catch (\Throwable $e) {
+            $this->addFlash('error', $e->getMessage());
+        }
 
-        $entityManager->persist($curso);
-
-        // Creamos la relación entre el curso nuevo y la carrera
-        $pertenece = new PerteneceA();
-        $pertenece->setCarrera($carrera);
-        $pertenece->setCurso($curso);
-        $pertenece->setEsElectivo($tipo === 'electivo');
-
-        $entityManager->persist($pertenece);
-        $entityManager->flush();
-
-        $this->addFlash('notice', 'Curso asociado exitosamente');
-
-        return $this->redirectToRoute('app_carrera_edit', ['id' => $carrera->getId()]);        
+        return $this->redirectToRoute('app_carrera_edit', ['id' => $carrera->getId()]);
     }
 
     #[Route('/{id}', name: 'app_carrera_delete', methods: ['POST'])]
@@ -306,7 +226,6 @@ final class CarreraController extends AbstractController
 
         return $this->redirectToRoute('app_carrera_index', [], Response::HTTP_SEE_OTHER);
     }
-
     
     #[Route('/{id}/asociar-curso/{cursoId}', name: 'app_carrera_asociar_curso', methods: ['PUT'])]
     public function asociarCurso(Request $request, Carrera $carrera, Curso $cursoId, EntityManagerInterface $entityManager): Response
@@ -401,24 +320,15 @@ final class CarreraController extends AbstractController
     }
 
     #[Route('/{id}/desinsc-alumno/{idAlumno}', name: 'api_carrera_desinscribir_alumno', methods: ['PUT'])]
-    public function desinscribirAlumno(
-            Alumno $idAlumno,
-            Carrera $carrera,
-            EntityManagerInterface $entityManager,
-        ): Response
+    public function desinscribirAlumno(Carrera $carrera, Alumno $idAlumno): Response
     {
-        $inscripcionR = $entityManager->getRepository(InscripcionCarrera::class);
-        $cuotaR = $entityManager->getRepository(Cuota::class);
-
-        $inscripcion = $inscripcionR->findOneBy(["carrera" => $carrera, "alumno" => $idAlumno]) ?? new InscripcionCarrera();
-        $cuotas = $inscripcion ? $cuotaR->findBy(["inscripcionCarrera" => $inscripcion]) : [];
-        foreach ($cuotas as $cuota) {
-            $entityManager->remove($cuota);
+        try {
+            $this->carreraService->desinscribirAlumno($carrera, $idAlumno);
+            return $this->json(["success" => true]);
+        } catch (\DomainException $e) {
+            return $this->json(["success" => false, "error" => $e->getMessage()], Response::HTTP_BAD_REQUEST);
+        } catch (\Throwable $e) {
+            return $this->json(["success" => false, "error" => "Error interno del servidor"], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        $entityManager->remove($inscripcion);
-        $entityManager->flush();
-
-        return $this->json(["success" => true]);
     }
 }
