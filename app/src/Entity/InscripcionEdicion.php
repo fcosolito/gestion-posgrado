@@ -29,8 +29,8 @@ class InscripcionEdicion
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTime $fechaInscripcion = null;
 
-    #[ORM\Column(type: Types::BIGINT, nullable: true)]
-    private ?string $nroLegajo = null;
+    #[ORM\Column(nullable: true)]
+    private ?int $nroLegajo = null;
 
     public function getId(): ?int
     {
@@ -85,12 +85,12 @@ class InscripcionEdicion
         return $this;
     }
 
-    public function getNroLegajo(): ?string
+    public function getNroLegajo(): ?int
     {
         return $this->nroLegajo;
     }
 
-    public function setNroLegajo(?string $nroLegajo): static
+    public function setNroLegajo(?int $nroLegajo): static
     {
         $this->nroLegajo = $nroLegajo;
 

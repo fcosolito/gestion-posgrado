@@ -188,11 +188,11 @@ class PagoServiceTest extends TestCase
 
         $comprobante->method('getArchivo')->willReturn('archivo.pdf');
 
-        $this->em->expects($this->exactly(3))->method('remove');
+        $this->em->expects($this->exactly(4))->method('remove');
         $this->em->expects($this->once())->method('flush');
 
         $result = $this->service->delete($pago, '/fake/path');
 
-        $this->assertEquals('exito', $result['exception']);
+        $this->assertEquals('exito', $result['estado']);
     }
 }

@@ -321,7 +321,6 @@ class AppFixtures extends Fixture
             $nota->setFechaCarga(new DateTime($data[2]));
             $nota->setDescripcion($data[3]);
             $nota->setDocumentacionNota($data[4]);
-            $data[0]->setNota($nota);
             $manager->persist($nota);
             $notas[] = $nota;
         }

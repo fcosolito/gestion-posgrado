@@ -69,8 +69,8 @@ class AlumnoServiceTest extends TestCase
     {
         $carrera = $this->createMock(Carrera::class);
         $carrera->method('getNombre')->willReturn('Carrera Test');
-        $carrera->method('getNroOrdenanza')->willReturn('123');
-        $carrera->method('getNroImplementacion')->willReturn('1');
+        $carrera->method('getNroOrdenanza')->willReturn(12345);
+        $carrera->method('getNroImplementacion')->willReturn(123);
         $carrera->method('getId')->willReturn(1);
 
         $inscripcion = $this->createMock(InscripcionCarrera::class);
@@ -80,8 +80,8 @@ class AlumnoServiceTest extends TestCase
 
         $this->assertCount(1, $result);
         $this->assertEquals('Carrera Test', $result[0]['nombre']);
-        $this->assertEquals('123', $result[0]['nro_ordenanza']);
-        $this->assertEquals('1', $result[0]['nro_implementacion']);
+        $this->assertEquals(12345, $result[0]['nro_ordenanza']);
+        $this->assertEquals(123, $result[0]['nro_implementacion']);
         $this->assertEquals(1, $result[0]['id']);
     }
 
@@ -125,12 +125,12 @@ class AlumnoServiceTest extends TestCase
         $carreraInscripta = $this->createMock(Carrera::class);
         $carreraInscripta->method('getId')->willReturn(1);
         $carreraInscripta->method('getNombre')->willReturn('Carrera 1');
-        $carreraInscripta->method('getNroOrdenanza')->willReturn('ORD-1');
-        $carreraInscripta->method('getNroImplementacion')->willReturn('IMP-1');
+        $carreraInscripta->method('getNroOrdenanza')->willReturn(12345);
+        $carreraInscripta->method('getNroImplementacion')->willReturn(123);
 
         $inscripcion = $this->createMock(InscripcionCarrera::class);
         $inscripcion->method('getCarrera')->willReturn($carreraInscripta);
-        $inscripcion->method('getNroLegajo')->willReturn('L-123');
+        $inscripcion->method('getNroLegajo')->willReturn(123);
         $inscripcion->method('getDescuento')->willReturn(null);
         $inscripcion->method('getFechaInscripcion')->willReturn(new \DateTime('2023-01-15'));
         
@@ -138,8 +138,8 @@ class AlumnoServiceTest extends TestCase
         $carreraNoInscripta = $this->createMock(Carrera::class);
         $carreraNoInscripta->method('getId')->willReturn(2);
         $carreraNoInscripta->method('getNombre')->willReturn('Carrera 2');
-        $carreraNoInscripta->method('getNroOrdenanza')->willReturn('ORD-2');
-        $carreraNoInscripta->method('getNroImplementacion')->willReturn('IMP-2');
+        $carreraNoInscripta->method('getNroOrdenanza')->willReturn(12345);
+        $carreraNoInscripta->method('getNroImplementacion')->willReturn(123);
 
         // 3. Setup Cuota (simple mock, assuming no payments for simplicity)
         $cuota = $this->createMock(Cuota::class);
@@ -150,7 +150,8 @@ class AlumnoServiceTest extends TestCase
         $result = $this->alumnoService->prepararCarrerasInscripcion(
             [$inscripcion], 
             [$cuota], 
-            [$carreraInscripta, $carreraNoInscripta]
+            [$carreraInscripta, $carreraNoInscripta],
+            []
         );
 
         // Assertions
@@ -161,7 +162,7 @@ class AlumnoServiceTest extends TestCase
         $this->assertEquals('No inscripto', $result[1]['estado']);
         
         // Check details for inscripta
-        $this->assertEquals('L-123', $result[0]['legajo']);
+        $this->assertEquals(123, $result[0]['legajo']);
         $this->assertEquals('Borrar', $result[0]['accion']);
         $this->assertEquals('2023-01-15', $result[0]['fechaInscripcion']);
         
@@ -213,8 +214,8 @@ class AlumnoServiceTest extends TestCase
         // Setup Curso
         $curso = $this->createMock(Curso::class);
         $curso->method('getNombre')->willReturn('Curso Test');
-        $curso->method('getNroOrdenanza')->willReturn('ORD-C1');
-        $curso->method('getNroImplementacion')->willReturn('IMP-C1');
+        $curso->method('getNroOrdenanza')->willReturn(12345);
+        $curso->method('getNroImplementacion')->willReturn(123);
 
         // Setup Edicion Inscripta
         $edicionInscripta = $this->createMock(Edicion::class);
@@ -224,7 +225,7 @@ class AlumnoServiceTest extends TestCase
 
         $inscripcion = $this->createMock(InscripcionEdicion::class);
         $inscripcion->method('getEdicion')->willReturn($edicionInscripta);
-        $inscripcion->method('getNroLegajo')->willReturn('L-456');
+        $inscripcion->method('getNroLegajo')->willReturn(456);
         $inscripcion->method('getDescuento')->willReturn(null);
         $inscripcion->method('getFechaInscripcion')->willReturn(new \DateTime('2023-02-01'));
 
@@ -243,13 +244,14 @@ class AlumnoServiceTest extends TestCase
         $result = $this->alumnoService->prepararEdicionesInscripcion(
             [$inscripcion],
             [$cuota],
-            [$edicionInscripta, $edicionNoInscripta]
+            [$edicionInscripta, $edicionNoInscripta],
+            []
         );
 
         $this->assertCount(2, $result);
         $this->assertEquals('Inscripto', $result[0]['estado']);
         $this->assertEquals('No inscripto', $result[1]['estado']);
-        $this->assertEquals('L-456', $result[0]['legajo']);
+        $this->assertEquals(456, $result[0]['legajo']);
         $this->assertEquals('Borrar', $result[0]['accion']);
         $this->assertEquals('Inscribir', $result[1]['accion']);
     }
@@ -382,7 +384,7 @@ class AlumnoServiceTest extends TestCase
         $nota = $this->createMock(Nota::class);
         $nota->method('getId')->willReturn(1);
         $nota->method('getInscripcionEdicion')->willReturn($inscripcion);
-        $nota->method('getValor')->willReturn(9);
+        $nota->method('getValor')->willReturn(9.0);
         $nota->method('getDescripcion')->willReturn('Excelente');
         $nota->method('getDocumentacionNota')->willReturn($doc);
         $nota->method('getFechaCarga')->willReturn(new \DateTime('2023-01-01'));
@@ -393,7 +395,7 @@ class AlumnoServiceTest extends TestCase
         $this->assertEquals(1, $result[0]['id']);
         $this->assertEquals('Curso A', $result[0]['curso']);
         $this->assertEquals('Edicion A', $result[0]['edicion']);
-        $this->assertEquals(9, $result[0]['nota']);
+        $this->assertEquals(9.0, $result[0]['nota']);
         $this->assertEquals('Excelente', $result[0]['descripcion']);
         $this->assertStringContainsString('test.pdf', $result[0]['documentacion']);
         $this->assertStringContainsString('Ver archivo', $result[0]['documentacion']);
@@ -415,7 +417,7 @@ class AlumnoServiceTest extends TestCase
         $nota = $this->createMock(Nota::class);
         $nota->method('getId')->willReturn(2);
         $nota->method('getInscripcionEdicion')->willReturn($inscripcion);
-        $nota->method('getValor')->willReturn(7);
+        $nota->method('getValor')->willReturn(7.0);
         $nota->method('getDescripcion')->willReturn('Bueno');
         $nota->method('getDocumentacionNota')->willReturn(null);
         $nota->method('getFechaCarga')->willReturn(null);
@@ -423,7 +425,7 @@ class AlumnoServiceTest extends TestCase
         $result = $this->alumnoService->prepararNotasData([$nota]);
 
         $this->assertCount(1, $result);
-        $this->assertEquals(7, $result[0]['nota']);
+        $this->assertEquals(7.0, $result[0]['nota']);
         $this->assertEquals('Sin documentación', $result[0]['documentacion']);
         $this->assertEquals('N/A', $result[0]['fecha_carga']);
     }
