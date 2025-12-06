@@ -1,4 +1,5 @@
 import {useState} from "react";
+import DropdownAcciones from '../components/DropdownAcciones';
 
 export default function Carreras ({ asociadas, curso }){
     const [isSearching, setIsSearching] = useState(false);
@@ -120,33 +121,24 @@ export default function Carreras ({ asociadas, curso }){
                                 {carrera.nroImplementacion}
                             </td>
                             <td className="fw-light">
-                                <div className="dropdown">
-                                    <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Acciones
-                                    </button>
-                                    {isSearching ? (
-                                    <ul className="dropdown-menu">
-                                        <li>
-                                            <button className="dropdown-item btn btn-secondary" onClick={() => asociarElectivo(carrera)}>
-                                                Asociar electivo
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button className="dropdown-item btn btn-secondary" onClick={() => asociarObligatorio(carrera)}>
-                                                Asociar obligatorio
-                                            </button>
-                                        </li>
-                                    </ul>
-                                    ) : (
-                                    <ul className="dropdown-menu">
-                                        <li>
-                                            <button className="dropdown-item btn btn-secondary" onClick={() => desasociar(carrera)}>
-                                                Desasociar
-                                            </button>
-                                        </li>
-                                    </ul>
-                                    )}
-                                </div>
+                                <DropdownAcciones
+                                    rowId={carrera.id}
+                                    opciones={isSearching ? [
+                                        {
+                                            label: 'Asociar electivo',
+                                            onClick: () => asociarElectivo(carrera)
+                                        },
+                                        {
+                                            label: 'Asociar obligatorio',
+                                            onClick: () => asociarObligatorio(carrera)
+                                        }
+                                    ] : [
+                                        {
+                                            label: 'Desasociar',
+                                            onClick: () => desasociar(carrera)
+                                        }
+                                    ]}
+                                />
                             </td>
                         </tr>
                     ))}

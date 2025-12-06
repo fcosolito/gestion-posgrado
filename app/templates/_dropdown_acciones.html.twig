@@ -1,0 +1,19 @@
+{# la idea de este componente twig es reemplazar mas facil los dropdowns que se encuentran en componentes twig
+debido a que el que cree yo (vale) es un componente jsx y es medio un lio #}
+
+<div class="dropdown-acciones">
+    <button class="btn-acciones" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-acciones">
+        {% for opcion in opciones %}
+            <li>
+                <a class="dropdown-item dropdown-item-acciones" href="{{ opcion.url }}">
+                    {{ opcion.label }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

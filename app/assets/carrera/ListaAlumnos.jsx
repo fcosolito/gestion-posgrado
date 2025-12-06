@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import DropdownAcciones from '../components/DropdownAcciones';
 
 export default function ListaAlumnos ({ carrera, alumnos, descuentos}) {
     const [editValues, setEditValues] = useState({});
@@ -116,26 +117,23 @@ export default function ListaAlumnos ({ carrera, alumnos, descuentos}) {
                                             <td>{ alumno.nroLegajo ? alumno.nroLegajo : ""}</td>
                                             <td>{ alumno.descuento ? descuentos.filter(d => d.id === alumno.descuento)[0].valor : 0 }</td>
                                             <td>
-                                                <div className="dropdown">
-                                                    <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        Acciones
-                                                    </button>
-                                                    <ul className="dropdown-menu">
-                                                        <li><a className="dropdown-item" href={`/alumno/${alumno.id}/visualizar`}>Ver</a></li>
-                                                        <li>
-                                                            <button
-                                                                onClick={() => handleEdit(alumno)}
-                                                                className="dropdown-item"
-                                                            >Editar</button>
-                                                        </li>
-                                                        <li>
-                                                            <button
-                                                                onClick={() => handleDesinscribir(alumno.id)}
-                                                                className="dropdown-item"
-                                                            >Eliminar inscripcion</button>
-                                                        </li>
-                                                    </ul>
-                                                </div>
+                                                <DropdownAcciones
+                                                    rowId={alumno.id}
+                                                    opciones={[
+                                                        {
+                                                            label: 'Ver',
+                                                            onClick: (id) => window.location.href = `/alumno/${id}/visualizar`
+                                                        },
+                                                        {
+                                                            label: 'Editar',
+                                                            onClick: () => handleEdit(alumno)
+                                                        },
+                                                        {
+                                                            label: 'Eliminar inscripcion',
+                                                            onClick: (id) => handleDesinscribir(id)
+                                                        }
+                                                    ]}
+                                                />
                                             </td>
                                         </tr>
                                     )

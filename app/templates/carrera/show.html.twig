@@ -93,14 +93,14 @@
                                             <td>{{ cursoObligatorio.nroImplementacion }}</td>
                                             <td>{{ cursoObligatorio.horas }}</td>
                                             <td>
-                                                <div class="dropdown">
-                                                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        Acciones
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="{{ path('app_curso_show', {'id': cursoObligatorio.id}) }}">Ver</a></li>
-                                                    </ul>
-                                                </div>
+                                                {{ include('_dropdown_acciones.html.twig', {
+                                                    opciones: [
+                                                        { 
+                                                            label: 'Ver', 
+                                                            url: path('app_curso_show', {'id': cursoObligatorio.id}) 
+                                                        }
+                                                    ]
+                                                }) }}
                                             </td>
                                         </tr>
                                         {% endfor %}
@@ -139,14 +139,14 @@
                                             <td>{{ cursoElectivo.nroImplementacion }}</td>
                                             <td>{{ cursoElectivo.horas }}</td>
                                             <td>
-                                                <div class="dropdown">
-                                                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        Acciones
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="{{ path('app_curso_show', {'id': cursoElectivo.id}) }}">Ver</a></li>
-                                                    </ul>
-                                                </div>
+                                                {{ include('_dropdown_acciones.html.twig', {
+                                                    opciones: [
+                                                        { 
+                                                            label: 'Ver', 
+                                                            url: path('app_curso_show', {'id': cursoElectivo.id}) 
+                                                        }
+                                                    ]
+                                                }) }}
                                             </td>
                                         </tr>
                                         {% endfor %}

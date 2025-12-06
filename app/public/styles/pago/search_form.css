@@ -9,4 +9,17 @@
 .search-form-buttons{
     margin-left:5vw;
     max-width:30%;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+.search-form-buttons button,
+.search-form-buttons a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 90px;
+    min-height: 40px;
+    padding: 0.5rem 1.5rem;
+    box-sizing: border-box;
 }

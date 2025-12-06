@@ -39,15 +39,18 @@
                         <td>{{ carrera.nroImplementacion }}</td>
                         <td>{{ inscriptosPorCarrera[carrera.id] }}</td>
                         <td>
-                            <div class="dropdown">
-                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Acciones
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{{ path('app_carrera_show', {'id': carrera.id}) }}">Ver</a></li>
-                                    <li><a class="dropdown-item" href="{{ path('app_carrera_edit', {'id': carrera.id}) }}">Editar</a></li>
-                                </ul>
-                            </div>
+                            {{ include('_dropdown_acciones.html.twig', {
+                                opciones: [
+                                    { 
+                                        label: 'Ver', 
+                                        url: path('app_carrera_show', {'id': carrera.id}) 
+                                    },
+                                    { 
+                                        label: 'Editar', 
+                                        url: path('app_carrera_edit', {'id': carrera.id}) 
+                                    }
+                                ]
+                            }) }}
                         </td>
                     </tr>
                 {% else %}

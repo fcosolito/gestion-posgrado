@@ -79,8 +79,10 @@
                             </td>
                             <td class="table-actions">
                                 <div class="dropdown">
-                                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Acciones
+                                    <button class="btn-acciones" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="dot"></span>
+                                        <span class="dot"></span>
+                                        <span class="dot"></span>
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <li><a class="dropdown-item" href="{{ path('app_pago_show', {'id': pago.id}) }}">Ver</a></li>
@@ -97,6 +99,7 @@
                                         </li>
                                     </ul>
                                 </div>
+                                
                             </td>
                         </tr>
                     {% else %}

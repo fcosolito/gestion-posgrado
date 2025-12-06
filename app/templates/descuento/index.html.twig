@@ -37,15 +37,18 @@
                                 <td class="fw-light" style="width: 15%;">{{ descuento.valor}}</td>
                                 <td class="fw-light text-wrap">{{ descuento.descripcion}}</td>
                                 <td style="width: 15%;">
-                                    <div class="dropdown">
-                                        <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Acciones
-                                        </button>
-                                        <ul class="dropdown-menu" >
-                                            <li><a class="dropdown-item" href="{{ path('app_descuento_show', {'id': descuento.id}) }}">Ver</a></li>
-                                            <li><a class="dropdown-item" href="{{ path('app_descuento_edit', {'id': descuento.id}) }}">Editar</a></li>
-                                        </ul>
-                                    </div>
+                                    {{ include('_dropdown_acciones.html.twig', {
+                                        opciones: [
+                                            { 
+                                                label: 'Ver', 
+                                                url: path('app_descuento_show', {'id': descuento.id}) 
+                                            },
+                                            { 
+                                                label: 'Editar', 
+                                                url: path('app_descuento_edit', {'id': descuento.id}) 
+                                            }
+                                        ]
+                                    }) }}
                                 </td>
                             </div>
                             </tr>

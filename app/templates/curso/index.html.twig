@@ -69,14 +69,14 @@
                     <td class="fw-light">{{ curso.nroOrdenanza }}</td>
                     <td class="fw-light">{{ curso.nroImplementacion }}</td>
                     <td>
-                        <div class="dropdown">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Acciones
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{{ path('app_curso_show', {'id': curso.id}) }}">Ver</a></li>
-                            </ul>
-                        </div>
+                        {{ include('_dropdown_acciones.html.twig', {
+                                opciones: [
+                                    { 
+                                        label: 'Ver', 
+                                        url: path('app_curso_show', {'id': curso.id}) 
+                                    }
+                                ]
+                        }) }}
                     </td>
                 </tr>
             {% else %}
