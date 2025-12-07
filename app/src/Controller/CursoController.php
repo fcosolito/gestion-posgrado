@@ -13,8 +13,10 @@ use App\Repository\DictaRepository;
 use App\Repository\DocenteRepository;
 use App\Repository\EdicionRepository;
 use App\Repository\PerteneceARepository;
+use App\Service\CursoService;
 use Doctrine\Common\Collections\Order;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -172,12 +174,13 @@ final class CursoController extends AbstractController
     }
     
 
-    #[Route('/{id}', name: 'app_curso_delete', methods: ['POST'])]
-    public function delete(Request $request, Curso $curso, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/delete', name: 'app_curso_delete', methods: ['POST'])]
+    public function delete(Request $request, Curso $curso, CursoService $cursoService, LoggerInterface $logger): Response
     {
+        $logger->info("Ejecucion de controler/delete");
         if ($this->isCsrfTokenValid('delete'.$curso->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($curso);
-            $entityManager->flush();
+            $logger->info("Token valido");
+            $cursoService->delete($curso);
         }
 
         return $this->redirectToRoute('app_curso_index', [], Response::HTTP_SEE_OTHER);

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Docente;
 use App\Form\DocenteType;
 use App\Repository\DocenteRepository;
+use App\Service\DocenteService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -92,11 +93,10 @@ final class DocenteController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_docente_delete', methods: ['POST'])]
-    public function delete(Request $request, Docente $docente, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Docente $docente, DocenteService $docenteService): Response
     {
         if ($this->isCsrfTokenValid('delete'.$docente->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($docente);
-            $entityManager->flush();
+            $docenteService->delete($docente);
         }
 
         return $this->redirectToRoute('app_docente_index', [], Response::HTTP_SEE_OTHER);
