@@ -43,7 +43,7 @@ window.mostrarModalEliminarConInscripciones = function(nombre, inscripciones, mo
         nombreElement.textContent = nombre;
     }
     
-    // Generar lista de ediciones
+    // Generar lista de inscripciones
     const listaInscripciones = document.getElementById('listaInscripcionesEliminar');
     if (listaInscripciones) {
         listaInscripciones.innerHTML = '';
