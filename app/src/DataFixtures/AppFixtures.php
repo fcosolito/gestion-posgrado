@@ -19,12 +19,16 @@ use App\Entity\Pago;
 use App\Entity\PagoCuota;
 use App\Entity\PerteneceA;
 use App\Entity\PrecioCarrera;
+use App\Service\CuotaService;
 use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
 class AppFixtures extends Fixture
 {
+    public function __construct(private CuotaService $cuotaService)
+    {}
+
      public function load(ObjectManager $manager): void
     {
         // Carreras (ampliadas)
@@ -334,6 +338,7 @@ class AppFixtures extends Fixture
                 $cuota = new Cuota();
                 $cuota->setInscripcionEdicion($inscEdicion);
                 $cuota->setNumeroCuota($i);
+                $cuota->setEstado($this->cuotaService->calcularEstado($cuota));
                 $manager->persist($cuota);
                 $cuotas[] = $cuota;
             }
@@ -347,6 +352,7 @@ class AppFixtures extends Fixture
                 $cuota = new Cuota();
                 $cuota->setInscripcionCarrera($inscCarrera);
                 $cuota->setNumeroCuota($i);
+                $cuota->setEstado($this->cuotaService->calcularEstado($cuota));
                 $manager->persist($cuota);
                 $cuotas[] = $cuota;
             }
@@ -401,6 +407,14 @@ class AppFixtures extends Fixture
         }
 
         // Persistir cambios
+        $manager->flush();
+
+        // Tiene que calcularse el estado despues de hacer flush 
+        // para guardar los PagoCuotas
+        foreach ($cuotas as $cuota) {
+            $cuota->setEstado($this->cuotaService->calcularEstado($cuota));
+            $manager->persist($cuota);
+        }
         $manager->flush();
     }
 }

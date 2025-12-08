@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20251204182131 extends AbstractMigration
+final class Version20251208150529 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -23,7 +23,7 @@ final class Version20251204182131 extends AbstractMigration
         $this->addSql('CREATE TABLE alumno (id INT AUTO_INCREMENT NOT NULL, nombre VARCHAR(255) NOT NULL, apellido VARCHAR(255) NOT NULL, dni INT NOT NULL, email VARCHAR(255) DEFAULT NULL, telefono BIGINT DEFAULT NULL, titulo_grado VARCHAR(255) DEFAULT NULL, fecha_nacimiento DATE DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE carrera (id INT AUTO_INCREMENT NOT NULL, nombre VARCHAR(255) NOT NULL, nro_ordenanza INT NOT NULL, nro_implementacion INT NOT NULL, cantidad_cuotas INT DEFAULT NULL, precio_inscripcion DOUBLE PRECISION DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE comprobante (id INT AUTO_INCREMENT NOT NULL, archivo VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE cuota (id INT AUTO_INCREMENT NOT NULL, inscripcion_carrera_id INT DEFAULT NULL, inscripcion_edicion_id INT DEFAULT NULL, numero_cuota INT NOT NULL, INDEX IDX_763CCB0FAD8A9CE (inscripcion_carrera_id), INDEX IDX_763CCB0F1AF8A5DF (inscripcion_edicion_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE cuota (id INT AUTO_INCREMENT NOT NULL, inscripcion_carrera_id INT DEFAULT NULL, inscripcion_edicion_id INT DEFAULT NULL, numero_cuota INT NOT NULL, estado VARCHAR(255) NOT NULL, INDEX IDX_763CCB0FAD8A9CE (inscripcion_carrera_id), INDEX IDX_763CCB0F1AF8A5DF (inscripcion_edicion_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE curso (id INT AUTO_INCREMENT NOT NULL, nombre VARCHAR(255) NOT NULL, horas INT NOT NULL, nro_ordenanza INT NOT NULL, nro_implementacion INT NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE descuento (id INT AUTO_INCREMENT NOT NULL, descripcion LONGTEXT DEFAULT NULL, valor DOUBLE PRECISION NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE dicta (id INT AUTO_INCREMENT NOT NULL, edicion_id INT NOT NULL, docente_id INT NOT NULL, es_firmante TINYINT(1) NOT NULL, INDEX IDX_D7C9065CD651B81E (edicion_id), INDEX IDX_D7C9065C94E27525 (docente_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
