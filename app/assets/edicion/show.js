@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (docentes_el) {
     const docentes_root = createRoot(docentes_el);
     const docentes = JSON.parse(docentes_el.dataset.docentes);
+    const edicion = JSON.parse(docentes_el.dataset.edicion);
 
     docentes_root.render(<ListaDocentes docentes={docentes} edicion={edicion} />)
   }
