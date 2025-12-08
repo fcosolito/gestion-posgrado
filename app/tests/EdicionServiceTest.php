@@ -12,6 +12,7 @@ use App\Entity\Edicion;
 use App\Entity\InscripcionEdicion;
 use App\Entity\Nota;
 use App\Entity\PagoCuota;
+use App\Service\CuotaService;
 use App\Service\EdicionService;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -27,7 +28,7 @@ class EdicionServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManagerInterface::class);
-        $this->service = new EdicionService($this->em);
+        $this->service = new EdicionService($this->em, $this->createMock(CuotaService::class));
     }
 
     private function mockRepo(array $methods = [])

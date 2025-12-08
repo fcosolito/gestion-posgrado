@@ -12,7 +12,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class PagoService
 {
-    public function __construct(private EntityManagerInterface $em) {}
+    public function __construct(private EntityManagerInterface $em, private CuotaService $cuotaService) {}
 
     public function newComprobante(Comprobante $comprobante, $archivo, $comprobanteDir): array
     {
@@ -106,6 +106,10 @@ class PagoService
         $this->em->persist($pagoCuota);
         $this->em->flush();
 
+        $cuota->setEstado($this->cuotaService->calcularEstado($cuota));
+        $this->em->persist($cuota);
+        $this->em->flush();
+
         return ["estado" => "exito"];
     }
 
@@ -116,6 +120,10 @@ class PagoService
             $pagoCuota = $pagoCuotaRepository->findOneBy(["pago" => $pago, "cuota" => $cuota]) ?? new PagoCuota();
 
             $this->em->remove($pagoCuota);
+            $this->em->flush();
+
+            $cuota->setEstado($this->cuotaService->calcularEstado($cuota));
+            $this->em->persist($cuota);
             $this->em->flush();
         } catch (Exception $e) {
             return ["estado" => "error", "exception" => $e->getMessage()];
@@ -142,15 +150,24 @@ class PagoService
                 $this->em->remove($comprobante);
             }
             
+            $cuotas = [];
             // 2. Eliminar las relaciones PagoCuota
             foreach ($pago->getPagoCuotas() as $pagoCuota) {
+                $cuotas[] = $pagoCuota->getCuota();
                 $this->em->remove($pagoCuota);
             }
-            
+
             // 3. Eliminar el pago
             $this->em->remove($pago);
             $this->em->flush();
-            
+
+            // Actualizar el estado de las cuotas antes asociadas al pago
+            foreach ($cuotas as $cuota) {
+                $cuota->setEstado($this->cuotaService->calcularEstado($cuota));
+                $this->em->persist($cuota);
+            }
+            $this->em->flush();
+
             return ["estado" => "exito"];
             
         } catch (\Exception $e) {

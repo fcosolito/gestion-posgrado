@@ -19,7 +19,7 @@ use Exception;
 
 class EdicionService 
 {
-    public function __construct(private EntityManagerInterface $em) {}
+    public function __construct(private EntityManagerInterface $em, private CuotaService $cuotaService) {}
 
     public function new(Edicion $edicion, Curso $curso): array
     {
@@ -154,6 +154,7 @@ class EdicionService
         $cuotaInscripcion = new Cuota();
         $cuotaInscripcion->setInscripcionEdicion($inscripcion);
         $cuotaInscripcion->setNumeroCuota(1);
+        $cuotaInscripcion->setEstado($this->cuotaService->calcularEstado($cuotaInscripcion));
 
         $this->em->persist($cuotaInscripcion);
         $this->em->persist($inscripcion);

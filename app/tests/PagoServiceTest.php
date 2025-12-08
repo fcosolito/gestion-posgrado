@@ -6,6 +6,7 @@ use App\Entity\Comprobante;
 use App\Entity\Cuota;
 use App\Entity\Pago;
 use App\Entity\PagoCuota;
+use App\Service\CuotaService;
 use App\Service\PagoService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -25,7 +26,7 @@ class PagoServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManagerInterface::class);
-        $this->service = new PagoService($this->em);
+        $this->service = new PagoService($this->em, $this->createMock(CuotaService::class));
     }
 
     /** ---------------------- TEST newComprobante ----------------------- */
@@ -180,15 +181,17 @@ class PagoServiceTest extends TestCase
     {
         $pago = $this->createMock(Pago::class);
         $comprobante = $this->createMock(Comprobante::class);
+        $pagoCuota = new PagoCuota();
+        $pagoCuota->setCuota(new Cuota());
 
-        $pagoCuotas = new ArrayCollection([new PagoCuota(), new PagoCuota()]);
+        $pagoCuotas = new ArrayCollection([$pagoCuota]);
 
         $pago->method('getComprobante')->willReturn($comprobante);
         $pago->method('getPagoCuotas')->willReturn($pagoCuotas);
 
         $comprobante->method('getArchivo')->willReturn('archivo.pdf');
 
-        $this->em->expects($this->exactly(4))->method('remove');
+        $this->em->expects($this->exactly(3))->method('remove');
         $this->em->expects($this->once())->method('flush');
 
         $result = $this->service->delete($pago, '/fake/path');

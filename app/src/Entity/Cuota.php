@@ -22,6 +22,9 @@ class Cuota
     #[ORM\ManyToOne]
     private ?InscripcionEdicion $inscripcionEdicion = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $estado = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -59,6 +62,18 @@ class Cuota
     public function setInscripcionEdicion(?InscripcionEdicion $inscripcionEdicion): static
     {
         $this->inscripcionEdicion = $inscripcionEdicion;
+
+        return $this;
+    }
+
+    public function getEstado(): ?string
+    {
+        return $this->estado;
+    }
+
+    public function setEstado(string $estado): static
+    {
+        $this->estado = $estado;
 
         return $this;
     }

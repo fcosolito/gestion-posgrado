@@ -20,7 +20,6 @@ use App\Repository\CursoRepository;
 use App\Repository\EdicionRepository;
 use App\Repository\InscripcionCarreraRepository;
 use App\Repository\InscripcionEdicionRepository;
-use App\Service\CalculadorCuota;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,11 +28,13 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AlumnoService
 {
-    public function prepararCuotasData(array $cuotas, CalculadorCuota $calculadorCuota): array{
+    public function __construct(private CuotaService $cuotaService) {}
+
+    public function prepararCuotasData(array $cuotas, CuotaService $cuotaService): array{
         $cuotasData = [];
         foreach ($cuotas as $cuota) {
             // Factorice lo anterior en este metodo, comprobar si funciona igual
-            $estadoPago = $calculadorCuota->calcularEstado($cuota);
+            $estadoPago = $cuotaService->calcularEstado($cuota);
 
 
             if ($cuota->getInscripcionCarrera() === null) {
@@ -242,6 +243,7 @@ class AlumnoService
             $cuota = new Cuota();
             $cuota->setInscripcionCarrera($inscripcion);
             $cuota->setNumeroCuota($i);
+            $cuota->setEstado($this->cuotaService->calcularEstado($cuota));
             $entityManager->persist($cuota);
         }
 
@@ -384,6 +386,7 @@ class AlumnoService
         $cuota = new Cuota();
         $cuota->setInscripcionEdicion($inscripcion);
         $cuota->setNumeroCuota(1);
+        $cuota->setEstado($this->cuotaService->calcularEstado($cuota));
        
         $entityManager->persist($cuota);
         $entityManager->flush();
