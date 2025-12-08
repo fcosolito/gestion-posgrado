@@ -1,0 +1,40 @@
+<div class="modal fade" id="modalEliminacionEdiciones" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Confirmar eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">
+                    ¿Está seguro de que desea eliminar el curso 
+                    <strong id="modalEdicionesCursoNombre"></strong>?
+                </p>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <strong>Ediciones asociadas a este curso:</strong>
+                    </div>
+                    <ul class="list-group list-group-flush" id="listaEdicionesEliminar">
+                        <!-- Se llenará dinámicamente -->
+                    </ul>
+                </div>
+                
+                <p class="text-danger mt-3 mb-0">
+                    <small id="textoEliminacion">
+                        <!-- Se llenará dinámicamente según el tipo -->
+                    </small>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarEliminacionEdiciones">
+                    <i class="bi bi-trash me-2"></i>Eliminar de todas formas
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

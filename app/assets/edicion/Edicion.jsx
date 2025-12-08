@@ -1,6 +1,6 @@
 import {useState} from 'react';
 
-export default function Curso({edicion, deleteFormHtml}) {
+export default function Curso({edicion, inscripciones, modalEliminacion}) {
     const [isEditing, setIsEditing] = useState(false);
     const [editValues, setEditValues] = useState({});
 
@@ -30,6 +30,10 @@ export default function Curso({edicion, deleteFormHtml}) {
         window.location.reload();
     };
 
+    const handleDelete = () => {
+        window.mostrarModalEliminarConInscripciones(edicion.nombre, inscripciones, modalEliminacion)
+    }
+
     return (
         <div className="container cuadrado-reutilizable">
             <div className="row d-flex justify-content-start mb-3">
@@ -54,9 +58,8 @@ export default function Curso({edicion, deleteFormHtml}) {
                         <div className="col-auto">
                             <button className="btn-amarillo" onClick={() => handleEdit(edicion)}>Editar</button>
                         </div>
-                        <div className="col-auto"
-                            dangerouslySetInnerHTML={{ __html: deleteFormHtml }}
-                        >
+                        <div className="col-auto">
+                            <button className="btn-rojo" onClick={() => handleDelete()}>Eliminar</button>
                         </div>
                     </div>
                     )}

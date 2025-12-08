@@ -17,6 +17,7 @@ use App\Repository\DescuentoRepository;
 use App\Repository\DictaRepository;
 use App\Repository\EdicionRepository;
 use App\Repository\InscripcionEdicionRepository;
+use App\Repository\NotaRepository;
 use App\Service\EdicionService;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -78,7 +79,7 @@ final class EdicionController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_edicion_show', methods: ['GET'])]
-    public function show(Edicion $edicion, DictaRepository $dictaRepository, InscripcionEdicionRepository $inscripcionRepository, DescuentoRepository $descuentoRepository): Response
+    public function show(Edicion $edicion, DictaRepository $dictaRepository, InscripcionEdicionRepository $inscripcionRepository, DescuentoRepository $descuentoRepository, NotaRepository $notaRepository): Response
     {
         $docentes_ser = array_map(
             function ($dicta) {
@@ -96,7 +97,7 @@ final class EdicionController extends AbstractController
         );
 
         $alumnos_ser = array_map(
-            function (InscripcionEdicion $i) {
+            function (InscripcionEdicion $i) use ($notaRepository) {
                 $alumno = $i->getAlumno();
 
                 return [
@@ -108,6 +109,7 @@ final class EdicionController extends AbstractController
                     "nroLegajo" => $i->getNroLegajo() ?? null,
                     "fechaInscripcion" => $i->getFechaInscripcion() ? $i->getFechaInscripcion()->format("Y-m-d") : null,
                     "inscripcion" => $i->getId(),
+                    "notasCount" => count($notaRepository->findBy(["inscripcionEdicion" => $i])),
                 ];
             },
             $inscripcionRepository->findBy(["edicion" => $edicion])

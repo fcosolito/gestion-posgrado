@@ -9,7 +9,7 @@
         <div class="col">
             <div id="curso"
                 data-curso="{{ curso|json_encode }}"
-                data-delete-form="{{ include('curso/_delete_form.html.twig')|e('html_attr') }}"
+                data-ediciones="{{ ediciones|json_encode }}"
             >
             </div>
         </div>
@@ -84,7 +84,10 @@
 </div>
 
 {# Eliminacion #}
-{{ include('_modal_eliminacion.html.twig') }}
+{{ include('curso/_modal_eliminacion_ediciones.html.twig') }}
+<div hidden>
+    {{ include('curso/_delete_form.html.twig') }}
+</div>
 {% endblock %}
 
 {% block javascripts %}

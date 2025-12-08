@@ -12,6 +12,7 @@ use App\Repository\CursoRepository;
 use App\Repository\DictaRepository;
 use App\Repository\DocenteRepository;
 use App\Repository\EdicionRepository;
+use App\Repository\InscripcionEdicionRepository;
 use App\Repository\PerteneceARepository;
 use App\Service\CursoService;
 use Doctrine\Common\Collections\Order;
@@ -103,16 +104,17 @@ final class CursoController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_curso_show', methods: ['GET', 'POST'])]
-    public function show(EdicionRepository $edicionRepository, PerteneceARepository $perteneceARepository, Curso $curso): Response
+    public function show(EdicionRepository $edicionRepository, PerteneceARepository $perteneceARepository, InscripcionEdicionRepository $inscRepository, Curso $curso): Response
     {
         $ediciones_ser = array_map(
-            function ($e) {
+            function ($e) use ($inscRepository) {
                 return [
                     "id" => $e->getId(),
                     "nombre" => $e->getNombre(),
                     "fechaInicio" => $e->getFechaInicio()->format("d-m-Y"),
                     "fechaFin" => $e->getFechaFin() ? $e->getFechaFin()->format("d-m-Y") : "",
                     "precio" => $e->getPrecio(),
+                    "inscripcionesCount" => count($inscRepository->findBy(["edicion" => $e])),
                 ];
             },
             $edicionRepository->findBy(["curso" => $curso], ["fechaInicio" => "ASC"])
