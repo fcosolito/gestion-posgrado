@@ -11,13 +11,12 @@ use App\Repository\AlumnoRepository;
 use App\Repository\CarreraRepository;
 use App\Repository\CursoRepository;
 use App\Repository\EdicionRepository;
-use App\Repository\InscripcionEdicionRepository;
 use App\Repository\CuotaRepository;
 use App\Repository\PagoCuotaRepository;
 use App\Repository\PrecioCarreraRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class CuotaService
+class CuotaService
 {
     public function __construct(
         private CarreraRepository $carreraR,
@@ -27,11 +26,50 @@ final class CuotaService
         private CuotaRepository $cuotaR,
         private PagoCuotaRepository $pagoCuotaR,
         private PrecioCarreraRepository $precioCarreraR,
-        private CalculadorCuota $calculadorCuota,
-        private InscripcionEdicionRepository $inscEdicionR,
         private EntityManagerInterface $em,
     ) {}
 
+    public function calcularEstado(Cuota $cuota): string
+    {
+        // Si la cuota esta paga, no se cambia su estado.
+        if ($cuota->getEstado() === "Paga") return "Paga";
+
+        $pagoCuotas = $this->pagoCuotaR->findBy(["cuota" => $cuota]);
+
+        // Si no hay pagos, la cuota esta Pendiente
+        if (count($pagoCuotas) === 0) return "Pendiente";
+        $montoPagado = 0;
+
+        foreach ($pagoCuotas as $pagoCuota) {
+            // Sumar el monto de cada PagoCuota (que es la parte del pago asignada a esta cuota)
+            $montoPagado += $pagoCuota->getMontoCuota();
+        }
+        
+        // Si el monto total asignado a la cuota cubre su valor, la cuota esta paga
+        if ($montoPagado >= $this->calcularValor($cuota)) {
+            return "Paga";
+        // Si tiene pagos pero no cubren el valor, es parcial.
+        } else {
+            return "Parcial";
+        }
+    }
+
+    public function calcularValor(Cuota $cuota): float
+    {
+        $inscCarrera = $cuota->getInscripcionCarrera();
+        $inscEdicion = $cuota->getInscripcionEdicion();
+        // calcular valor
+        if ($inscCarrera) {
+            $precioCarrera = $this->precioCarreraR->findPrecioVigentePorCarrera($inscCarrera->getCarrera()->getId());
+            $valor = $precioCarrera ? $precioCarrera->getPrecio() : 0;
+        } elseif ($inscEdicion) {
+            $valor = $inscEdicion->getEdicion()->getPrecio() ?? 0;
+        } else {
+            $valor = 0;
+        }
+
+        return $valor;
+    }
     /**
      * Punto principal que encapsula todo el procesado del index
      */
@@ -179,8 +217,8 @@ final class CuotaService
             "numeroCuota" => $cuota->getNumeroCuota(),
             "pagos" => $pagos,
             "montoTotalAsociado" => $montoTotal,
-            "valor" => $this->calculadorCuota->calcularValor($cuota),
-            "estado" => $this->calculadorCuota->calcularEstado($cuota),
+            "valor" => $this->calcularValor($cuota),
+            "estado" => $this->calcularEstado($cuota),
             "inscripcionCarrera" => $inscCarrera ? [
                 "carreraNombre" => $inscCarrera->getCarrera()->getNombre(),
                 "carreraId" => $inscCarrera->getCarrera()->getId(),

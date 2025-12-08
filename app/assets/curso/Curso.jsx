@@ -1,6 +1,6 @@
 import {useState} from 'react';
 
-export default function Curso({curso, deleteFormHtml}) {
+export default function Curso({ curso, ediciones, modalEliminacion }) {
     const [isEditing, setIsEditing] = useState(false);
     const [editValues, setEditValues] = useState({});
 
@@ -19,14 +19,7 @@ export default function Curso({curso, deleteFormHtml}) {
     };
 
     const handleEliminar = () => {
-        const form = document.getElementById("curso-delete-form");
-
-        window.mostrarModalEliminar(
-            "Confirmar eliminación",
-            "¿Esta seguro de que desea eliminar el curso?",
-            `${curso.nombre}`,
-            () => form.submit()
-        );
+        window.mostrarModalEliminarConEdiciones(curso.nombre, ediciones, modalEliminacion)
     }
 
     const handleSave = async () => {
@@ -141,11 +134,6 @@ export default function Curso({curso, deleteFormHtml}) {
 
             )}
 
-            <div 
-                hidden
-                dangerouslySetInnerHTML={{ __html: deleteFormHtml }}
-            >
-            </div>
         </div>
 
     );

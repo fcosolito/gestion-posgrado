@@ -80,7 +80,7 @@
         btnEditar.addEventListener('click', () => window.location.href = "{{ path('app_descuento_edit', {'id': descuento.id}) }}");
         btnEliminar.addEventListener('click', () => mostrarModalEliminar(
             "Confirmar eliminación",
-            "¿Esta seguro de que desea eliminar el descuento?",
+            "¿Esta seguro de que desea eliminar el descuento? Las inscripciones con este descuento lo perderán.",
             descripcion,
             () => form.submit()
         ));

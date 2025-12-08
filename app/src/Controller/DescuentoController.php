@@ -7,6 +7,7 @@ use App\Entity\InscripcionEdicion;
 use App\Form\DescuentoType;
 use App\Repository\DescuentoRepository;
 use App\Repository\InscripcionEdicionRepository;
+use App\Service\DescuentoService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -104,11 +105,10 @@ final class DescuentoController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_descuento_delete', methods: ['POST'])]
-    public function delete(Request $request, Descuento $descuento, EntityManagerInterface $entityManager): Response
+    public function delete(Request $request, Descuento $descuento, DescuentoService $descuentoService): Response
     {
         if ($this->isCsrfTokenValid('delete'.$descuento->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($descuento);
-            $entityManager->flush();
+            $descuentoService->delete($descuento);
         }
 
         return $this->redirectToRoute('app_descuento_index', [], Response::HTTP_SEE_OTHER);

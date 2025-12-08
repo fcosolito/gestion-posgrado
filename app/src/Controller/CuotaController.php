@@ -2,23 +2,9 @@
 
 namespace App\Controller;
 
-use App\Entity\Carrera;
 use App\Entity\Cuota;
-use App\Entity\InscripcionEdicion;
-use App\Entity\PagoCuota;
 use App\Form\CuotaType;
-use App\Repository\AlumnoRepository;
-use App\Repository\CarreraRepository;
-use App\Repository\CuotaRepository;
-use App\Repository\CursoRepository;
-use App\Repository\EdicionRepository;
-use App\Repository\InscripcionEdicionRepository;
-use App\Repository\PagoCuotaRepository;
-use App\Repository\PrecioCarreraRepository;
 use App\Service\CuotaService;
-use App\Service\CalculadorCuota;
-use App\Service\CalculadorEstadoCuota;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

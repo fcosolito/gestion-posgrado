@@ -14,7 +14,7 @@ use App\Entity\Nota;
 use App\Entity\Pago;
 use App\Entity\PagoCuota;
 use App\Service\AlumnoService;
-use App\Service\CalculadorCuota;
+use App\Service\CuotaService;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use PHPUnit\Framework\TestCase;
@@ -25,13 +25,13 @@ class AlumnoServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->alumnoService = new AlumnoService();
+        $this->alumnoService = new AlumnoService($this->createMock(CuotaService::class));
     }
 
     public function testPrepararCuotasData(): void
     {
-        $calculadorMock = $this->createMock(CalculadorCuota::class);
-        $calculadorMock->method('calcularEstado')->willReturn('Al día');
+        $calculadorMock = $this->createMock(CuotaService::class);
+        $calculadorMock->method('calcularEstado')->willReturn('Paga');
 
         // Case 1: Cuota de Carrera
         $carrera = $this->createMock(Carrera::class);
@@ -61,7 +61,7 @@ class AlumnoServiceTest extends TestCase
 
         $this->assertCount(2, $result);
         $this->assertEquals('Ingeniería', $result[0]['carreraCurso']);
-        $this->assertEquals('Al día', $result[0]['estado']);
+        $this->assertEquals('Paga', $result[0]['estado']);
         $this->assertEquals('Edición 2023', $result[1]['carreraCurso']);
     }
 

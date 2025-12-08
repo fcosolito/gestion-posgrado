@@ -20,8 +20,8 @@ use App\Repository\CursoRepository;
 use App\Repository\EdicionRepository;
 use App\Repository\InscripcionCarreraRepository;
 use App\Repository\InscripcionEdicionRepository;
-use App\Service\CalculadorCuota;
 use App\Service\AlumnoService;
+use App\Service\CuotaService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -280,7 +280,7 @@ final class AlumnoController extends AbstractController
     }
 
     #[Route('/{id}/visualizar', name: 'app_alumno_visualizar', methods: ['GET', 'POST'])]
-    public function visualizar(Request $request, int $id, AlumnoRepository $alumnoRepository, EntityManagerInterface $entityManager, CalculadorCuota $calculadorCuota, AlumnoService $alumnoService): Response
+    public function visualizar(Request $request, int $id, AlumnoRepository $alumnoRepository, EntityManagerInterface $entityManager, CuotaService $cuotaService, AlumnoService $alumnoService): Response
     {
         // Buscar manualmente el alumno
         $alumno = $alumnoRepository->find($id);
@@ -345,7 +345,7 @@ final class AlumnoController extends AbstractController
         }
 
         // Preparar datos de cuotas para el template
-        $cuotasData = $alumnoService->prepararCuotasData($cuotas, $calculadorCuota);
+        $cuotasData = $alumnoService->prepararCuotasData($cuotas, $cuotaService);
         
         $formEditar = $this->createForm(AlumnoType::class, $alumno);
         $formEditar->handleRequest($request);

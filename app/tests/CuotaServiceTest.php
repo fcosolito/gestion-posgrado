@@ -3,17 +3,12 @@
 namespace App\Tests\Service;
 
 use App\Service\CuotaService;
-use App\Service\CalculadorCuota;
-
 use App\Entity\Carrera;
-use App\Entity\Curso;
-use App\Entity\Edicion;
 use App\Entity\Alumno;
 use App\Entity\Cuota;
 use App\Entity\PagoCuota;
 use App\Entity\Pago;
 use App\Entity\Comprobante;
-use App\Entity\InscripcionCarrera;
 use App\Repository\CarreraRepository;
 use App\Repository\CursoRepository;
 use App\Repository\EdicionRepository;
@@ -37,8 +32,6 @@ class CuotaServiceTest extends TestCase
     private CuotaRepository&MockObject $cuotaR;
     private PagoCuotaRepository&MockObject $pagoCuotaR;
     private PrecioCarreraRepository&MockObject $precioCarreraR;
-    private CalculadorCuota&MockObject $calculadorCuota;
-    private InscripcionEdicionRepository&MockObject $inscEdicionR;
     private EntityManagerInterface&MockObject $em;
 
     private CuotaService $service;
@@ -52,8 +45,6 @@ class CuotaServiceTest extends TestCase
         $this->cuotaR = $this->createMock(CuotaRepository::class);
         $this->pagoCuotaR = $this->createMock(PagoCuotaRepository::class);
         $this->precioCarreraR = $this->createMock(PrecioCarreraRepository::class);
-        $this->calculadorCuota = $this->createMock(CalculadorCuota::class);
-        $this->inscEdicionR = $this->createMock(InscripcionEdicionRepository::class);
         $this->em = $this->createMock(EntityManagerInterface::class);
 
         $this->service = new CuotaService(
@@ -64,8 +55,6 @@ class CuotaServiceTest extends TestCase
             $this->cuotaR,
             $this->pagoCuotaR,
             $this->precioCarreraR,
-            $this->calculadorCuota,
-            $this->inscEdicionR,
             $this->em
         );
     }
@@ -85,9 +74,6 @@ class CuotaServiceTest extends TestCase
         $this->pagoCuotaR
             ->method('findBy')
             ->willReturn([]);
-
-        $this->calculadorCuota->method('calcularValor')->willReturn(1000.0);
-        $this->calculadorCuota->method('calcularEstado')->willReturn("pendiente");
 
         $res = $this->service->obtenerDatosIndex([]);
 
@@ -114,8 +100,6 @@ class CuotaServiceTest extends TestCase
             ->willReturn([$cuota]);
 
         $this->pagoCuotaR->method('findBy')->willReturn([]);
-        $this->calculadorCuota->method('calcularValor')->willReturn(500.0);
-        $this->calculadorCuota->method('calcularEstado')->willReturn("pendiente");
 
         $res = $this->service->obtenerDatosIndex(["carrera" => 5]);
 
@@ -140,8 +124,6 @@ class CuotaServiceTest extends TestCase
         $this->cuotaR->method('findByAlumno')->willReturn([$soloAlumno]);
 
         $this->pagoCuotaR->method('findBy')->willReturn([]);
-        $this->calculadorCuota->method('calcularValor')->willReturn(700.0);
-        $this->calculadorCuota->method('calcularEstado')->willReturn("pendiente");
 
         $res = $this->service->obtenerDatosIndex([
             "carrera" => 1,
@@ -182,9 +164,6 @@ class CuotaServiceTest extends TestCase
             ->with(["cuota" => $cuota])
             ->willReturn([$pago]);
 
-        $this->calculadorCuota->method('calcularValor')->willReturn(10000.0);
-        $this->calculadorCuota->method('calcularEstado')->willReturn("parcial");
-
         $res = $this->service->obtenerDatosIndex([]);
 
         // El primer resultado será esta cuota, serializada
@@ -195,7 +174,7 @@ class CuotaServiceTest extends TestCase
         $this->assertEquals(1, $res["cuotas"][0]["id"]);
         $this->assertEquals(3000, $res["cuotas"][0]["montoTotalAsociado"]);
         $this->assertCount(1, $res["cuotas"][0]["pagos"]);
-        $this->assertEquals("parcial", $res["cuotas"][0]["estado"]);
+        $this->assertEquals("Paga", $res["cuotas"][0]["estado"]);
         $this->assertEquals(10000, $res["cuotas"][0]["valor"]);
     }
 
