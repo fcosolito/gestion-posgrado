@@ -11,30 +11,40 @@ Este instructivo fue provado en Debian 13 trixie.
 Symfony necesita PHP y algunas extensiones similares a las que usaste en Docker.
 ## Habilitar repositorio Sury para instalar PHP.
 
+```
 sudo apt update
 sudo apt install -y ca-certificates apt-transport-https lsb-release gnupg wget curl git
 
 sudo wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
 echo deb https://packages.sury.org/php/ trixie main | sudo tee /etc/apt/sources.list.d/php.list
 sudo apt update
+```
 
 ## Instalar PHP 8.3 + extensiones
 
+```
 sudo apt install -y   php8.3 php8.3-cli php8.3-common php8.3-intl php8.3-mysql php8.3-xsl   php8.3-gd php8.3-sockets php8.3-curl php8.3-zip php8.3-xml php8.3-mbstring   libicu-dev libpq-dev libxslt1-dev libgd-dev libssl-dev libsodium-dev php-amqp
+```
 
 # 3. Instalar Node.js + npm para assets
 
+```
 sudo apt install -y nodejs npm
+```
 
 # 4. Instalar Composer
 
+```
 curl -sS https://getcomposer.org/installer | php
 sudo mv composer.phar /usr/local/bin/composer
+```
 
 # 5. Instalar Symfony CLI 
 
+```
 wget https://get.symfony.com/cli/installer -O - | bash
 sudo mv ~/.symfony*/bin/symfony /usr/local/bin/symfony
+```
 
 # 6. Colocar el proyecto en la VM
 Puede tambien copiarse por otro medio ademas de Git.
@@ -50,24 +60,32 @@ cd /var/www/gestion-posgrado/app
 En el directorio del proyecto:
 Dependencias PHP (prod):
 
+```
 composer install --no-dev --optimize-autoloader --no-scripts
+```
 
 Dependencias JS (si usás Webpack Encore):
 
+```
 npm install
 npm run build
+```
 
 # 8. Configuración de entorno
 
 Crear .env.local:
 
+```
 nano .env.local
+```
 
 Ejemplo:
 
+```
 APP_ENV=prod
 APP_DEBUG=0
 DATABASE_URL=mysql://<usuario>:<contrasena>@<host con base de datos>:3306/posgrado
+```
 
 Estas propiedades tambien pueden definirse como variables de
 entorno. Si se definen con ambos metodos, las variables de 
@@ -112,10 +130,13 @@ sudo apt install -y nginx php8.3-fpm
 
 Configurar sitio:
 
+```
 sudo nano /etc/nginx/sites-available/gestion-posgrado.conf
+```
 
 Contenido:
 
+```
 server {
     listen 8080;
     server_name _;
@@ -132,6 +153,7 @@ server {
         fastcgi_param DOCUMENT_ROOT $realpath_root;
     }
 }
+```
 
 Activar sitio:
 
@@ -143,7 +165,7 @@ sudo systemctl restart php8.3-fpm
 
 # 12. Acceder a la aplicación
 
-Abrí un navegador:
+Abrir en un navegador:
 
 http://<IP_DE_LA_VM>:8080/
 
