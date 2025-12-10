@@ -8,7 +8,6 @@ Este instructivo fue provado en Debian 13 trixie.
 
 # 2. Instalar PHP 8.3 y extensiones necesarias
 
-Symfony necesita PHP y algunas extensiones similares a las que usaste en Docker.
 ## Habilitar repositorio Sury para instalar PHP.
 
 ```
