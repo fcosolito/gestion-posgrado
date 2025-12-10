@@ -96,6 +96,8 @@ Aplicar:
 ```
 sudo chown -R www-data:www-data var
 sudo chmod -R 775 var
+sudo chown -R www-data:www-data public/
+sudo chmod -R 775 public/
 ```
 
 # 11. Configurar servidor web
