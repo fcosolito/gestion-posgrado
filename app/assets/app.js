@@ -77,6 +77,7 @@ window.mostrarModalConfirmar = function(nombre, alumno_id, inscripcion_id, tipo)
 };
 
 // Función global para mostrar modal con cuotas (funciona para carreras y ediciones)
+// inscripcionId es el id de la edicion o carrera, no el de la inscripcion
 window.mostrarModalEliminarConCuotas = function(nombre, cuotas, alumnoId, inscripcionId, tipo) {
 
     // Actualizar título

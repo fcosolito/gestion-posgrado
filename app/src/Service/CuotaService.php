@@ -62,8 +62,10 @@ class CuotaService
         if ($inscCarrera) {
             $precioCarrera = $this->precioCarreraR->findPrecioVigentePorCarrera($inscCarrera->getCarrera()->getId());
             $valor = $precioCarrera ? $precioCarrera->getPrecio() : 0;
+            $valor = $inscCarrera->getDescuento() ? ((1 - $inscCarrera->getDescuento()->getValor()/100) * $valor) : $valor;
         } elseif ($inscEdicion) {
             $valor = $inscEdicion->getEdicion()->getPrecio() ?? 0;
+            $valor = $inscEdicion->getDescuento() ? ((1 - $inscEdicion->getDescuento()->getValor()/100) * $valor) : $valor;
         } else {
             $valor = 0;
         }

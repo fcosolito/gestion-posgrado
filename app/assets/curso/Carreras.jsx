@@ -134,6 +134,10 @@ export default function Carreras ({ asociadas, curso }){
                                         }
                                     ] : [
                                         {
+                                            label: 'Ver',
+                                            onClick: () => window.location.href = `/carrera/${carrera.id}`
+                                        },
+                                        {
                                             label: 'Desasociar',
                                             onClick: () => desasociar(carrera)
                                         }

@@ -155,7 +155,7 @@ export default function ListaDocentes ({ docentes, edicion }) {
                                                 <div className="col-auto">
                                                     <button
                                                         onClick={() => handleSave(docente.id)}
-                                                        className="btn btn-primary"
+                                                        className="btn btn-verde"
                                                     >
                                                         Guardar
                                                     </button>
@@ -163,7 +163,7 @@ export default function ListaDocentes ({ docentes, edicion }) {
                                                 <div className="col-auto">
                                                     <button
                                                         onClick={handleCancel}
-                                                        className="btn btn-danger"
+                                                        className="btn btn-rojo"
                                                     >
                                                         Cancelar
                                                     </button>

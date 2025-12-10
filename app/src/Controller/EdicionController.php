@@ -13,6 +13,7 @@ use App\Entity\Nota;
 use App\Form\NotaType;
 use App\Entity\InscripcionEdicion;
 use App\Form\EdicionType;
+use App\Repository\CuotaRepository;
 use App\Repository\DescuentoRepository;
 use App\Repository\DictaRepository;
 use App\Repository\EdicionRepository;
@@ -79,7 +80,7 @@ final class EdicionController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_edicion_show', methods: ['GET'])]
-    public function show(Edicion $edicion, DictaRepository $dictaRepository, InscripcionEdicionRepository $inscripcionRepository, DescuentoRepository $descuentoRepository, NotaRepository $notaRepository): Response
+    public function show(Edicion $edicion, DictaRepository $dictaRepository, InscripcionEdicionRepository $inscripcionRepository, DescuentoRepository $descuentoRepository, NotaRepository $notaRepository, CuotaRepository $cuotaRepository): Response
     {
         $docentes_ser = array_map(
             function ($dicta) {
@@ -97,7 +98,7 @@ final class EdicionController extends AbstractController
         );
 
         $alumnos_ser = array_map(
-            function (InscripcionEdicion $i) use ($notaRepository) {
+            function (InscripcionEdicion $i) use ($notaRepository, $cuotaRepository) {
                 $alumno = $i->getAlumno();
 
                 return [
@@ -110,6 +111,15 @@ final class EdicionController extends AbstractController
                     "fechaInscripcion" => $i->getFechaInscripcion() ? $i->getFechaInscripcion()->format("Y-m-d") : null,
                     "inscripcion" => $i->getId(),
                     "notasCount" => count($notaRepository->findBy(["inscripcionEdicion" => $i])),
+                    "cuotas" => array_map(
+                        function (Cuota $cuota) {
+                            return [
+                                "estado" => $cuota->getEstado(),
+                                "numero" => $cuota->getNumeroCuota(),
+                            ];
+                        },
+                        $cuotaRepository->findBy(["inscripcionEdicion" => $i])
+                    ),
                 ];
             },
             $inscripcionRepository->findBy(["edicion" => $edicion])

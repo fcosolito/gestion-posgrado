@@ -51,6 +51,18 @@ export default function ListaInscripciones ({ edicion, alumnos, descuentos }) {
         window.location.reload();
     };
 
+    const handleDesinscribir = async (alumno) => {
+        console.log(alumno)
+        window.mostrarModalEliminarConCuotas(
+                    edicion.nombre,
+                    alumno.cuotas,
+                    alumno.id,
+                    edicion.id,
+                    "edicion"
+                );
+        //window.location.reload();
+    };
+
     const handleInscripcionChange = (field, value) => {
         setInscripcion((prev) => ({ ...prev, [field]: value}));
     };
@@ -232,6 +244,14 @@ export default function ListaInscripciones ({ edicion, alumnos, descuentos }) {
                                                             onClick={() => handleEdit(alumno)}
                                                         >
                                                             Editar
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button
+                                                            className="dropdown-item btn btn-secondary"
+                                                            onClick={() => handleDesinscribir(alumno)}
+                                                        >
+                                                            Desinscribir
                                                         </button>
                                                     </li>
                                                 </ul>
