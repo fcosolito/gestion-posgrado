@@ -1,2 +1,1 @@
 # Aplicación de gestión para Posgrado
-
