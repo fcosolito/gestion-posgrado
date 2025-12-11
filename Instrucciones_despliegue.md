@@ -162,13 +162,21 @@ sudo systemctl restart nginx
 sudo systemctl restart php8.3-fpm
 ```
 
-# 12. Acceder a la aplicación
+# 12. Inicializar base de datos
+Crear base posgrado.
+```
+php bin/console doctrine:database:create
+php bin/console doctrine:migrations:migrate
+
+```
+
+# 13. Acceder a la aplicación
 
 Abrir en un navegador:
 
 http://<IP_DE_LA_VM>:8080/
 
-# 13. Comandos útiles
+# 14. Comandos útiles
 
 Ver logs de Symfony:
 
@@ -182,7 +190,7 @@ Ver logs del servidor web:
 sudo journalctl -u nginx -f
 ```
 
-# 14. Solucion de problemas
+# 15. Solucion de problemas
 ## Composer install falla
 Comprobar que la version que se esta usando de php es la correcta (8.3).
 ```
