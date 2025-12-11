@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import BuscadorDropdown from "../components/BuscadorDropdown";
+import DropdownAcciones from '../components/DropdownAcciones';
 
 export default function DetalleCuotaPagos({ cuota }){
     const [pago, setPago] = useState(null);
@@ -289,23 +290,23 @@ export default function DetalleCuotaPagos({ cuota }){
                                 <td>{pago.monto}</td>
                                 <td>{pago.montoAsociado}</td>
                                 <td>
-                                    <div className="dropdown">
-                                        <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Acciones
-                                        </button>
-                                        <ul className="dropdown-menu" style={{ zIndex: 1050,}}>
-                                            <li><a className="dropdown-item" href={`/pago/${pago.id}`}>Ver</a></li>
-                                            <li><a className="dropdown-item" href={`/pago/${pago.id}/edit`}>Editar</a></li>
-                                            <li>
-                                                <button
-                                                    onClick={() => handleDesasociar(pago)}
-                                                    className="dropdown-item"
-                                                >
-                                                    Desasociar
-                                                </button>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                    <DropdownAcciones
+                                        rowId={pago.id}
+                                        opciones={[
+                                            {
+                                                label: 'Ver',
+                                                onClick: (id) => window.location.href = `/pago/${id}`
+                                            },
+                                            {
+                                                label: 'Editar',
+                                                onClick: (id) => window.location.href = `/pago/${id}/edit`
+                                            },
+                                            {
+                                                label: 'Desasociar',
+                                                onClick: (id) => handleDesasociar(pago)
+                                            }
+                                        ]}
+                                    />
                                 </td>
                             </tr>
                         ))}

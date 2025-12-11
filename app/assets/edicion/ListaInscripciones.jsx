@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import BuscadorDropdown from "../components/BuscadorDropdown";
+import DropdownAcciones from '../components/DropdownAcciones';
 
 export default function ListaInscripciones ({ edicion, alumnos, descuentos }) {
     const [editingRow, setEditingRow] = useState(null);
@@ -213,7 +214,7 @@ export default function ListaInscripciones ({ edicion, alumnos, descuentos }) {
                                                 <div className="col-auto">
                                                     <button
                                                         onClick={() => handleSave(alumno.inscripcion)}
-                                                        className="btn btn-primary"
+                                                        className="btn-verde"
                                                     >
                                                         Guardar
                                                     </button>
@@ -221,41 +222,30 @@ export default function ListaInscripciones ({ edicion, alumnos, descuentos }) {
                                                 <div className="col-auto">
                                                     <button
                                                         onClick={handleCancel}
-                                                        className="btn btn-danger"
+                                                        className="btn-rojo"
                                                     >
                                                         Cancelar
                                                     </button>
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="dropdown">
-                                                <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    Acciones
-                                                </button>
-                                                <ul className="dropdown-menu">
-                                                    <li>
-                                                        <a className="dropdown-item btn btn-secondary" href={`/alumno/${alumno.id}/visualizar`}>
-                                                            Ver
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <button
-                                                            className="dropdown-item btn btn-secondary"
-                                                            onClick={() => handleEdit(alumno)}
-                                                        >
-                                                            Editar
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <button
-                                                            className="dropdown-item btn btn-secondary"
-                                                            onClick={() => handleDesinscribir(alumno)}
-                                                        >
-                                                            Desinscribir
-                                                        </button>
-                                                    </li>
-                                                </ul>
-                                            </div>
+                                            <DropdownAcciones
+                                                rowId={alumno.id}
+                                                opciones={[
+                                                    {
+                                                        label: 'Ver',
+                                                        onClick: (id) => window.location.href = `/alumno/${id}`
+                                                    },
+                                                    {
+                                                        label: 'Editar',
+                                                        onClick: (id) => handleEdit(alumno)
+                                                    },
+                                                    {
+                                                        label: 'Desinscribir',
+                                                        onClick: (id) => handleDesinscribir(alumno)
+                                                    }
+                                                ]}
+                                            />
                                         )}
 
                                     </td>

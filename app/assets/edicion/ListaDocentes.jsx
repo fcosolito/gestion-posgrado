@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import SelectorDropdown from '../components/SelectorDropdown';
 import BuscadorDropdown from '../components/BuscadorDropdown';
+import DropdownAcciones from '../components/DropdownAcciones';
 
 export default function ListaDocentes ({ docentes, edicion }) {
     const [editingRow, setEditingRow] = useState(null);
@@ -170,34 +171,23 @@ export default function ListaDocentes ({ docentes, edicion }) {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <div className="dropdown">
-                                                <button className="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                    Acciones
-                                                </button>
-                                                <ul className="dropdown-menu">
-                                                    <li>
-                                                        <a className="dropdown-item btn btn-secondary" href={`/docente/${docente.id}`}>
-                                                            Ver
-                                                        </a>
-                                                    </li>
-                                                    <li>
-                                                        <button
-                                                            className="dropdown-item btn btn-secondary"
-                                                            onClick={() => handleEdit(docente)}
-                                                        >
-                                                            Editar
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <button
-                                                            className="dropdown-item btn btn-secondary"
-                                                            onClick={() => handleDesasociar(docente.id)}
-                                                        >
-                                                            Desasociar
-                                                        </button>
-                                                    </li>
-                                                </ul>
-                                            </div>
+                                            <DropdownAcciones
+                                                rowId={docente.id}
+                                                opciones={[
+                                                    {
+                                                        label: 'Ver',
+                                                        onClick: (id) => window.location.href = `/docente/${id}`
+                                                    },
+                                                    {
+                                                        label: 'Editar',
+                                                        onClick: (id) => handleEdit(docente)
+                                                    },
+                                                    {
+                                                        label: 'Desasociar',
+                                                        onClick: (id) => handleDesasociar(id)
+                                                    }
+                                                ]}
+                                            />
                                         )}
 
                                     </td>
