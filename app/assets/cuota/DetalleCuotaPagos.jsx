@@ -256,6 +256,11 @@ export default function DetalleCuotaPagos({ cuota }){
                     </button>
                 </div>
             </div>
+            <div className="row pb-2 pt-2 ms-1 form-group align-items-end">
+                <div className="col-auto">
+                    <span className="small fs-9 fw-light">Puede volver a asociar un pago para modificar el monto asociado a la cuota.</span>
+                </div>
+            </div>
             <hr className="m-3"></hr>
             <div className="row">
                 <div className="col-auto">
