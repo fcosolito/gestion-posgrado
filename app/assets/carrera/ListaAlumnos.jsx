@@ -99,13 +99,13 @@ export default function ListaAlumnos ({ carrera, alumnos, descuentos}) {
                                                     <div className="col">
                                                         <button
                                                             onClick={() => handleSave(alumno.inscripcion)}
-                                                            className="btn btn-primary"
+                                                            className="btn btn-verde"
                                                         >Guardar</button>
                                                     </div>
                                                     <div className="col">
                                                         <button
                                                             onClick={handleCancel}
-                                                            className="btn btn-danger"
+                                                            className="btn btn-rojo"
                                                         >Cancelar</button>
                                                     </div>
                                                 </div>

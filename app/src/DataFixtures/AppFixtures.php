@@ -34,12 +34,12 @@ class AppFixtures extends Fixture
         // Carreras (ampliadas)
         $carreras = [];
         $carreraData = [
-            ["Maestría en Ingeniería de Software", 1234, 5678, 12, 5000.00],
-            ["Especialización en Data Science", 1235, 5679, 10, 4500.00],
-            ["Doctorado en Ciencias de la Computación", 1236, 5680, 24, 8000.00],
-            ["Licenciatura en Sistemas", 1237, 5681, 8, 3000.00],
-            ["Tecnicatura en Desarrollo Web", 1238, 5682, 6, 2000.00],
-            ["Maestría en Inteligencia Artificial", 1239, 5683, 18, 6000.00],
+            ["Magíster en Ingeniería en Sistemas de Información", 1326, 152012, 12, 5000.00],
+            ["Maestría en Minería de Datos", 1235, 52015, 10, 4500.00],
+            ["Maestría en Ingeniería en Calidad", 1236, 102011, 24, 8000.00],
+            ["Maestría en Transporte", 1237, 52018, 18, 3000.00],
+            ["Especialización en Energía Eléctrica", 1238, 22024, 24, 2000.00],
+            ["Especialización en Ingeniería Estructural ", 1239, 72023, 18, 6000.00],
         ];
 
         foreach ($carreraData as $data) {
@@ -102,8 +102,6 @@ class AppFixtures extends Fixture
         // Alumnos (ampliados)
         $alumnos = [];
         $alumnoData = [
-            ["Franco", "Cosolito", 30123456, "franco@mail.com"],
-            ["Enzo", "Garello", 32123456, "enzo@mail.com"],
             ["María", "Gómez", 34123456, "maria.gomez@email.com"],
             ["Carlos", "López", 36123456, "carlos.lopez@email.com"],
             ["Ana", "Martínez", 38123456, "ana.martinez@email.com"],
@@ -219,7 +217,7 @@ class AppFixtures extends Fixture
         $descuentos = [];
         $descuentoData = [
             ["Beca por excelencia académica", 20.00],
-            ["Descuento por pago anticipado", 10.00],
+            ["Descuento exalumno", 10.00],
             ["Beca deportiva", 15.00],
             ["Beca por situación económica", 25.00],
             ["Descuento por grupo familiar", 30.00],
@@ -291,8 +289,6 @@ class AppFixtures extends Fixture
             [$alumnos[7], $ediciones[6], null],
             [$alumnos[8], $ediciones[7], $descuentos[1]],
             [$alumnos[9], $ediciones[0], $descuentos[2]],
-            [$alumnos[10], $ediciones[1], $descuentos[3]],
-            [$alumnos[11], $ediciones[2], $descuentos[4]],
         ];
 
         foreach ($inscEdicionData as $data) {
